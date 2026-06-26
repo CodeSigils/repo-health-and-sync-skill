@@ -317,6 +317,33 @@ If no `.sh` files are found, skip this step.
 
 ---
 
+### B9: CI efficiency audit
+
+**Why:** CI pipelines that run on every push regardless of scope waste
+minutes, energy, and attention. Documentation-only changes should not
+trigger full test suites. Tag pushes should not re-run branch CI.
+Advisory only — every project's CI budget is different.
+
+**How:** Inspect `.github/workflows/*.yml` for efficiency signals.
+
+**Severity:** WARNING — advisory. CI efficiency is project-dependent and
+there is no single correct configuration.
+
+Signals evaluated:
+
+| Signal | Efficient | Inefficient |
+| :----- | :-------- | :---------- |
+| Trigger scoping | Separate workflow for docs/CI/release | Monolithic workflow triggers on everything |
+| `paths-ignore` | Excludes `*.md` (docs) from build triggers | No `paths-ignore` — docs trigger full CI |
+| Tag handling | Tag pushes skip build (release is manual) | Tag pushes re-run the full pipeline |
+| Caching | `actions/cache` for dependencies | No cache — fresh install every run |
+| Guard workflow independence | Standalone guard workflow (e.g. trailer check) | Guard embedded in main build — doc-only pushes skip it |
+| Artifact separation | Ship/release workflow separate from test | Tests and shipping in same workflow |
+
+If no `.github/workflows/` directory exists, skip this step.
+
+---
+
 ### B11: Co-author guard
 
 **Why:** Commit trailers (`Co-authored-by:`, `Signed-off-by:`,
