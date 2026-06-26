@@ -45,11 +45,12 @@ These apply to *how we develop this skill*, not what the skill checks.
 
 ## Documentation standards
 
-Documentation completeness is enforced by `scripts/verify.sh` §Doc audit —
-the check suite is the canonical spec. No inline requirements to drift.
-Run `bash scripts/verify.sh` before every commit; it catches gaps in
-audience, self-guiding claim, quickstart shell block, example output,
-phase coverage, cross-links, and ecosystem references.
+Documentation completeness is enforced by `scripts/doc-audit.py` reading
+`docs/doc-standards.json` — the manifest IS the spec. Adding a new requirement
+means adding one entry to the JSON file; no shell greps to maintain.
+
+Run `bash scripts/verify.sh` before every commit; it includes the doc audit
+and validates the manifest schema via `--self-test`.
 
 ---
 
@@ -73,8 +74,9 @@ Before marking work done, run through this checklist in order:
 
 1. **Tree clean** — `git status --porcelain` shows nothing
 2. **Self-tests pass** — `python3 scripts/check-commit-trailers.py --self-test`
-3. **Cross-refs resolve** — every `references/*.md` linked from SKILL.md exists.
-   Verify with: `for ref in $(grep -oP 'references/[\w.-]+\.md' SKILL.md | sort -u); do test -f "$ref" || echo "MISSING $ref"; done`
+   and `python3 scripts/doc-audit.py --self-test`
+3. **Cross-refs resolve** — every `references/*.md` linked from SKILL.md exists,
+   and `docs/doc-standards.json` references resolve. Verify with: `for ref in $(grep -oP 'references/[\w.-]+\.md' SKILL.md | sort -u); do test -f "$ref" || echo "MISSING $ref"; done`
 4. **No stale refs** — `grep -rn --include='*.md' 'PLAN\.md\|PROPOSALS\.md\|REPORT\.md\|USER-SUGGESTIONS\.md' . | grep -v '.git/'` returns nothing
 5. **SKILL.md under 600 lines** — `wc -l < SKILL.md` must be ≤ 600
 6. **CHANGELOG updated** — every user-facing change gets a line
@@ -97,9 +99,9 @@ Top-level layout:
 - **CHANGELOG.md** — release lines
 - **LICENSE** — MIT
 - **.gitignore** — agent state + OS/IDE junk
-- **docs/** — 3 files: README.md (audience), decisions.md (architecture), research.md (evidence)
+- **docs/** — 3 files + doc-standards.json: README.md (audience), decisions.md (architecture), research.md (evidence)
 - **references/** — 8 files, one concern each
-- **scripts/** — `check-commit-trailers.py` (Python checker, 10/10 self-test)
+- **scripts/** — `check-commit-trailers.py` (Python checker, 10/10 self-test), `doc-audit.py` (manifest-driven doc checker)
 
 Key constraint: maintainer-only paths (`scripts/`, `.github/`, `docs/`) are
 never included in Phase C sync targets. See SKILL.md line 81.
