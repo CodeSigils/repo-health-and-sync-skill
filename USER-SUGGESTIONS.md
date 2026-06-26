@@ -1,4 +1,9 @@
-# User Suggestions — Repository Health and Sync Skill
+# User Suggestions — Repository Health and Sync Skill (HISTORICAL)
+
+**Status:** Historical reference. All content has been incorporated into B0
+design principles (commit-log-first, proportionate anti-drift, forge-awareness,
+quality-skill fallback) and the corresponding B-phase checks. This file is
+preserved for provenance only — it is not consulted during skill execution.
 
 Extracted from SKILL.md section "From the USER For AGENT Review"
 Date: 2025-06-25
