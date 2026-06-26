@@ -9,5 +9,6 @@ this skill do not receive these files.
 - [decisions.md](decisions.md) — what was built, why, phase rationale, anti-patterns avoided
 - [research.md](research.md) — survey data, ecosystem tables, evidence that informed decisions
 
-These two files replaced 4 older research documents (~2000 lines). They are
-self-contained and have no cross-references to each other or to SKILL.md.
+These two files consolidated information from earlier draft documents. They
+are self-contained — each can be read independently — and reference each
+other and SKILL.md as needed.

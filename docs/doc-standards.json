@@ -64,5 +64,31 @@
       "type": "regex",
       "pattern": "hermes-agent\\.nousresearch\\.com|CodeSigils/hermes-skill-hq"
     }
+  ],
+  "docs/README.md": [
+    {
+      "id": "maintainer-audience",
+      "description": "Declares maintainer-only audience",
+      "type": "regex",
+      "pattern": "not shipped to skill users"
+    },
+    {
+      "id": "links-decisions",
+      "description": "Links to decisions.md",
+      "type": "regex",
+      "pattern": "decisions\\.md"
+    },
+    {
+      "id": "links-research",
+      "description": "Links to research.md",
+      "type": "regex",
+      "pattern": "research\\.md"
+    },
+    {
+      "id": "consolidated-note",
+      "description": "Documents consolidation origin",
+      "type": "regex",
+      "pattern": "consolidated information from"
+    }
   ]
 }
