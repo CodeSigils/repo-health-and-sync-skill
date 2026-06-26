@@ -1,227 +1,110 @@
 # AGENTS.md — Repo Health and Sync Skill
 
-This file governs how this repository is developed and maintained. It is the
-first thing an agent should read when asked to modify this skill.
+This file governs how this repository is developed. Read it first before
+modifying the skill. Canonical skill behaviour is in SKILL.md §B0.
 
 ---
 
 ## Commit convention
 
-Every commit must answer two questions for a human or agent reading the log
-cold. Use this format for the commit message body:
+Every commit must answer what and why. Use this body format:
 
 ```
 what: <one-line description of the change>
-why:  <reason this change was necessary — design rationale, observed
-      failure, user request, or research finding>
+why:  <reason — design rationale, observed failure, user request, or finding>
 ```
 
-The subject line should be `type: scope — short description` matching the
-conventional-commits style this project uses in its own CHANGELOG:
+Subject line: `type: scope — description`. Types match this repo's CHANGELOG:
 
 - `feat:` — new check, reference file, or B-phase addition
-- `docs:` — documentation (AGENTS.md, README, docs/, comment-only changes)
-- `refactor:` — restructuring with no behaviour change
+- `docs:` — documentation (AGENTS.md, README, docs/)
+- `refactor:` — restructuring, no behaviour change
 - `fix:` — bug fix in skill code or reference files
-- `chore:` — housekeeping (gitignore, changelog, CI)
+- `chore:` — housekeeping (gitignore, CI, changelog)
 
-Write detailed bodies. An agent reading `git log` from a fresh clone should
-understand *what* was built, *why* it was the right call, and *what evidence*
-supported it — without reading SKILL.md. Include the evidence source when
-relevant (survey finding, user suggestion number, observed failure).
-
-**Examples of good vs poor commits from this project's history:**
-
-| Good | Poor |
-| :--- | :--- |
-| `docs: B0 portable-grep principle, fix 2 GNU-only violations` | `changelog: flatten doc update` |
-| Body explains the rule, where the violations were, and the fix. | Single line, no why, reader must chase the diff. |
+An agent reading `git log` cold should understand *what* was built, *why*,
+and *what evidence* supported it — without reading SKILL.md. Cite evidence
+sources (survey finding, user suggestion number, observed failure).
 
 ---
 
-## This project's own B0 principles
+## Maintainer principles (adapted from SKILL.md §B0)
 
-These apply to *how we develop the skill itself*, not what the skill checks.
+These apply to *how we develop this skill*, not what the skill checks.
 
-### Proportionate anti-drift
-Every new check or reference file must trace to a specific observed failure,
-concrete user request, or systematic research finding. Speculative additions
-accumulate maintenance debt. When unsure, add to `docs/research.md` as a
-research target instead of implementing directly.
-
-### Repo as source (applies to us)
-`scripts/`, `.github/`, and `docs/` are maintainer-only. They are never sync
-targets. The CHANGELOG and AGENTS.md stay in the repo; they are *not* part
-of the skill runtime.
-
-### Portable grep in skill code
-Every `grep` command in SKILL.md, reference files, and scripts must use
-POSIX-compatible flags. `-P` (PCRE) is GNU-only and fails on BSD/macOS.
-Use `-E` for extended regex or POSIX basic regex by default. For extraction
-logic that PCRE `\K` enables, use `awk` or `sed` instead.
-
-### Cross-reference integrity
-Every path in a reference link (`references/foo.md`) must resolve to a real
-file. Verify after any rename, delete, or addition with `git ls-files`.
-
-### Quality-skill fallback (also applies to us)
-Before depending on an external tool (shellcheck, formatters, linters) in
-a verification script or detection pattern, probe availability and degrade
-gracefully. Never hardcode a path or assume installation.
-
-### File-swamp ceiling
-`references/` has a 15-file hard ceiling. Adding a 9th file means one of the
-existing 8 must be merged, archived, or deleted. Same principle applies to
-`scripts/` — one script, one concern.
-
----
-
-## File structure
-
-```
-├── AGENTS.md              # THIS FILE — how to develop the skill
-├── SKILL.md               # Canonical skill definition (~575 lines)
-├── CHANGELOG.md           # Release line per unreleased feature
-├── README.md              # User-facing install and quickstart
-├── LICENSE                # MIT
-├── .gitignore             # Agent local state + OS/IDE junk
-├── docs/
-│   ├── README.md          # Maintainer audience note
-│   ├── decisions.md       # Architecture decisions and phase rationale
-│   └── research.md        # Evidence base and survey data
-├── references/            # 8 files — one concern each
-│   ├── agent-instruction-ecosystem.md
-│   ├── anti-drift-proportionality.md
-│   ├── co-author-guard.md
-│   ├── drift-pairs.md
-│   ├── gitignore-templates.md
-│   ├── heuristic-discovery.md
-│   ├── repo-health-json-schema.md
-│   └── sync-targets.md
-└── scripts/
-    └── check-commit-trailers.py  # Shared Python checker (10/10 self-test)
-```
+| Principle | Why | Canonical source |
+| :-------- | :-- | :--------------- |
+| **Proportionate anti-drift** | Every addition traces to observed failure or user request. Speculative checks accumulate debt. | SKILL.md line 75 |
+| **Repo as source** | `scripts/`, `.github/`, `docs/` are never sync targets. | SKILL.md line 81 |
+| **Portable grep** | `-P` is GNU-only; use `-E` or awk/sed instead. | SKILL.md line 89 |
+| **Cross-reference integrity** | Every `references/*.md` link resolves. Verify after rename/delete. | SKILL.md (implicit — enforce via verification) |
+| **Quality-skill fallback** | Probe tool availability before depending on it. Degrade gracefully. | SKILL.md line 103 |
+| **File-swamp ceiling** | `references/` hard ceiling: 15 files. `scripts/`: one script, one concern. | `docs/decisions.md` §15-file ceiling |
 
 ---
 
 ## How to add or modify a B-check
 
-1. **Decide where it belongs.** Does it add a new B-check (B12), extend an
-   existing one, or add a reference file for an existing check?
-
-2. **Ground it.** Every new check needs:
-   - **Observed failure** or **user request** (cite the source)
-   - **False-positive assessment** — when would this fire incorrectly?
-   - **Severity** (INFO / WARNING / BLOCKING) with the criterion
-   - **Skip condition** — how does the agent know to skip gracefully?
-
-3. **Update SKILL.md.** Add a section following the existing structure:
-   `### B<N>: Title` → Why → How → Severity → Remediation → Reference link.
-
-4. **Update or add reference file.** Detail goes in `references/`, not inline.
-   Each reference file starts with YAML frontmatter (title, description, status).
-
-5. **Update docs/research.md.** Add the evidence or research that supports
-   the check. Label it by evidence quality (research-backed / observed /
-   pragmatic).
-
-6. **Update docs/decisions.md.** If the new check changes architecture or
-   introduces a new principle, record it in the decisions file.
-
-7. **Update CHANGELOG.md.** Every user-facing change gets a `-` line in
-   `## Unreleased`.
-
-8. **Verify.** Write a temporary verification script that exercises the
-   change, run it, then clean it up. At minimum, run:
-   - `git status --porcelain` — confirm clean tree
-   - `python3 scripts/check-commit-trailers.py --self-test`
-   - Cross-reference integrity (every `references/*.md` in SKILL.md resolves)
-   - Shellcheck on any new `.sh` files
-
-9. **Commit** with structured what:/why: body.
+1. **Decide scope** — new B-check (B12), extend existing one, or add reference?
+2. **Ground it** — needs observed failure or user request, false-positive assessment, severity, and skip condition.
+3. **Update SKILL.md** — follow `### B<N>: Title` → Why → How → Severity → Remediation → Reference link.
+4. **Update or add reference file** — detail in `references/`, not inline. Every file needs YAML frontmatter.
+5. **Update docs/research.md** — add evidence with quality label (research-backed / observed / pragmatic).
+6. **Update docs/decisions.md** — record architectural shifts.
+7. **Update CHANGELOG.md** — one `-` line under `## Unreleased`.
+8. **Verify** — see [Verification checklist](#verification-checklist) below.
+9. **Commit** — structured what:/why: body, evidence cited.
 
 ---
 
-## Shellcheck compliance
+## Verification checklist
 
-Every `.sh` file in this repo must pass shellcheck with zero warnings.
-This is enforced by the project's own B2 check. Run before committing:
+Before marking work done, run through this checklist in order:
 
-```bash
-shellcheck scripts/*.sh 2>/dev/null || shellcheck --shell=bash scripts/*.sh
-```
-
-If the repo contains no `.sh` files at a given point, that's fine — but any
-`.sh` file added must pass shellcheck.
-
----
-
-## Changelog discipline
-
-Every change that affects SKILL.md, reference files, scripts, or docs gets
-a line in `## Unreleased`. The line should be a concise summary that
-a downstream reader (or a release notes generator) can understand.
-
-When releasing, create an annotated tag, update `## Unreleased` to a version
-heading, and push. The `gh release create` step is separate from tagging.
-
----
-
-## Verification standard
-
-Before marking work as done:
-
-1. **Tree is clean** — `git status --porcelain` shows nothing
+1. **Tree clean** — `git status --porcelain` shows nothing
 2. **Self-tests pass** — `python3 scripts/check-commit-trailers.py --self-test`
-3. **Cross-refs resolve** — every `references/foo.md` linked from SKILL.md exists
-4. **No stale references** — old deleted files are not referenced anywhere
-5. **SKILL.md under 600 lines** — hard ceiling
-6. **CHANGELOG updated** — if the change is user-facing
+3. **Cross-refs resolve** — every `references/*.md` linked from SKILL.md exists.
+   Verify with: `for ref in $(grep -oP 'references/[\w.-]+\.md' SKILL.md | sort -u); do test -f "$ref" || echo "MISSING $ref"; done`
+4. **No stale refs** — `grep -rn --include='*.md' 'PLAN\.md\|PROPOSALS\.md\|REPORT\.md\|USER-SUGGESTIONS\.md' . | grep -v '.git/'` returns nothing
+5. **SKILL.md under 600 lines** — `wc -l < SKILL.md` must be ≤ 600
+6. **CHANGELOG updated** — every user-facing change gets a line
 7. **Shellcheck clean** — on any modified `.sh` files
 
-For complex changes, write an ad-hoc temporary verification script under
+For complex changes, write a temporary verification script under
 `/tmp/hermes-verify-*.sh` and clean it up after.
 
 ---
 
-## Research and evidence standards
+## Project structure (canonical source: `git ls-files`)
 
-This project maintains two distinct doc types:
+Only file that is not a tracked file and lives at repo root: none —
+the repo has only tracked files, no uncommitted infrastructure.
+Top-level layout:
 
-| File | Content | Audience |
-| :--- | :------ | :------- |
-| `docs/decisions.md` | What was built, why, architecture rationale | Maintainer reviewing the project |
-| `docs/research.md` | Survey data, ecosystem tables, evidence findings | Maintainer evaluating evidence |
+- **AGENTS.md** — maintainer instructions (this file)
+- **SKILL.md** — canonical skill definition (~575 lines)
+- **README.md** — user-facing install/quickstart
+- **CHANGELOG.md** — release lines
+- **LICENSE** — MIT
+- **.gitignore** — agent state + OS/IDE junk
+- **docs/** — 3 files: README.md (audience), decisions.md (architecture), research.md (evidence)
+- **references/** — 8 files, one concern each
+- **scripts/** — `check-commit-trailers.py` (Python checker, 10/10 self-test)
 
-Evidence quality labels (used in research.md):
-
-- **research-backed** — grounded in systematic survey or documented study
-- **observed** — grounded in specific user observation or single source
-- **pragmatic** — common-sense design choice with no formal study
-
-Promote labels when new evidence supports them. Never leave a label at
-"pragmatic" when research exists that could back it.
+Key constraint: maintainer-only paths (`scripts/`, `.github/`, `docs/`) are
+never included in Phase C sync targets. See SKILL.md line 81.
 
 ---
 
-## Common pitfalls for maintainers
+## Common pitfalls
 
-1. **Duplicating content between SKILL.md and references/.** If the same
-   detail appears in both, it will drift. SKILL.md holds the index and
-   per-check "Why / How / Severity / Remediation"; references hold the detail.
+These are the patterns most likely to cause rework or drift:
 
-2. **Adding speculative checks.** "Seems useful" is not a sufficient reason.
-   Every B-check traces to an observed failure or user request.
-
-3. **Forgetting to update cross-refs on rename/delete.** `references/` and
-   `SKILL.md` must stay in sync. Verify with a quick grep after structural
-   changes.
-
-4. **Letting SKILL.md grow past 600 lines.** The ceiling is firm. When it
-   approaches, extract to a new reference file or consolidate existing ones.
-
-5. **Committing without a structured body.** A one-line subject doesn't
-   survive cold-start context. Every commit needs "what:" and "why:" sections.
-
-6. **Shipping maintainer tooling.** `scripts/`, `.github/`, and `docs/` are
-   never sync targets. Don't put user-facing content there.
+1. **Duplicating content between SKILL.md and references/.** Detail goes in
+   references/; SKILL.md holds the index and per-check Why/How/Severity.
+2. **Speculative checks.** "Seems useful" without an observed failure or
+   user request will accumulate maintenance debt before value.
+3. **Forgetting to update cross-refs on rename/delete.** A single stale
+   `references/` link breaks the skill. Verify with the checklist above.
+4. **Letting SKILL.md grow past 600 lines.** When it approaches this ceiling,
+   extract to a new reference file or consolidate existing ones.
