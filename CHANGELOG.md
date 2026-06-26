@@ -16,3 +16,5 @@
 - Phase 8: end-to-end verification (42/42 pass); historical research docs archived.
 - 'Repo as source' B0 principle: separate maintainer tooling from user install, closes user suggestion #8.
 - Flatten docs/ from 4 research documents (2000 lines) to 2 human-readable files: decisions.md (164 lines) + research.md (223 lines)
+- root README.md: user-facing install/quickstart
+- docs/README.md: maintainer audience note; B0 updated to include docs/ in never-sync list
