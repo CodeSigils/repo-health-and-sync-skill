@@ -65,16 +65,13 @@
       "pattern": "hermes-agent\\.nousresearch\\.com|CodeSigils/hermes-skill-hq"
     },
     {
-      "id": "tree-lists-gitignore",
-      "description": "Project structure includes .gitignore",
-      "type": "regex",
-      "pattern": "\\.gitignore"
-    },
-    {
-      "id": "tree-lists-license",
-      "description": "Project structure includes LICENSE",
-      "type": "regex",
-      "pattern": "LICENSE"
+      "id": "tree-lists-all-root-files",
+      "description": "All root committed files appear in README",
+      "type": "contains-all",
+      "items": [
+        "AGENTS.md", "SKILL.md", "README.md", "LICENSE",
+        ".gitattributes", ".gitignore", ".repo-health.json"
+      ]
     }
   ],
   "docs/README.md": [
