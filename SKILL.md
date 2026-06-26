@@ -344,6 +344,45 @@ If no `.github/workflows/` directory exists, skip this step.
 
 ---
 
+### B10: `.gitignore` + repository metadata audit
+
+**Why:** Missing or incomplete `.gitignore` files let build artifacts,
+OS junk, agent state, and credential-adjacent files leak into commits.
+Undocumented instruction-file conflicts (e.g. `AGENTS.md` + `CLAUDE.md`
+both present with no documented precedence) create invisible divergence
+in agent behavior.
+
+**How:** Check six categories:
+
+| # | What it checks | If missing |
+| :- | :------------- | :--------- |
+| 1 | `.gitignore` exists at repo root | WARNING |
+| 2 | Agent-artifact patterns covered | `.open-mem/`, `.omo/`, `.aider.*`, `CLAUDE.local.md`, `.claude/**/*.log`, `AGENT.md`, `GEMINI.md` |
+| 3 | OS junk covered | `.DS_Store`, `Thumbs.db`, `*.swp`, `*.swo`, `*~` |
+| 4 | Language build artifacts | `node_modules/`, `__pycache__/`, `*.pyc`, `target/`, `dist/` |
+| 5 | IDE files covered | `.vscode/`, `.idea/`, `*.sublime-*` |
+| 6 | Instruction-file conflicts | Flag if 2+ of `[AGENTS.md, WARP.md, .rules, CLAUDE.md, GEMINI.md, .github/copilot-instructions.md]` co-exist |
+
+**Severity:** WARNING — missing `.gitignore` is advisory; incorrect
+exclusions may block builds. Instruction-file conflicts are flagged for
+manual review (no automated resolution).
+
+**How to check each category:**
+
+- **1:** `test -f .gitignore`
+- **2-5:** If `.gitignore` exists, read it and grep for each pattern listed
+  above. Emit the missing pattern names, not the entire file.
+- **6:** Walk the repo root for the listed filenames. If any two are found,
+  list them and suggest documenting precedence in one of them.
+
+**Remediation:** For missing patterns, add them to `.gitignore`. For
+instruction-file conflicts, pick one primary file and reference the other
+from it, or document the precedence order in a comment.
+
+If `.gitignore` already covers a pattern, skip that check silently.
+
+---
+
 ### B11: Co-author guard
 
 **Why:** Commit trailers (`Co-authored-by:`, `Signed-off-by:`,
