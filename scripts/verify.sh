@@ -9,13 +9,19 @@ PASS=0
 FAIL=0
 
 check() {
-    local label="$1"
-    shift
-    if "$@" >/dev/null 2>&1; then
+    local label="$1"; shift
+    local out rc
+    out=$("$@" 2>&1) && rc=0 || rc=$?
+    if [ "$rc" -eq 0 ]; then
         echo "  PASS  $label"
         PASS=$((PASS + 1))
     else
         echo "  FAIL  $label"
+        echo "    command: $*"
+        if [ -n "$out" ]; then
+            echo "    output (first 5 lines):"
+            echo "$out" | head -5 | sed 's/^/      /'
+        fi
         FAIL=$((FAIL + 1))
     fi
 }
@@ -114,7 +120,25 @@ else
 fi
 
 # Version alignment (this repo): SKILL.md frontmatter is the single source
-skill_ver=$(grep -E '^\s+version:' SKILL.md | sed 's/.*"\(.*\)".*/\1/' | tr -d '"')
+# Extract version from YAML frontmatter between --- markers.
+# Uses Python (stdlib, no yaml dependency) to handle single/double quotes,
+# optional leading whitespace, and nested metadata.version field.
+skill_ver=$(python3 -c "
+import re
+with open('SKILL.md') as f:
+    content = f.read()
+parts = content.split('---', 2)
+if len(parts) < 3:
+    exit()
+fm = parts[1]
+# Try metadata.version first, then top-level version
+for pat in [r'^\\s+version:\\s*[\"\\'](.+?)[\"\\']',
+            r'^version:\\s*[\"\\'](.+?)[\"\\']']:
+    m = re.search(pat, fm, re.MULTILINE)
+    if m:
+        print(m.group(1))
+        break
+" 2>/dev/null || true)
 if [ -n "$skill_ver" ]; then
     echo "  INFO  SKILL.md version: $skill_ver"
     # If a tag exists, ensure it matches
@@ -129,8 +153,8 @@ if [ -n "$skill_ver" ]; then
             FAIL=$((FAIL + 1))
         fi
     else
-        echo "  PASS  No tags yet — version $skill_ver is plausible"
-        PASS=$((PASS + 1))
+        echo "  FAIL  No tags found — SKILL.md has version $skill_ver but no v* tag"
+        FAIL=$((FAIL + 1))
     fi
 else
     echo "  INFO  No version found in SKILL.md frontmatter"

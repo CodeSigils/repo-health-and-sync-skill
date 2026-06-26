@@ -38,7 +38,7 @@ explicit declarations.
 ## Overview — How to use this skill
 
 1. Confirm you're inside the repo root (`git rev-parse --show-toplevel`).
-2. Run Phase B phases in order (B1 through B6).
+2. Run Phase B phases in order (B1 through B11).
 3. If any BLOCKING item, stop and fix before continuing.
 4. If the repo has a runtime target, run Phase C (C1 through C4).
 
@@ -55,7 +55,7 @@ before running any phase.
 messages that serve as their own release documentation (what: + why: per
 commit, conventional format, clear scopes). For those projects, requiring a
 `CHANGELOG.md` creates a duplicate drift surface (AP1) rather than tightening
-it. The skill's CHANGELOG checks (B4, planned B7c) should defer to the commit
+it. The skill's CHANGELOG checks (B7c) should defer to the commit
 log when:
 - Project uses conventional commits or a consistent structured format
 - 90%+ of recent commits have descriptive bodies (not just one-line subjects)
@@ -76,7 +76,7 @@ without formal releases. Only stale tags matter, not absence of tags.
 failure mode. Speculative checks accumulate maintenance debt before they
 create value. If a check fires and you haven't seen this failure before,
 consider disabling it rather than patching around it. See
-`references/anti-drift-proportionality.md` once created.
+`references/anti-drift-proportionality.md`.
 
 **Repo as source.** The git repository is the authoritative copy of every
 file it tracks. Deployed runtime targets (Hermes skill directories, config
@@ -97,7 +97,7 @@ scripts) must work on any system where the repo builds.
 mechanism (`SKILL.md`, `hermes skills install`) is Hermes-specific. To port
 to another agent runtime, see
 [references/agent-instruction-ecosystem.md](references/agent-instruction-ecosystem.md)
-for the adaptation path and portability tiers. The detection logic in B1-B6
+for the adaptation path and portability tiers. The detection logic in B1-B11
 and C1-C4 is agent-agnostic.
 
 **Quality-skill fallback (tri-layer probe).** Before running a B-phase check
@@ -314,21 +314,13 @@ gets a pattern check; any match is flagged.
 **Severity:** WARNING — portability is project-dependent. Projects that
 target Linux exclusively may reject portable patterns that add complexity.
 
-Detection patterns (grep each `.sh` file found by B2's walk):
-
-| Pattern | How to detect | Portable replacement |
-| :------ | :------------ | :------------------- |
-| `which` | `grep '\bwhich\b'` | `command -v` |
-| `grep -P` | `grep -n 'grep.*-P'` | `grep -E` |
-| `sed -i` (no backup) | `sed -i[^b ]` | `sed -i.bak` |
-| `echo` with escapes | `echo.*\\` | `printf '%s\n'` |
-| Hardcoded `/bin/bash` | `#!/bin/bash` | `#!/usr/bin/env bash` |
-| Octal `\012` | `\\012` | `\n` |
-| `find -exit` | `find.*-exit` | `find ... -exec` |
-| `flock` | `\bflock\b` | `mkdir .lock \|\| exit 1` |
+The 8 detection patterns (`which`, `grep -P`, `sed -i` without backup,
+`echo` with escapes, hardcoded `/bin/bash`, octal `\012`, `find -exit`,
+`flock`) and their portable replacements are defined in:
 
 See [references/heuristic-discovery.md](references/heuristic-discovery.md)
-§ B8 for the full detection approach and per-pattern remediation.
+§ B8 for the full detection table, remediation, and `.repo-health.json`
+skip configuration.
 
 If no `.sh` files are found, skip this step.
 
@@ -564,7 +556,7 @@ flag B5 as WARNING and prompt 33 release creations or tag deletions.
 - [Anti-Drift Proportionality](references/anti-drift-proportionality.md) — When to add a check vs when to wait
 - [Co-Author Guard](references/co-author-guard.md) — Four-layer enforcement for attribution trailers
 - [Drift Pairs](references/drift-pairs.md) — Reusable cross-commit detection patterns
-- [Heuristic Discovery](references/heuristic-discovery.md) — B1-B6 and B8 detection tables, severity, remediation
+- [Heuristic Discovery](references/heuristic-discovery.md) — B1-B11 and B8 detection tables, severity, remediation
 - [.gitignore Templates](references/gitignore-templates.md) — Official templates, agent-artifact patterns, per-language recommendations
 - [Repo Health JSON Schema](references/repo-health-json-schema.md) — Full schema specification and field documentation
 - [Sync Targets](references/sync-targets.md) — C1-C4 procedures and target types

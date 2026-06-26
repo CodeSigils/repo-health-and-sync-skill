@@ -50,6 +50,10 @@ Documentation completeness is enforced by `scripts/doc-audit.py` reading
 `docs/doc-standards.json` — the manifest IS the spec. Adding a new requirement
 means adding one entry to the JSON file; no shell greps to maintain.
 
+Currently the manifest only covers `README.md`. The architecture supports
+multi-file manifests — add new file keys to the JSON to extend. Contributions
+are welcome for SKILL.md, AGENTS.md, and reference file standards.
+
 Run `bash scripts/verify.sh` before every commit; it includes the doc audit
 and validates the manifest schema via `--self-test`.
 
