@@ -78,6 +78,14 @@ create value. If a check fires and you haven't seen this failure before,
 consider disabling it rather than patching around it. See
 `references/anti-drift-proportionality.md` once created.
 
+**Repo as source.** The git repository is the authoritative copy of every
+file it tracks. Deployed runtime targets (Hermes skill directories, config
+mirrors, HQ clones, build artifacts) are derived copies. Never ship
+maintainer tooling — CI scripts, release infra, development helpers — to a
+user's machine. Phase C enforces this mechanically: sync goes repo→target,
+not the reverse, and maintainer-only files stay in `scripts/` and `.github/`
+which are never sync targets.
+
 **Forge-awareness.** These checks work on any git repo. The skill activation
 mechanism (`SKILL.md`, `hermes skills install`) is Hermes-specific. To port
 to another agent runtime, see
