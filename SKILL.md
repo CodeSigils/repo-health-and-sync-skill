@@ -11,7 +11,7 @@ license: MIT
 compatibility: hermes
 metadata:
   author: CodeSigils
-  version: "1.1.0"
+  version: "0.1.0"
   purpose: project-governance
   tags:
     - git-hygiene
