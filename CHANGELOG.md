@@ -18,3 +18,4 @@
 - Flatten docs/ from 4 research documents (2000 lines) to 2 human-readable files: decisions.md (164 lines) + research.md (223 lines)
 - root README.md: user-facing install/quickstart
 - docs/README.md: maintainer audience note; B0 updated to include docs/ in never-sync list
+- B0: 'Portable grep in skill code' principle; fixed 2 GNU-only `grep -P` usages in reference files (heuristic-discovery.md, drift-pairs.md)

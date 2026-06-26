@@ -225,7 +225,7 @@ discovery (same file walk, same exclusion rules).
 | :------ | :---------------- | :------------------- |
 | `which` | `grep -rn '\bwhich\b' --include='*.sh' .` | `command -v` |
 | `grep -P` | `grep -rn 'grep.*-P' --include='*.sh' .` | `grep -E` |
-| `sed -i` without backup extension | `grep -rnP 'sed -i[^b ]' --include='*.sh' .` | `sed -i.bak` |
+| `sed -i` without backup extension | `grep -rnE 'sed -i[^b ]' --include='*.sh' .` | `sed -i.bak` |
 | `echo` with escape sequences | `grep -rn 'echo.*\\' --include='*.sh' .` | `printf '%s\n'` |
 | Hardcoded `/bin/bash` shebang | `grep -rn '#!/bin/bash' --include='*.sh' .` | `#!/usr/bin/env bash` |
 | Octal `\012` in printf/sed | `grep -rn '\\012' --include='*.sh' .` | `\n` |

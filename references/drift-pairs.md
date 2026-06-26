@@ -104,7 +104,7 @@ no inventory entries without a matching script).
 
 ```bash
 if [ -f .scripts.yml ]; then
-  inventory_scripts=$(grep -oP '^\s+-\s+\K\S+' .scripts.yml | sort -u)
+  inventory_scripts=$(awk '/^[[:space:]]+-[[:space:]]+/ {print $2}' .scripts.yml | sort -u)
   actual_scripts=$(find scripts/ -name '*.sh' -o -name '*.py' | sed 's|^scripts/||' | sort -u)
   for script in $inventory_scripts; do
     if ! echo "$actual_scripts" | grep -qF "$script"; then

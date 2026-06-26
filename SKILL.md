@@ -86,6 +86,13 @@ user's machine. Phase C enforces this mechanically: sync goes repo→target,
 not the reverse, and maintainer-only files stay in `scripts/`, `.github/`, and `docs/` —
 these are never sync targets.
 
+**Portable grep in skill code.** Every `grep` command in this SKILL.md and its
+reference files must use POSIX-compatible flags. `-P` (PCRE) is GNU-only and
+fails on BSD/macOS. Use `-E` for extended regex or POSIX basic regex by default.
+For extraction logic that PCRE `\K` enables, use `awk` or `sed` instead. The
+detection commands the agent runs (B8 heuristic-discovery table, drift-pairs
+scripts) must work on any system where the repo builds.
+
 **Forge-awareness.** These checks work on any git repo. The skill activation
 mechanism (`SKILL.md`, `hermes skills install`) is Hermes-specific. To port
 to another agent runtime, see
