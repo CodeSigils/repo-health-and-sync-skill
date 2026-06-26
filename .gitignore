@@ -12,8 +12,11 @@ Thumbs.db
 
 # Agent local state (committed instruction files excluded)
 .claude/*.local.*
+.claude/*.log
 CLAUDE.local.md
 .aider.*
+AGENT.md
+GEMINI.md
 gemini-debug.log
 .open-mem/
 .omo/

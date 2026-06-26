@@ -20,4 +20,5 @@
 - docs/README.md: maintainer audience note; B0 updated to include docs/ in never-sync list
 - B2: shellcheck binary guard in "How" step (both SKILL.md and heuristic-discovery.md)
 - AGENTS.md: structured skill-development guide with commit conventions, verification standards, maintainer best practices (tightened from 227 to 110 lines via pointer-over-inline)
+- Dogfood: added scripts/verify.sh (self-consistency, 8/8), .repo-health.json, patched 3 missing .gitignore patterns (.claude/*.log, AGENT.md, GEMINI.md)
 - B0: 'Portable grep in skill code' principle; fixed 2 GNU-only `grep -P` usages in reference files (heuristic-discovery.md, drift-pairs.md)
