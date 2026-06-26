@@ -14,7 +14,7 @@ what: <one-line description of the change>
 why:  <reason — design rationale, observed failure, user request, or finding>
 ```
 
-Subject line: `type: scope — description`. Types match this repo's CHANGELOG:
+Subject line: `type: scope — description`. Types match this repo's commit convention:
 
 - `feat:` — new check, reference file, or B-phase addition
 - `docs:` — documentation (AGENTS.md, README, docs/)

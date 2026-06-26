@@ -1,11 +1,11 @@
 ---
-title: Heuristic Discovery — B1-B6 Detection Patterns
-description: Runtime detection patterns for Phase B project health baseline checks.
+title: Heuristic Discovery — B1-B8 Detection Patterns
+description: Runtime detection patterns for Phase B project health baseline checks (B1-B8).
 status: reference
-supersedes: inline sections in SKILL.md B1-B6
+supersedes: inline sections in SKILL.md B1-B8
 ---
 
-# Heuristic Discovery — B1-B6 Detection Patterns
+# Heuristic Discovery — B1-B8 Detection Patterns
 
 This file contains the detailed detection tables, severity mappings, and
 remediation steps for Phase B checks. SKILL.md points here instead of
