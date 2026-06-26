@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Repo metadata: updated README.md (install command, badges, phase table), added .gitattributes, set 6 GitHub topics
+- scripts/verify.sh: fixed 2 GNU-only violations (grep -oP → -oE, sort -V → git --sort)
+
 ## [0.1.0] - 2026-06-26
 
 - Initial skill framework: Phase B (B1-B6 project health baseline) and Phase C (C1-C4 reverse sync).

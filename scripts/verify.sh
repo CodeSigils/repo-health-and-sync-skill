@@ -36,7 +36,7 @@ while IFS= read -r ref; do
         echo "  REF_MISS  $ref"
         cross_miss=$((cross_miss + 1))
     fi
-done < <(grep -oP 'references/[\w.-]+\.md' SKILL.md | sort -u)
+done < <(grep -oE 'references/[A-Za-z0-9_.-]+\.md' SKILL.md | sort -u)
 if [ "$cross_miss" -eq 0 ]; then
     echo "  PASS  SKILL.md cross-refs resolve"
     PASS=$((PASS + 1))
@@ -111,7 +111,7 @@ skill_ver=$(grep -E '^\s+version:' SKILL.md | sed 's/.*"\(.*\)".*/\1/' | tr -d '
 if [ -n "$skill_ver" ]; then
     echo "  INFO  SKILL.md version: $skill_ver"
     # If a tag exists, ensure it matches
-    latest_tag=$(git tag -l 'v*' 2>/dev/null | sort -V | tail -1 || true)
+    latest_tag=$(git tag -l 'v*' --sort=-version:refname 2>/dev/null | head -1 || true)
     if [ -n "$latest_tag" ]; then
         tag_ver="${latest_tag#v}"
         if [ "$skill_ver" = "$tag_ver" ]; then

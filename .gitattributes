@@ -1,0 +1,15 @@
+# Auto-detect text files, normalize to LF
+* text=auto
+
+# Linguist overrides — prevent docs from inflating language stats
+*.md linguist-documentation
+docs/* linguist-documentation
+references/* linguist-documentation
+CHANGELOG.md linguist-documentation
+AGENTS.md linguist-documentation
+SKILL.md linguist-documentation
+README.md linguist-documentation
+
+# Declare scripts explicitly
+scripts/check-commit-trailers.py linguist-language=Python
+scripts/verify.sh linguist-language=Shell
