@@ -40,16 +40,16 @@ prevent globbing)
 | :---- | :---- | :------ | :------------ |
 | **B1** | Git hygiene | Dirty trees, orphan tags, un-pushed commits | — |
 | **B2** | Shellcheck | Every `.sh` file, `command -v` guard | No `.sh` files |
-| **B3** | Consistency check | Project's own check or `.repo-health.json` | Absent, add trivial one |
+| **B3** | Consistency check | Project's own check or `.repo-health.json` | No check found (INFO/WARNING) |
 | **B4** | Version alignment | Cross-manifest version consistency | No version sources |
 | **B5** | Tag vs Release | Tags vs GitHub Releases cross-ref | No tags |
 | **B6** | Format + lint | Project's own formatter config | No config found |
-| **B7** | Commit audit | 4 sub-steps: format, drift, CHANGELOG, version | No baseline (untagged) |
-| **B8** | Cross-platform shell | GNU-only patterns (`-P`, `sort -V`, `which`) | No `.sh` files |
+| **B7** | Commit audit | 4 sub-steps: format, drift, CHANGELOG, version | Sub-steps degrade gracefully per missing baseline |
+| **B8** | Cross-platform shell | Non-portable patterns (`which`, `grep -P`, `sed -i` without backup) | No `.sh` files |
 | **B9** | CI efficiency | Trigger scoping, caching, artifact separation | No `.github/workflows/` |
 | **B10** | .gitignore + meta | 6-category coverage + instruction-file conflicts | — |
 | **B11** | Co-author guard | 4-layer `*-by:` trailer enforcement | Single-contributor repos |
-| **C1** | Detect targets | Heuristic scan or `.repo-health.json` | No remote |
+| **C1** | Detect targets | Heuristic scan or `.repo-health.json` | No sync target clues found |
 | **C2** | Pre-sync verify | Phase B must have no BLOCKING items | — |
 | **C3** | Execute sync | Default copy or declared `install_cmd` | — |
 | **C4** | Post-sync verify | File walk or `diff -rq` | — |
@@ -81,9 +81,11 @@ sync targets, or add a custom consistency check. See
 
 ```text
 ├── AGENTS.md             # How to develop this skill (for contributors)
-├── SKILL.md              # Canonical skill definition (~575 lines)
+├── SKILL.md              # Canonical skill definition
 ├── .gitattributes        # Git/Linguist configuration
-├── references/           # 8 files — per-check detail and configuration
+├── .gitignore            # B10 target (agent-artifact + OS/IDE patterns)
+├── LICENSE               # MIT
+├── references/           # Per-check detail and configuration
 ├── scripts/              # Enforcement scripts
 ├── docs/                 # Maintainer documentation
 │   ├── README.md         # Audience note

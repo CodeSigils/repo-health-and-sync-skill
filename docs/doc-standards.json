@@ -63,6 +63,18 @@
       "description": "Ecosystem links",
       "type": "regex",
       "pattern": "hermes-agent\\.nousresearch\\.com|CodeSigils/hermes-skill-hq"
+    },
+    {
+      "id": "tree-lists-gitignore",
+      "description": "Project structure includes .gitignore",
+      "type": "regex",
+      "pattern": "\\.gitignore"
+    },
+    {
+      "id": "tree-lists-license",
+      "description": "Project structure includes LICENSE",
+      "type": "regex",
+      "pattern": "LICENSE"
     }
   ],
   "docs/README.md": [
