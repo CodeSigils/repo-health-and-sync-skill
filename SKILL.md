@@ -283,6 +283,74 @@ primary manifest.
 
 ---
 
+### B11: Co-author guard
+
+**Why:** Commit trailers (`Co-authored-by:`, `Signed-off-by:`,
+`Helped-by:`, `Reviewed-by:`) encode attribution and responsibility.
+Accidental or automated trailers create permanent history artifacts that
+misrepresent who did what. Prevention is better than rewrite.
+
+**Severity for B11:**
+
+| Sub-step | What it does | Severity |
+| :------- | :----------- | :------- |
+| B11a     | Agent MUST NOT rule for attribution trailers | N/A (instruction) |
+| B11b     | CONTRIBUTING.md policy documentation | N/A (documentation) |
+| B11c     | Shared Python checker + commit-msg hook | BLOCKING |
+| B11d     | CI enforcement over commit range | BLOCKING |
+
+**How:** The enforcement is four-layer, from policy to automated blocking.
+See [references/co-author-guard.md](references/co-author-guard.md) for the
+full implementation, hook template, CI config, and counter-indications.
+
+#### B11a: Agent instruction layer
+
+Add a MUST NOT rule to the project's agent instruction file (AGENTS.md,
+CLAUDE.md, or equivalent): agents must not include `*-by:` attribution
+trailers in commit messages. The exact wording is in the reference file.
+
+#### B11b: Policy layer
+
+Add a "Commit trailers" section to CONTRIBUTING.md documenting the policy
+and the `ALLOW_ATTRIBUTION_TRAILERS=1` bypass mechanism.
+
+#### B11c: Technical layer (shared checker + hook)
+
+A single Python script (`scripts/check-commit-trailers.py`) serves both
+local commit hooks and CI. It uses a generic `*-by:` regex to catch all
+attribution trailer variants without maintaining a blocklist.
+
+Install the hook:
+
+```bash
+cat > .git/hooks/commit-msg << 'HOOK'
+#!/usr/bin/env bash
+set -euo pipefail
+exec python3 "$(git rev-parse --show-toplevel)/scripts/check-commit-trailers.py" "$1"
+HOOK
+chmod +x .git/hooks/commit-msg
+```
+
+The checker has a `--self-test` mode for CI-verifiable integrity.
+
+#### B11d: CI enforcement
+
+Run the same checker over the commit range on every push or PR:
+
+```bash
+python3 scripts/check-commit-trailers.py --range origin/main..HEAD
+```
+
+The `--range` mode iterates each commit in the range and applies the same
+detection logic as the local hook. Use the `ALLOW_ATTRIBUTION_TRAILERS=1`
+env var for bypass at both hook and CI level.
+
+**Counter-indications:** Pair-programming teams, mailing-list workflows,
+and single-contributor repos may want to skip B11 entirely. See the
+reference file for details and `.repo-health.json` skip configuration.
+
+---
+
 ## Phase C — Reverse Sync
 
 **Why:** Many projects produce runtime artifacts deployed to system directories
