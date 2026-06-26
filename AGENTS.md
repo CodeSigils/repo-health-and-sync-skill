@@ -1,7 +1,7 @@
 # AGENTS.md — Repo Health and Sync Skill
 
 This file governs how this repository is developed. Read it first before
-modifying the skill. Canonical skill behaviour is in SKILL.md §B0.
+modifying the skill. Canonical skill behaviour is in [SKILL.md §B0](SKILL.md#b0-design-principles-read-before-phase-b).
 
 ---
 
@@ -34,13 +34,13 @@ These apply to *how we develop this skill*, not what the skill checks.
 
 | Principle | Why | Canonical source |
 | :-------- | :-- | :--------------- |
-| **Proportionate anti-drift** | Every addition traces to observed failure or user request. Speculative checks accumulate debt. | SKILL.md line 75 |
-| **Repo as source** | `scripts/`, `.github/`, `docs/` are never sync targets. | SKILL.md line 81 |
-| **Portable grep** | `-P` is GNU-only; use `-E` or awk/sed instead. | SKILL.md line 89 |
-| **Cross-reference integrity** | Every `references/*.md` link resolves. Verify after rename/delete. | SKILL.md (implicit — enforce via verification) |
-| **File-swamp ceiling** | `references/` hard ceiling: 15 files. | `docs/decisions.md` §15-file ceiling |
-| **Quality-skill fallback** | Probe tool availability before depending on it. Degrade gracefully. | SKILL.md line 103 |
-| **Script decomposition** | `scripts/` uses delegation: `verify.sh` orchestrates, focused scripts own one concern each. Soft ceiling of 5 files before splitting into subdirectories. | precedent in `verify.sh` → `doc-audit.py` + `check-commit-trailers.py` |
+| **Proportionate anti-drift** | Every addition traces to observed failure or user request. Speculative checks accumulate debt. | [SKILL.md §B0](SKILL.md#b0-design-principles-read-before-phase-b) |
+| **Repo as source** | `scripts/`, `.github/`, `docs/` are never sync targets. | [SKILL.md §C](SKILL.md#c1-detect-targets) |
+| **Portable grep** | `-P` is GNU-only; use `-E` or awk/sed instead. | [SKILL.md §B8](SKILL.md#b8-cross-platform-shell) |
+| **Cross-reference integrity** | Every `references/*.md` link resolves. Verify after rename/delete. | [SKILL.md](SKILL.md) § verification |
+| **File-swamp ceiling** | `references/` hard ceiling: 15 files. | [docs/decisions.md](docs/decisions.md) §15-file ceiling |
+| **Quality-skill fallback** | Probe tool availability before depending on it. Degrade gracefully. | [SKILL.md §B6](SKILL.md#b6-format--lint) |
+| **Script decomposition** | `scripts/` uses delegation: `verify.sh` orchestrates, focused scripts own one concern each. Soft ceiling of 5 files before splitting into subdirectories. | [verify.sh](scripts/verify.sh) → [doc-audit.py](scripts/doc-audit.py) + [check-commit-trailers.py](scripts/check-commit-trailers.py) |
 
 ---
 
@@ -119,7 +119,7 @@ Top-level layout:
 - **scripts/** — `check-commit-trailers.py` (Python checker, 10/10 self-test), `doc-audit.py` (manifest-driven doc checker)
 
 Key constraint: maintainer-only paths (`scripts/`, `.github/` if present, `docs/`) are
-never included in Phase C sync targets. See SKILL.md line 81.
+never included in Phase C sync targets. See [SKILL.md §C](SKILL.md#c1-detect-targets).
 
 ---
 
