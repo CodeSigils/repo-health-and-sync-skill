@@ -50,9 +50,18 @@ Documentation completeness is enforced by `scripts/doc-audit.py` reading
 `docs/doc-standards.json` — the manifest IS the spec. Adding a new requirement
 means adding one entry to the JSON file; no shell greps to maintain.
 
-Currently the manifest only covers `README.md`. The architecture supports
-multi-file manifests — add new file keys to the JSON to extend. Contributions
-are welcome for SKILL.md, AGENTS.md, and reference file standards.
+Currently the manifest covers `README.md` and `AGENTS.md` (project
+structure). The architecture supports multi-file manifests — add new file
+keys to the JSON to extend. Contributions are welcome for SKILL.md,
+`docs/README.md`, and reference file standards.
+
+**Guard structural content against drift.** Lists, trees, and lookup tables
+that enumerate tracked files, directories, or phases must be verified against
+`git ls-files` (or equivalent) via `doc-standards.json`. An omission in a
+listing is a documentation defect — the manifest should catch it.
+`contains-all` checks are the simplest mechanism: a flat list of expected
+entries in one check, matching any occurrence in the target file. Use this
+whenever documentation enumerates a bounded set of real artifacts.
 
 Run `bash scripts/verify.sh` before every commit; it includes the doc audit
 and validates the manifest schema via `--self-test`.
@@ -99,13 +108,14 @@ the repo has only tracked files, no uncommitted infrastructure.
 Top-level layout:
 
 - **AGENTS.md** — maintainer instructions (this file)
-- **SKILL.md** — canonical skill definition (~575 lines)
+- **SKILL.md** — canonical skill definition
 - **README.md** — user-facing install/quickstart
 - **LICENSE** — MIT
 - **.gitattributes** — Git/Linguist configuration
 - **.gitignore** — agent state + OS/IDE junk
+- **.repo-health.json** — self-configuration for the skill's own repo
 - **docs/** — 3 files + doc-standards.json: README.md (audience), decisions.md (architecture), research.md (evidence)
-- **references/** — 8 files, one concern each
+- **references/** — one concern per file
 - **scripts/** — `check-commit-trailers.py` (Python checker, 10/10 self-test), `doc-audit.py` (manifest-driven doc checker)
 
 Key constraint: maintainer-only paths (`scripts/`, `.github/` if present, `docs/`) are

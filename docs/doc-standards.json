@@ -74,6 +74,17 @@
       ]
     }
   ],
+  "AGENTS.md": [
+    {
+      "id": "root-files-listed",
+      "description": "All root committed files appear in project structure",
+      "type": "contains-all",
+      "items": [
+        "AGENTS.md", "SKILL.md", "README.md", "LICENSE",
+        ".gitattributes", ".gitignore", ".repo-health.json"
+      ]
+    }
+  ],
   "docs/README.md": [
     {
       "id": "maintainer-audience",
