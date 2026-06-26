@@ -84,6 +84,48 @@ else
     FAIL=$((FAIL + 1))
 fi
 
+# --- README documentation audit ---
+echo ""
+echo "=== Documentation audit === "
+echo ""
+
+# Doc A1: audience line
+check "Doc: audience declared" grep -qE 'For Hermes|For skill maintainers' README.md
+
+# Doc A2: self-guiding claim
+check "Doc: self-guiding claim" grep -q 'self-guiding' README.md
+
+# Doc A3: quickstart shell block
+check "Doc: quickstart bash block" grep -q '```bash' README.md
+
+# Doc A4: example output with B-check
+check "Doc: example B-check output" grep -qE 'WARNING.*B[0-9]' README.md
+
+# Doc A5: phase table covers all B1-B11 + C1-C4
+phase_miss=0
+for phase in B1 B2 B3 B4 B5 B6 B7 B8 B9 B10 B11 C1 C2 C3 C4; do
+    if ! grep -q "\\*\\*${phase}\\*\\*" README.md; then
+        echo "  PHASE_MISS  ${phase} not in README table"
+        phase_miss=$((phase_miss + 1))
+    fi
+done
+if [ "$phase_miss" -eq 0 ]; then
+    echo "  PASS  Doc: phase table covers all B1-B11 + C1-C4"
+    PASS=$((PASS + 1))
+else
+    echo "  FAIL  Doc: $phase_miss phase(s) missing from table"
+    FAIL=$((FAIL + phase_miss))
+fi
+
+# Doc A6: cross-links
+check "Doc: links to SKILL.md" grep -q 'SKILL.md' README.md
+check "Doc: links to AGENTS.md" grep -q 'AGENTS.md' README.md
+check "Doc: references/ link" grep -q 'references/' README.md
+
+# Doc A7: See also section with ecosystem links
+check "Doc: See also section" grep -q '## See also' README.md
+check "Doc: ecosystem links" grep -qE 'hermes-agent\\.nousresearch\\.com|CodeSigils/hermes-skill-hq' README.md
+
 # Shellcheck: run on any .sh files found (excluding .git)
 sh_count=$(find . -name '*.sh' -not -path './.git/*' | wc -l)
 if [ "$sh_count" -gt 0 ]; then

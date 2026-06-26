@@ -43,6 +43,16 @@ These apply to *how we develop this skill*, not what the skill checks.
 
 ---
 
+## Documentation standards
+
+Documentation completeness is enforced by `scripts/verify.sh` §Doc audit —
+the check suite is the canonical spec. No inline requirements to drift.
+Run `bash scripts/verify.sh` before every commit; it catches gaps in
+audience, self-guiding claim, quickstart shell block, example output,
+phase coverage, cross-links, and ecosystem references.
+
+---
+
 ## How to add or modify a B-check
 
 1. **Decide scope** — new B-check (B12), extend existing one, or add reference?
