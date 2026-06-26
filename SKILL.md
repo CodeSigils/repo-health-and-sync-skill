@@ -213,6 +213,76 @@ catches it as BLOCKING.
 
 ---
 
+### B7: Commit audit
+
+**Why:** Every commit traverses review, CI, and deployment pipelines. Unchecked
+commits — inconsistent messages, missing CHANGELOG updates, stale versions —
+accumulate silently until a release fails. B7 catches these per-commit gaps
+before they compound.
+
+**Severity for B7:**
+
+| Sub-step | What it checks | Severity |
+| :------- | :------------- | :------- |
+| B7a      | Commit message format consistency | WARNING |
+| B7b      | Runtime files changed but CHANGELOG didn't | BLOCKING |
+| B7c      | No `## Unreleased` section despite commits since last tag | WARNING |
+| B7d      | Source files changed but version unchanged | INFO (advisory) |
+
+#### B7a: Commit message audit
+
+Sample the last 10 commits with `git log --oneline -10` and classify each
+by format:
+
+- `type(scope): message` — Conventional Commits (preferred)
+- `type: message` — Conventional Commits, no scope
+- `message` — unstructured
+
+Count how many match Conventional Commits. If fewer than 7/10 follow a
+structured format, emit a WARNING. The agent logs the sample and the ratio,
+but does NOT require retroactive fixes — this is a culture signal, not a
+block.
+
+**Remediation:** Suggest adopting Conventional Commits for new commits.
+For the current batch, consider whether to squash-merge into a single
+well-formed commit before release.
+
+#### B7b: Cross-commit drift
+
+Detect when runtime source files (under `skills/`, `src/`, `lib/`, `app/`)
+were modified but `CHANGELOG.md` was not. This is the most common cause of
+stale-release bugs after version skew.
+
+**How:** Run `git diff --name-only` between the baseline (latest tag or
+`origin/main`) and HEAD. If runtime paths changed but CHANGELOG.md didn't,
+emit BLOCKING.
+
+See [references/drift-pairs.md](references/drift-pairs.md) for the full
+detection script and `.repo-health.json` configuration options.
+
+#### B7c: CHANGELOG completeness
+
+Check that `## Unreleased` exists in CHANGELOG.md when there are commits
+since the last release tag. If there are tags but no Unreleased section,
+emit WARNING with the count of un-released commits.
+
+**How:** Determine the latest `v*` tag, count commits since it, then check
+CHANGELOG.md for `## Unreleased`. If no tags exist but a CHANGELOG.md does,
+check it has an Unreleased section as a hygiene signal.
+
+#### B7d: Version-bump awareness (advisory)
+
+Emit INFO when source files changed but the version field in `package.json`
+(or whatever version source the project uses) did not. This is advisory only
+— many commits are not releases — but it alerts the agent to consider
+whether a version bump is warranted.
+
+**How:** Count source file changes between baseline and HEAD via
+`git diff --name-only`, compare against version field changes in the
+primary manifest.
+
+---
+
 ## Phase C — Reverse Sync
 
 **Why:** Many projects produce runtime artifacts deployed to system directories
