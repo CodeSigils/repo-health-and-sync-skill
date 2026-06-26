@@ -20,7 +20,7 @@ Subject line: `type: scope — description`. Types match this repo's CHANGELOG:
 - `docs:` — documentation (AGENTS.md, README, docs/)
 - `refactor:` — restructuring, no behaviour change
 - `fix:` — bug fix in skill code or reference files
-- `chore:` — housekeeping (gitignore, CI, changelog)
+- `chore:` — housekeeping (gitignore, CI)
 
 An agent reading `git log` cold should understand *what* was built, *why*,
 and *what evidence* supported it — without reading SKILL.md. Cite evidence
@@ -38,8 +38,9 @@ These apply to *how we develop this skill*, not what the skill checks.
 | **Repo as source** | `scripts/`, `.github/`, `docs/` are never sync targets. | SKILL.md line 81 |
 | **Portable grep** | `-P` is GNU-only; use `-E` or awk/sed instead. | SKILL.md line 89 |
 | **Cross-reference integrity** | Every `references/*.md` link resolves. Verify after rename/delete. | SKILL.md (implicit — enforce via verification) |
+| **File-swamp ceiling** | `references/` hard ceiling: 15 files. | `docs/decisions.md` §15-file ceiling |
 | **Quality-skill fallback** | Probe tool availability before depending on it. Degrade gracefully. | SKILL.md line 103 |
-| **File-swamp ceiling** | `references/` hard ceiling: 15 files. `scripts/`: one script, one concern. | `docs/decisions.md` §15-file ceiling |
+| **Script decomposition** | `scripts/` uses delegation: `verify.sh` orchestrates, focused scripts own one concern each. Soft ceiling of 5 files before splitting into subdirectories. | precedent in `verify.sh` → `doc-audit.py` + `check-commit-trailers.py` |
 
 ---
 
@@ -62,9 +63,8 @@ and validates the manifest schema via `--self-test`.
 4. **Update or add reference file** — detail in `references/`, not inline. Every file needs YAML frontmatter.
 5. **Update docs/research.md** — add evidence with quality label (research-backed / observed / pragmatic).
 6. **Update docs/decisions.md** — record architectural shifts.
-7. **Update CHANGELOG.md** — one `-` line under `## Unreleased`.
-8. **Verify** — see [Verification checklist](#verification-checklist) below.
-9. **Commit** — structured what:/why: body, evidence cited.
+7. **Verify** — see [Verification checklist](#verification-checklist) below.
+8. **Commit** — structured what:/why: body, evidence cited.
 
 ---
 
@@ -75,11 +75,12 @@ Before marking work done, run through this checklist in order:
 1. **Tree clean** — `git status --porcelain` shows nothing
 2. **Self-tests pass** — `python3 scripts/check-commit-trailers.py --self-test`
    and `python3 scripts/doc-audit.py --self-test`
-3. **Cross-refs resolve** — every `references/*.md` linked from SKILL.md exists,
-   and `docs/doc-standards.json` references resolve. Verify with: `for ref in $(grep -oP 'references/[\w.-]+\.md' SKILL.md | sort -u); do test -f "$ref" || echo "MISSING $ref"; done`
+3. **Cross-refs resolve** — `bash scripts/verify.sh` checks every `references/*.md`
+   linked from SKILL.md and validates `docs/doc-standards.json` schema.
+   (No inline command — this file is the pointer, that file is the check.)
 4. **No stale refs** — `grep -rn --include='*.md' 'PLAN\.md\|PROPOSALS\.md\|REPORT\.md\|USER-SUGGESTIONS\.md' . | grep -v '.git/'` returns nothing
 5. **SKILL.md under 600 lines** — `wc -l < SKILL.md` must be ≤ 600
-6. **CHANGELOG updated** — every user-facing change gets a line
+6. **Tagged releases** — every user-facing change gets an annotated tag (`git tag -a`)
 7. **Shellcheck clean** — on any modified `.sh` files
 
 For complex changes, write a temporary verification script under
@@ -96,14 +97,14 @@ Top-level layout:
 - **AGENTS.md** — maintainer instructions (this file)
 - **SKILL.md** — canonical skill definition (~575 lines)
 - **README.md** — user-facing install/quickstart
-- **CHANGELOG.md** — release lines
 - **LICENSE** — MIT
+- **.gitattributes** — Git/Linguist configuration
 - **.gitignore** — agent state + OS/IDE junk
 - **docs/** — 3 files + doc-standards.json: README.md (audience), decisions.md (architecture), research.md (evidence)
 - **references/** — 8 files, one concern each
 - **scripts/** — `check-commit-trailers.py` (Python checker, 10/10 self-test), `doc-audit.py` (manifest-driven doc checker)
 
-Key constraint: maintainer-only paths (`scripts/`, `.github/`, `docs/`) are
+Key constraint: maintainer-only paths (`scripts/`, `.github/` if present, `docs/`) are
 never included in Phase C sync targets. See SKILL.md line 81.
 
 ---

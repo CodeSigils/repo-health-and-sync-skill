@@ -5,7 +5,6 @@
 *.md linguist-documentation
 docs/* linguist-documentation
 references/* linguist-documentation
-CHANGELOG.md linguist-documentation
 AGENTS.md linguist-documentation
 SKILL.md linguist-documentation
 README.md linguist-documentation

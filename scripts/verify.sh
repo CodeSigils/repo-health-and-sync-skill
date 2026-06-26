@@ -78,15 +78,6 @@ else
     FAIL=$((FAIL + 1))
 fi
 
-# CHANGELOG has an Unreleased section
-if grep -q '## Unreleased' CHANGELOG.md; then
-    echo "  PASS  CHANGELOG.md has ## Unreleased"
-    PASS=$((PASS + 1))
-else
-    echo "  FAIL  CHANGELOG.md missing ## Unreleased"
-    FAIL=$((FAIL + 1))
-fi
-
 # --- README documentation audit (manifest-driven) ---
 echo ""
 echo "=== Documentation audit === "

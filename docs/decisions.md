@@ -75,6 +75,23 @@ or project-specific governance policies.
 pre-commit, ecosystem formatters) already handle those concerns. The skill
 detects whether they're present but does not replace them.
 
+### Eliminated repo CHANGELOG.md
+
+**Decision:** Removed this repo's `CHANGELOG.md` (30bd423). Git tags and
+annotated release metadata are the release record.
+
+**Why:** The CHANGELOG was a duplicate drift surface — every commit needed
+a CHANGELOG entry AND a commit message, and the two could diverge. Git tags
+are single-source: `git tag -a` records the version, `git log` is the
+history. The verification checklist now says "every release gets an
+annotated tag" instead of "every change gets a CHANGELOG line."
+
+**Impact:**
+- `verify.sh` no longer checks for `## Unreleased`
+- AGENTS.md checklist item 6 replaced with "Tagged releases"
+- SKILL.md references to CHANGELOG remain — they instruct agents about
+  checking *other repos'* CHANGELOGs (conceptual, not self-referential)
+
 ---
 
 ## B0 design principles (read before any phase)
@@ -130,15 +147,16 @@ has no BLOCKING items.
 
 ```
 ├── AGENTS.md                 # THIS FILE — how to develop the skill
-├── SKILL.md                  # ~560 lines — canonical skill definition
-├── CHANGELOG.md              # Release log
+├── SKILL.md                  # ~575 lines — canonical skill definition
 ├── README.md                 # User-facing install/quickstart
 ├── LICENSE                   # MIT
 ├── .gitignore                # Agent-artifact patterns + OS/IDE junk
+├── .gitattributes            # Git/Linguist configuration
 ├── docs/
 │   ├── README.md             # Maintainer audience note
 │   ├── decisions.md          # What and why
-│   └── research.md           # Evidence base
+│   ├── research.md           # Evidence base
+│   └── doc-standards.json    # Doc completeness manifest
 ├── references/               # 8 files — one concern each
 │   ├── agent-instruction-ecosystem.md
 │   ├── anti-drift-proportionality.md
@@ -149,7 +167,9 @@ has no BLOCKING items.
 │   ├── repo-health-json-schema.md
 │   └── sync-targets.md
 └── scripts/
-    └── check-commit-trailers.py  # Shared Python checker (10/10 self-test)
+    ├── verify.sh                 # Orchestration (self-consistency)
+    ├── check-commit-trailers.py  # Shared Python checker (10/10 self-test)
+    └── doc-audit.py              # Manifest-driven doc completeness audit
 ```
 
 ---

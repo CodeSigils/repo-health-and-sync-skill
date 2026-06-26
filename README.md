@@ -20,7 +20,7 @@ hermes skills install CodeSigils/repo-health-and-sync-skill
 ```bash
 cd /path/to/some/repo
 hermes skills load repo-health-and-sync-skill
-# The agent then runs: Phase B (B1→B6), fix blocking items, continue.
+# The agent then runs: Phase B (B1→B11), fix blocking items, continue.
 ```
 
 The skill is self-guiding. The agent reads [SKILL.md](SKILL.md) and walks
@@ -59,12 +59,13 @@ Phase B gates Phase C: never sync a broken repo. Full detail in
 
 ---
 
-## Requirements
+## Dependencies
 
 - **git** — all checks operate on a git repository
 - **shellcheck** — required for B2 (skipped gracefully if absent)
 - **gh** CLI — required for B5 (tag vs release); skipped gracefully if absent
-- Compatible with any Hermes agent runtime
+None are hard requirements — the skill degrades gracefully when a tool is
+not on PATH, skipping the check and logging the reason.
 
 ---
 
@@ -78,14 +79,17 @@ sync targets, or add a custom consistency check. See
 
 ## Project structure
 
-```
+```text
 ├── AGENTS.md             # How to develop this skill (for contributors)
 ├── SKILL.md              # Canonical skill definition (~575 lines)
+├── .gitattributes        # Git/Linguist configuration
 ├── references/           # 8 files — per-check detail and configuration
 ├── scripts/              # Enforcement scripts
 ├── docs/                 # Maintainer documentation
+│   ├── README.md         # Audience note
 │   ├── decisions.md      # Architecture rationale
-│   └── research.md       # Evidence base
+│   ├── research.md       # Evidence base
+│   └── doc-standards.json# Doc completeness manifest
 └── .repo-health.json     # Self-configuration for the skill's own repo
 ```
 
