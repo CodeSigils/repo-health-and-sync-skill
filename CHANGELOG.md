@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Repo metadata: updated README.md (install command, badges, phase table), added .gitattributes, set 6 GitHub topics
+- README.md: closed 10 gaps — how-it-works, output example, audience, C-row expansion, .repo-health.json link, contributors pointer, SKILL.md table link, "See also" — +31 lines, tightened
 - scripts/verify.sh: fixed 2 GNU-only violations (grep -oP → -oE, sort -V → git --sort)
 
 ## [0.1.0] - 2026-06-26
