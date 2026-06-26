@@ -2,17 +2,17 @@
 |title: Repo Health and Sync Skill — Research Companion
 |date: 2026-06-25
 |version: companion-v1 — restructured from gap-report to research companion
-|source: PLAN.md (1200 lines, 11 sections), PROPOSALS, USER-SUGGESTIONS
+|source: docs/PLAN.md (1200 lines, 11 sections), PROPOSALS, USER-SUGGESTIONS
 |status: "research-ready — 6 B-checks identified for web-research strengthening"
 |---
 
 # Repo Health and Sync Skill — Research Companion
 
-This document accompanies PLAN.md. It is a working research document:
+This document accompanies docs/PLAN.md. It is a working research document:
 identify evidence-thin decisions → research them → record findings →
-update PLAN.md specs and labels. The 16 user suggestions from
-USER-SUGGESTIONS.md are mapped to plan coverage in PROPOSALS §4 and
-PLAN.md §1; this document is the evidence-quality record, not the
+update docs/PLAN.md specs and labels. The 16 user suggestions from
+docs/USER-SUGGESTIONS.md are mapped to plan coverage in PROPOSALS §4 and
+docs/PLAN.md §1; this document is the evidence-quality record, not the
 provenance record. Structure:
 
 | § | Section | Purpose |
@@ -45,7 +45,7 @@ evidence for specific B-check decisions.
 
 ## 2. Evidence Quality Map
 
-Each B-check in PLAN.md §4.1 carries an evidence label:
+Each B-check in docs/PLAN.md §4.1 carries an evidence label:
 
 | Level | Meaning | Count in plan |
 | :---- | :------ | :-----------: |
@@ -374,5 +374,5 @@ Label should remain **pragmatic** — the survey confirms the standard formatter
 | v2 | 2026-06-25 | Added gap analysis (7-gap inventory) |
 | v3 | 2026-06-25 | Refined gap analysis, added coverage audit |
 | v4 | 2026-06-25 | Rewrite centered on gap analysis with severity levels |
-| v5 | 2026-06-25 | All 7 gaps closed in PLAN.md |
+| v5 | 2026-06-25 | All 7 gaps closed in docs/PLAN.md |
 | companion-v1 | 2026-06-25 | **Restructured** — replaced gap-inventory focus with research companion. Added §2 Evidence Quality Map, §3 Research Targets (6 B-checks), §5 Specification Changes Register. §4 Coverage Audit kept unchanged. |

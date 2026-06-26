@@ -13,4 +13,4 @@
 - B10 `.gitignore` + repository metadata audit: 6-category check (agent artifacts, OS junk, build artifacts, IDE files, instruction-file conflicts).
 - references/agent-instruction-ecosystem.md: agent instruction files per platform, portability tiers, adaptation paths.
 - references/gitignore-templates.md: official templates, agent-artifact patterns from Agents.gitignore, per-language recommendations.
-- Phase 8: end-to-end verification (42/42 pass), USER-SUGGESTIONS.md marked as historical.
+- Phase 8: end-to-end verification (42/42 pass), docs/USER-SUGGESTIONS.md marked as historical.

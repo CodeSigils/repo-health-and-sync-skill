@@ -1,8 +1,8 @@
 ---
 title: PROPOSALS — Research Basis for the Implementation Plan
 date: 2026-06-25 (updated from 2025-06-25 — plan supersedes decisions)
-status: historical reference document — decisions superseded by PLAN.md
-relation-to-plan: "PLAN.md is the authoritative implementation plan.
+status: historical reference document — decisions superseded by docs/PLAN.md
+relation-to-plan: "docs/PLAN.md is the authoritative implementation plan.
   This document preserves the research that informed it. Decision content
   (recommendations, options, phase proposals) is preserved for provenance
   but marked where superseded."
@@ -10,8 +10,8 @@ relation-to-plan: "PLAN.md is the authoritative implementation plan.
 
 # PROPOSALS — Repo Health and Sync Skill: Updated Proposals
 
-This document captures the research that informed PLAN.md. It is a
-historical reference — PLAN.md (1171 lines, 11 sections) is the
+This document captures the research that informed docs/PLAN.md. It is a
+historical reference — docs/PLAN.md (1171 lines, 11 sections) is the
 authoritative implementation plan. This file should be read alongside
 it, not standalone.
 
@@ -25,7 +25,7 @@ Based on research across:
 - Anthropic Claude Code API docs
 - OpenAI Codex / Agents SDK docs
 - github-issues skill
-- 16 user suggestions from USER-SUGGESTIONS.md
+- 16 user suggestions from docs/USER-SUGGESTIONS.md
 
 ---
 
@@ -161,10 +161,10 @@ Maps to B2 naming convention check in the plan's §10.1 gap closure.
 
 ---
 
-## User Suggestion Mapping — Historical (superseded by PLAN.md)
+## User Suggestion Mapping — Historical (superseded by docs/PLAN.md)
 
 **This section is historical.** The current coverage mapping lives in
-USER-SUGGESTIONS.md (raw source) and PLAN.md §1 (survey), with status
+docs/USER-SUGGESTIONS.md (raw source) and docs/PLAN.md §1 (survey), with status
 per suggestion listed below. This earlier mapping is retained for
 provenance.
 
@@ -189,12 +189,12 @@ provenance.
 
 ---
 
-## Historical Content — Superseded by PLAN.md
+## Historical Content — Superseded by docs/PLAN.md
 
 ### Proposed New Phase Structure (original)
 
 The original proposal extended B1-B6 to B7-B11, plus Phase C refinements.
-PLAN.md §5 refines this into 8 concrete phases with dependency ordering,
+docs/PLAN.md §5 refines this into 8 concrete phases with dependency ordering,
 evidence labels, and verification criteria. The original structure is
 preserved here for provenance.
 
@@ -226,7 +226,7 @@ Options 1 and 2 are recorded here for completeness.
 | 3. Two-phase | Phase 1: B7 + B11. Phase 2: restructure. | Medium | Pragmatic |
 
 **Plan's refinement:** 8 phases instead of 2, with dependency graph,
-evidence labels, and verification criteria. See PLAN.md §4-§5.
+evidence labels, and verification criteria. See docs/PLAN.md §4-§5.
 
 ### Recommendation (original — superseded)
 
@@ -241,8 +241,8 @@ now historical — the plan is the current decision record.
 ### Reference File Architecture (original)
 
 The originally proposed file structure included a `templates/` directory
-and `USER-SUGGESTIONS.md`. The plan rejected `templates/` (AP8 —
-Templates Before Need) and plans to remove `USER-SUGGESTIONS.md` after
+and `docs/USER-SUGGESTIONS.md`. The plan rejected `templates/` (AP8 —
+Templates Before Need) and plans to remove `docs/USER-SUGGESTIONS.md` after
 Phase 0. The plan's §2 evaluates 12 candidate reference files by priority
 (5 P0, 5 P1, 1 P2, 1 skip). The original architecture is preserved here
 for provenance.
@@ -265,12 +265,12 @@ repo-health-and-sync-skill/
 │   └── anti-drift-proportionality.md  # heuristic
 ├── templates/
 │   └── .repo-health.json.example      # ⚠ plan rejected (AP8)
-└── USER-SUGGESTIONS.md                # ⚠ planned for removal
+└── docs/USER-SUGGESTIONS.md                # ⚠ planned for removal
 ```
 
 **Key differences from plan:**
 - templates/ directory → rejected (AP8 — Templates Before Need)
-- USER-SUGGESTIONS.md → planned removal after Phase 0
+- docs/USER-SUGGESTIONS.md → planned removal after Phase 0
 - Plan evaluates 12 files (5 P0 essential, 5 P1 valuable, 1 P2 deferred,
   1 skip) vs the 11 proposed here
 
@@ -289,4 +289,4 @@ repo-health-and-sync-skill/
 9. OpenAI API docs: Agents SDK, Codex tools (developers.openai.com)
 10. config-doc-drift-prevention skill (installed skill)
 11. github-actions-workflows skill (installed skill)
-12. USER-SUGGESTIONS.md (extracted from SKILL.md)
+12. docs/USER-SUGGESTIONS.md (extracted from SKILL.md)

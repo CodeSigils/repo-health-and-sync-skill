@@ -448,7 +448,7 @@ See [references/foo.md](references/foo.md) for details.
 #### 3. Entry criteria: no file without an observed failure
 
 Proportionate anti-drift principle applies to reference files too. Every reference file must trace to one of:
-- An observed failure mode documented in USER-SUGGESTIONS.md or agent-concepts-study
+- An observed failure mode documented in docs/USER-SUGGESTIONS.md or agent-concepts-study
 - A concrete user suggestion with evidence that the gap causes repeated issues
 - Inline content that demonstrably makes SKILL.md too long to scan (< 200 lines target)
 
@@ -498,7 +498,7 @@ The reference file directory is a tool, not a museum. The 15-file ceiling, cross
 |  │     archive lesson: the checker must pass on itself first, else it
 |  │     replicates the drift it claims to cure.
 |  ├── Remove "From the USER" section from SKILL.md
-|  │   └── Content → keep in USER-SUGGESTIONS.md (already done)
+|  │   └── Content → keep in docs/USER-SUGGESTIONS.md (already done)
 |  ├── Create CHANGELOG.md with "Unreleased" section
 |  └── Create basic references/ directory structure
 |
@@ -545,7 +545,7 @@ Phase 8: Final verification
   ├── Verify SKILL.md length is ~200 lines
   ├── Verify all cross-references resolve
   ├── Verify CHANGELOG.md populated
-  └── Remove USER-SUGGESTIONS.md or mark as historical
+  └── Remove docs/USER-SUGGESTIONS.md or mark as historical
 ```
 
 ---
@@ -582,7 +582,7 @@ checks are tied to either survey evidence or concrete user observations, not spe
 ### Phase 0 — Cleanup
 
 **What changes:**
-- Remove lines 38-156 from SKILL.md (the "From the USER" section). Content already captured in USER-SUGGESTIONS.md.
+- Remove lines 38-156 from SKILL.md (the "From the USER" section). Content already captured in docs/USER-SUGGESTIONS.md.
 - Create `CHANGELOG.md` with `## Unreleased` section listing "Initial skill framework with Phase B (B1-B6) and Phase C (C1-C4)"
 - Create `references/` directory skeleton
 
@@ -823,7 +823,7 @@ if __name__ == "__main__":
 | B8 cross-platform shell audit | ✅ Accepted | Added detection table |
 | B9 CI efficiency audit | ✅ Accepted | Added evaluation criteria |
 | B10 .gitignore metadata audit | ✅ Accepted | Added pattern checklist |
-| Keep USER-SUGGESTIONS.md | ❌ Rejected | Remove after Phase 0 — content captured elsewhere |
+| Keep docs/USER-SUGGESTIONS.md | ❌ Rejected | Remove after Phase 0 — content captured elsewhere |
 | templates/ directory | ❌ Rejected | Premature per proportionate anti-drift |
 | 10 reference files | ⚠️ Scoped | 5 essential (P0), 5 valuable (P1), 1 deferred (P2) |
 
@@ -1037,7 +1037,7 @@ After all phases:
 | Cross-references resolve | `grep -r '(references/' SKILL.md \| grep -v '#'` | Every reference has a file |
 | No inline script paths | `grep -c 'scripts/\|\.sh' SKILL.md` | < 5 (only generic mentions allowed) |
 | Version in frontmatter | `grep '^version:' SKILL.md` | >= "1.1.0" |
-| All user suggestions mapped | Each of 16 items in USER-SUGGESTIONS.md has a phase in this plan | Phase column populated |
+| All user suggestions mapped | Each of 16 items in docs/USER-SUGGESTIONS.md has a phase in this plan | Phase column populated |
 | B2 naming-convention check | Add naming convention check to B2 spec | `verb-noun` pattern check runs and flags non-standard names |
 | B0 tri-layer fallback | B0 tri-layer fallback documented per B-phase | Per-check degraded mode documented |
 | B0 forge-awareness | Forge-awareness preamble exists in B0 | B0 preamble mentions portability tiers |
@@ -1075,7 +1075,7 @@ First deliverable (Phase 0 + Phase 1): SKILL.md reduced from 614 to ~350 lines, 
 
 ## §10 Gap Closure Research
 
-Three structural gaps identified in REPORT.md required evidence-backed investigation. Each was closed by integrating research findings into the plan's existing phase structure without creating new phases.
+Three structural gaps identified in docs/REPORT.md required evidence-backed investigation. Each was closed by integrating research findings into the plan's existing phase structure without creating new phases.
 
 ### §10.1 S5 — Script Naming Conventions (was: deferred to P2)
 
