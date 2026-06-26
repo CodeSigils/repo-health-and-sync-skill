@@ -11,3 +11,5 @@
 - B8 cross-platform shell audit: 8 non-portable pattern detections against `.sh` files with portable replacements.
 - B9 CI efficiency audit: 6 signal evaluation table for `.github/workflows/*.yml` (trigger scoping, paths-ignore, caching, etc.).
 - B10 `.gitignore` + repository metadata audit: 6-category check (agent artifacts, OS junk, build artifacts, IDE files, instruction-file conflicts).
+- references/agent-instruction-ecosystem.md: agent instruction files per platform, portability tiers, adaptation paths.
+- references/gitignore-templates.md: official templates, agent-artifact patterns from Agents.gitignore, per-language recommendations.

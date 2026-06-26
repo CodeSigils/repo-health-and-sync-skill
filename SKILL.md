@@ -80,9 +80,10 @@ consider disabling it rather than patching around it. See
 
 **Forge-awareness.** These checks work on any git repo. The skill activation
 mechanism (`SKILL.md`, `hermes skills install`) is Hermes-specific. To port
-to another agent runtime (Claude Code, Codex, Cursor, Copilot), create a
-forge-specific adapter in `forge-adapters/` or rewrite the frontmatter for
-that forge. The detection logic in B1-B6 and C1-C4 is agent-agnostic.
+to another agent runtime, see
+[references/agent-instruction-ecosystem.md](references/agent-instruction-ecosystem.md)
+for the adaptation path and portability tiers. The detection logic in B1-B6
+and C1-C4 is agent-agnostic.
 
 **Quality-skill fallback (tri-layer probe).** Before running a B-phase check
 that depends on an external quality tool (shellcheck, linters, formatters),
@@ -375,9 +376,11 @@ manual review (no automated resolution).
 - **6:** Walk the repo root for the listed filenames. If any two are found,
   list them and suggest documenting precedence in one of them.
 
-**Remediation:** For missing patterns, add them to `.gitignore`. For
-instruction-file conflicts, pick one primary file and reference the other
-from it, or document the precedence order in a comment.
+**Remediation:** For missing patterns, add them to `.gitignore`. See
+[references/gitignore-templates.md](references/gitignore-templates.md) for
+the recommended patterns from Agents.gitignore and per-language templates.
+For instruction-file conflicts, pick one primary file and reference the
+other from it, or document the precedence order in a comment.
 
 If `.gitignore` already covers a pattern, skip that check silently.
 
@@ -541,6 +544,14 @@ flag B5 as WARNING and prompt 33 release creations or tag deletions.
 
 ## References
 
+- [Agent Instruction Ecosystem](references/agent-instruction-ecosystem.md) — Portability tiers and adaptation paths for multi-forge projects
+- [Anti-Drift Proportionality](references/anti-drift-proportionality.md) — When to add a check vs when to wait
+- [Co-Author Guard](references/co-author-guard.md) — Four-layer enforcement for attribution trailers
+- [Drift Pairs](references/drift-pairs.md) — Reusable cross-commit detection patterns
+- [Heuristic Discovery](references/heuristic-discovery.md) — B1-B6 and B8 detection tables, severity, remediation
+- [.gitignore Templates](references/gitignore-templates.md) — Official templates, agent-artifact patterns, per-language recommendations
+- [Repo Health JSON Schema](references/repo-health-json-schema.md) — Full schema specification and field documentation
+- [Sync Targets](references/sync-targets.md) — C1-C4 procedures and target types
 - Conventional Commits: https://www.conventionalcommits.org/
 - Keep a Changelog: https://keepachangelog.com/
 - Semantic Versioning: https://semver.org/
