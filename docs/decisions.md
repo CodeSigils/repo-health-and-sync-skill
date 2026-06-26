@@ -129,12 +129,15 @@ has no BLOCKING items.
 ## File structure at completion
 
 ```
+├── AGENTS.md                 # THIS FILE — how to develop the skill
 ├── SKILL.md                  # ~560 lines — canonical skill definition
 ├── CHANGELOG.md              # Release log
+├── README.md                 # User-facing install/quickstart
 ├── LICENSE                   # MIT
 ├── .gitignore                # Agent-artifact patterns + OS/IDE junk
 ├── docs/
-│   ├── decisions.md          # THIS FILE — what and why
+│   ├── README.md             # Maintainer audience note
+│   ├── decisions.md          # What and why
 │   └── research.md           # Evidence base
 ├── references/               # 8 files — one concern each
 │   ├── agent-instruction-ecosystem.md
