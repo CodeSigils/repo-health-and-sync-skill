@@ -47,7 +47,8 @@ un-pushed commits. For stale tracking branches, run
 **Discovery (runtime):** Walk the repo with `find . -name '*.sh'`, excluding
 directories like `.git`, `node_modules`, `__pycache__`, `.venv`, `venv`,
 `dist`, `build`, `output`, and `target`. Check `.repo-health.json` for
-additional `skip_shellcheck_paths`. Run `shellcheck` on every `.sh` file
+additional `skip_shellcheck_paths`. If `command -v shellcheck` fails, skip this
+step and log the reason. Run `shellcheck` on every `.sh` file
 found. Also verify script names follow a `verb-noun` pattern with standard
 prefixes (`check-`, `build-`, `deploy-`, `test-`, `lint-`, `install-`,
 `run-`, `release-`, `clean-`). Override expectations via `.repo-health.json`.

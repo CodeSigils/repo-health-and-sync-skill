@@ -150,7 +150,8 @@ one-liners.
 
 **How:** Walk the repo with `find . -name '*.sh'`, excluding `.git`,
 `node_modules`, `__pycache__`, `.venv`, `venv`, `dist`, `build`, `output`,
-and `target`. Run `shellcheck` on every `.sh` file found. Check script naming
+and `target`. If `command -v shellcheck` fails, skip this step and log the reason.
+Run `shellcheck` on every `.sh` file found. Check script naming
 follows a `verb-noun` pattern with standard prefixes.
 
 See [references/heuristic-discovery.md](references/heuristic-discovery.md) for
