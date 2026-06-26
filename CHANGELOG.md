@@ -14,3 +14,4 @@
 - references/agent-instruction-ecosystem.md: agent instruction files per platform, portability tiers, adaptation paths.
 - references/gitignore-templates.md: official templates, agent-artifact patterns from Agents.gitignore, per-language recommendations.
 - Phase 8: end-to-end verification (42/42 pass), docs/USER-SUGGESTIONS.md marked as historical.
+- 'Repo as source' B0 principle: separate maintainer tooling from user install, closes user suggestion #8.
