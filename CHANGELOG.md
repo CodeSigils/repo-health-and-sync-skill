@@ -8,3 +8,4 @@
 - B11 co-author guard: 4-layer enforcement (agent instruction, policy, shared Python checker, CI) for attribution trailers.
 - references/co-author-guard.md: full implementation, hook template, CI config, bypass, counter-indications.
 - scripts/check-commit-trailers.py: shared Python checker with `*-by:` regex, `--self-test`, `--range`, and `ALLOW_ATTRIBUTION_TRAILERS=1` bypass.
+- B8 cross-platform shell audit: 8 non-portable pattern detections against `.sh` files with portable replacements.

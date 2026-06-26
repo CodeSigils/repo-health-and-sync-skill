@@ -283,6 +283,40 @@ primary manifest.
 
 ---
 
+### B8: Cross-platform shell audit
+
+**Why:** Shell scripts that work on Linux may silently fail on macOS, BSD,
+or other Unix systems. Non-portable constructs (`which`, `grep -P`,
+`sed -i` without backup, `echo` with escapes, hardcoded `/bin/bash`, etc.)
+cause CI failures on non-Linux runners and frustrate cross-platform
+contributors.
+
+**How:** Scan all `.sh` files for non-portable patterns. Each `.sh` file
+gets a pattern check; any match is flagged.
+
+**Severity:** WARNING — portability is project-dependent. Projects that
+target Linux exclusively may reject portable patterns that add complexity.
+
+Detection patterns (grep each `.sh` file found by B2's walk):
+
+| Pattern | How to detect | Portable replacement |
+| :------ | :------------ | :------------------- |
+| `which` | `grep '\bwhich\b'` | `command -v` |
+| `grep -P` | `grep -n 'grep.*-P'` | `grep -E` |
+| `sed -i` (no backup) | `sed -i[^b ]` | `sed -i.bak` |
+| `echo` with escapes | `echo.*\\` | `printf '%s\n'` |
+| Hardcoded `/bin/bash` | `#!/bin/bash` | `#!/usr/bin/env bash` |
+| Octal `\012` | `\\012` | `\n` |
+| `find -exit` | `find.*-exit` | `find ... -exec` |
+| `flock` | `\bflock\b` | `mkdir .lock \|\| exit 1` |
+
+See [references/heuristic-discovery.md](references/heuristic-discovery.md)
+§ B8 for the full detection approach and per-pattern remediation.
+
+If no `.sh` files are found, skip this step.
+
+---
+
 ### B11: Co-author guard
 
 **Why:** Commit trailers (`Co-authored-by:`, `Signed-off-by:`,

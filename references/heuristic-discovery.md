@@ -211,3 +211,36 @@ command above (e.g., `npm run format`, `prettier --write .`, `cargo fmt`,
 Format failures are WARNING, not BLOCKING, unless the project's own
 consistency check (B3) also enforces them — in which case B3 already
 catches it as BLOCKING.
+
+---
+
+## B8: Cross-platform shell audit
+
+Scan `.sh` files for non-portable shell constructs. Runs after B2's file
+discovery (same file walk, same exclusion rules).
+
+### Detection patterns
+
+| Pattern | Detection command | Portable replacement |
+| :------ | :---------------- | :------------------- |
+| `which` | `grep -rn '\bwhich\b' --include='*.sh' .` | `command -v` |
+| `grep -P` | `grep -rn 'grep.*-P' --include='*.sh' .` | `grep -E` |
+| `sed -i` without backup extension | `grep -rnP 'sed -i[^b ]' --include='*.sh' .` | `sed -i.bak` |
+| `echo` with escape sequences | `grep -rn 'echo.*\\' --include='*.sh' .` | `printf '%s\n'` |
+| Hardcoded `/bin/bash` shebang | `grep -rn '#!/bin/bash' --include='*.sh' .` | `#!/usr/bin/env bash` |
+| Octal `\012` in printf/sed | `grep -rn '\\012' --include='*.sh' .` | `\n` |
+| `find -exit` (non-POSIX) | `grep -rn 'find.*-exit' --include='*.sh' .` | `find ... -exec ... \;` |
+| `flock` (Linux-only) | `grep -rn '\bflock\b' --include='*.sh' .` | `mkdir .lock || exit 1` |
+
+### Remediation
+
+For each match, replace with the portable alternative and re-run shellcheck
+to confirm the fix didn't introduce new issues. If the project targets Linux
+exclusively, add `skip_portability_check` to `.repo-health.json`:
+
+```json
+{
+  "skip_portability_check": true
+}
+```
+
