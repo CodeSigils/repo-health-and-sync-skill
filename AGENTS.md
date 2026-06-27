@@ -86,8 +86,9 @@ and validates the manifest schema via `--self-test`.
 Before marking work done, run through this checklist in order:
 
 1. **Tree clean** — `git status --porcelain` shows nothing
-2. **Self-tests pass** — `python3 scripts/check-commit-trailers.py --self-test`
-   and `python3 scripts/doc-audit.py --self-test`
+2. **Self-tests pass** — `python3 scripts/check-commit-trailers.py --self-test`,
+   `python3 scripts/doc-audit.py --self-test`, and
+   `bash scripts/verify.sh --self-test`
 3. **Cross-refs resolve** — `bash scripts/verify.sh` checks every `references/*.md`
    linked from SKILL.md and validates `docs/doc-standards.json` schema.
    (No inline command — this file is the pointer, that file is the check.)

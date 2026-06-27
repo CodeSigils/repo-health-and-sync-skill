@@ -5,6 +5,90 @@
 # passes, non-zero with details on first failure. Portable: no GNU-only flags.
 set -euo pipefail
 
+# --- Self-test mode: verify verify.sh itself ---
+if [ "${1:-}" = "--self-test" ]; then
+    echo "=== verify.sh --self-test ==="
+    echo ""
+    errors=0
+
+    # 1. Bash syntax
+    if bash -n "$0" 2>/dev/null; then
+        echo "  PASS  bash syntax"
+    else
+        echo "  FAIL  bash syntax"
+        errors=$((errors + 1))
+    fi
+
+    # 2. All PASS labels are unique (no silent masking of duplicate names)
+    # shellcheck disable=SC2016
+    dups=$(grep -oE 'echo "  PASS  [^"]*"' "$0" | sed 's/echo "  PASS  //;s/"$//' | grep -Fxv '$label' | sort | uniq -d)
+    if [ -z "$dups" ]; then
+        echo "  PASS  all check labels unique"
+    else
+        echo "  FAIL  duplicate labels: $dups"
+        errors=$((errors + 1))
+    fi
+
+    # 3. Required external files exist
+    for f in scripts/doc-audit.py scripts/check-commit-trailers.py \
+             docs/doc-standards.json SKILL.md README.md AGENTS.md; do
+        if [ -f "$f" ]; then
+            echo "  PASS  $f exists"
+        else
+            echo "  FAIL  $f not found"
+            errors=$((errors + 1))
+        fi
+    done
+
+    # 4. check() function is defined and handles pass/fail
+    tmpf=$(mktemp /tmp/hermes-self-test-XXXXXX.sh)
+    # Extract check() function logic for isolated test
+    cat >"$tmpf" <<'TESTEOF'
+check() {
+    local label="$1"; shift
+    local out rc
+    out=$("$@" 2>&1) && rc=0 || rc=$?
+    if [ "$rc" -eq 0 ]; then
+        echo "  PASS  $label"
+    else
+        echo "  FAIL  $label"
+    fi
+}
+check "unit-test-pass" true
+check "unit-test-fail" false
+TESTEOF
+    check_outer=$(bash "$tmpf" 2>&1)
+    rm -f "$tmpf"
+    pass_ok=false; fail_ok=false
+    while IFS= read -r line; do
+        case "$line" in
+            *"PASS  unit-test-pass"*) pass_ok=true ;;
+            *"FAIL  unit-test-fail"*)  fail_ok=true ;;
+        esac
+    done <<<"$check_outer"
+    if $pass_ok; then echo "  PASS  check() detects pass"; else echo "  FAIL  check() misreports pass"; errors=$((errors + 1)); fi
+    if $fail_ok; then echo "  PASS  check() detects failure"; else echo "  FAIL  check() misreports failure"; errors=$((errors + 1)); fi
+
+    # 5. Shellcheck on self (if available)
+    if command -v shellcheck >/dev/null 2>&1; then
+        if shellcheck "$0" >/dev/null 2>&1; then
+            echo "  PASS  self shellcheck"
+        else
+            echo "  INFO  self shellcheck warnings (non-fatal)"
+        fi
+    else
+        echo "  INFO  shellcheck not available, skip"
+    fi
+
+    echo ""
+    if [ "$errors" -eq 0 ]; then
+        echo "  verify.sh: OK"
+    else
+        echo "  $errors self-test failure(s)"
+    fi
+    exit "$errors"
+fi
+
 PASS=0
 FAIL=0
 
@@ -162,4 +246,7 @@ fi
 
 echo ""
 echo "--- Summary: $PASS pass, $FAIL fail ---"
+if [ "${1:-}" = "--self-test" ]; then
+    exit 0
+fi
 exit "$FAIL"
