@@ -51,20 +51,16 @@ relevant files/config at runtime, **severity** when it fails, and
 These principles govern all checks below. The agent should internalise them
 before running any phase.
 
-**Commit log vs CHANGELOG.** Some projects produce well-structured commit
-messages that serve as their own release documentation (what: + why: per
-commit, conventional format, clear scopes). For those projects, requiring a
-`CHANGELOG.md` creates a duplicate drift surface (AP1) rather than tightening
-it. The skill's CHANGELOG checks (B7c) should defer to the commit
-log when:
+**Commit log vs CHANGELOG.** The git log is the authoritative historical
+record. Some projects produce well-structured commits that serve as their
+own release documentation. For those, requiring a CHANGELOG creates a
+duplicate drift surface (AP1). The agent checks three conditions:
 - Project uses conventional commits or a consistent structured format
 - 90%+ of recent commits have descriptive bodies (not just one-line subjects)
 - Release notes can be generated from `git log tag..tag --format`
 
-When these conditions hold, CHANGELOG absence should be INFO, not WARNING.
-The agent checks commit log quality first, then decides whether CHANGELOG
-enforcement is proportionate. This honours the principle that `git log` is
-the authoritative historical record.
+When all three hold, CHANGELOG absence should be INFO, not WARNING.
+B7b and B7c apply this gate.
 
 **Detect, don't enforce.** No convention is universal across ecosystems.
 The skill discovers the project's existing patterns before imposing rules.
@@ -175,8 +171,8 @@ project's own check script (if one exists) is the authority.
 See [references/heuristic-discovery.md](references/heuristic-discovery.md) for
 the full discovery order, severity table, and remediation.
 
-If missing, add a trivial check that confirms the working tree is clean and
-version sources align (see B4).
+If missing, emit INFO. Consider adding a simple check for tree cleanliness
+and version alignment (see B4).
 
 ---
 
@@ -208,7 +204,7 @@ Releases. Cross-reference all three.
 See [references/heuristic-discovery.md](references/heuristic-discovery.md) for
 the signal table, severity mapping, and remediation commands.
 
-If the project has no v\* tags, skip this step.
+If no tags are found, skip this step.
 
 ---
 
@@ -281,9 +277,8 @@ repo's commit log already serves as its release record:
    ("No CHANGELOG and commit messages are unstructured — consider
    either improving commit quality or adding a CHANGELOG").
 
-This honours the B0 principle that `git log` is the authoritative
-historical record. Projects with disciplined commit logs should not be
-penalised for skipping a CHANGELOG.
+Per B0, git log is authoritative — skip CHANGELOG enforcement when
+commit quality is high.
 
 See [references/drift-pairs.md](references/drift-pairs.md) for the full
 detection script and `.repo-health.json` configuration options.
@@ -366,7 +361,7 @@ Signals evaluated:
 | Guard workflow independence | Standalone guard workflow (e.g. trailer check) | Guard embedded in main build — doc-only pushes skip it |
 | Artifact separation | Ship/release workflow separate from test | Tests and shipping in same workflow |
 
-If no `.github/workflows/` directory exists, skip this step.
+If no `.github/workflows/` directory is found, skip this step.
 
 ---
 
