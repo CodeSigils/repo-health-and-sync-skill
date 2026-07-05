@@ -93,7 +93,7 @@ Before marking work done, run through this checklist in order:
    linked from SKILL.md and validates `docs/doc-standards.json` schema.
    (No inline command — this file is the pointer, that file is the check.)
 4. **No stale refs** — `grep -rn --include='*.md' 'PLAN\.md\|PROPOSALS\.md\|REPORT\.md\|USER-SUGGESTIONS\.md' . | grep -v '.git/'` returns nothing
-5. **SKILL.md under 700 lines** — `wc -l < SKILL.md` must be ≤ 700
+5. **SKILL.md under 650 lines** — `wc -l < SKILL.md` must be ≤ 650
 6. **Tagged releases** — every user-facing change gets an annotated tag (`git tag -a`)
 7. **Shellcheck clean** — on any modified `.sh` files
 
@@ -134,5 +134,5 @@ These are the patterns most likely to cause rework or drift:
    user request will accumulate maintenance debt before value.
 3. **Forgetting to update cross-refs on rename/delete.** A single stale
    `references/` link breaks the skill. Verify with the checklist above.
-4. **Letting SKILL.md grow past 700 lines.** When it approaches this ceiling,
+4. **Letting SKILL.md grow past 650 lines.** When it approaches this ceiling,
    extract to a new reference file or consolidate existing ones.

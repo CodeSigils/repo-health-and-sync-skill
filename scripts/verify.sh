@@ -160,11 +160,11 @@ fi
 
 # SKILL.md under 600 lines
 skill_len=$(wc -l < SKILL.md)
-if [ "$skill_len" -le 700 ]; then
-    echo "  PASS  SKILL.md $skill_len lines (≤700)"
+if [ "$skill_len" -le 650 ]; then
+    echo "  PASS  SKILL.md $skill_len lines (≤650)"
     PASS=$((PASS + 1))
 else
-    echo "  FAIL  SKILL.md $skill_len lines exceeds 700"
+    echo "  FAIL  SKILL.md $skill_len lines exceeds 650"
     FAIL=$((FAIL + 1))
 fi
 

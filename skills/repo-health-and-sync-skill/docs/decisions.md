@@ -147,7 +147,7 @@ has no BLOCKING items.
 
 ```
 ├── AGENTS.md                 # THIS FILE — how to develop the skill
-├── SKILL.md                  # ~601 lines — canonical skill definition
+├── SKILL.md                  # ~596 lines — canonical skill definition
 ├── README.md                 # User-facing install/quickstart
 ├── LICENSE                   # MIT
 ├── .gitignore                # Agent-artifact patterns + OS/IDE junk
