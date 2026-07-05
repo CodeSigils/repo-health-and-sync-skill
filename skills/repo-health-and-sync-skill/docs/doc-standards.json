@@ -1,0 +1,114 @@
+{
+  "README.md": [
+    {
+      "id": "audience",
+      "description": "Audience declared",
+      "type": "regex",
+      "pattern": "For Hermes|For skill maintainers"
+    },
+    {
+      "id": "self-guiding",
+      "description": "Self-guiding claim",
+      "type": "regex",
+      "pattern": "self-guiding"
+    },
+    {
+      "id": "quickstart-bash",
+      "description": "Quickstart bash block",
+      "type": "regex",
+      "pattern": "```bash"
+    },
+    {
+      "id": "example-output",
+      "description": "Example B-check output",
+      "type": "regex",
+      "pattern": "WARNING.*B[0-9]"
+    },
+    {
+      "id": "phase-table",
+      "description": "Phase table covers all B1-B11 + C1-C4",
+      "type": "contains-all",
+      "items": [
+        "**B1**", "**B2**", "**B3**", "**B4**", "**B5**", "**B6**",
+        "**B7**", "**B8**", "**B9**", "**B10**", "**B11**",
+        "**C1**", "**C2**", "**C3**", "**C4**"
+      ]
+    },
+    {
+      "id": "link-skills-md",
+      "description": "Links to SKILL.md",
+      "type": "regex",
+      "pattern": "SKILL\\.md"
+    },
+    {
+      "id": "link-agents-md",
+      "description": "Links to AGENTS.md",
+      "type": "regex",
+      "pattern": "AGENTS\\.md"
+    },
+    {
+      "id": "link-references",
+      "description": "Links to references/",
+      "type": "regex",
+      "pattern": "references/"
+    },
+    {
+      "id": "see-also",
+      "description": "See also section",
+      "type": "regex",
+      "pattern": "## See also"
+    },
+    {
+      "id": "ecosystem-links",
+      "description": "Ecosystem links",
+      "type": "regex",
+      "pattern": "hermes-agent\\.nousresearch\\.com|CodeSigils/hermes-skill-hq"
+    },
+    {
+      "id": "tree-lists-all-root-files",
+      "description": "All root committed files appear in README",
+      "type": "contains-all",
+      "items": [
+        "AGENTS.md", "SKILL.md", "README.md", "LICENSE",
+        ".gitattributes", ".gitignore", ".repo-health.json"
+      ]
+    }
+  ],
+  "AGENTS.md": [
+    {
+      "id": "root-files-listed",
+      "description": "All root committed files appear in project structure",
+      "type": "contains-all",
+      "items": [
+        "AGENTS.md", "SKILL.md", "README.md", "LICENSE",
+        ".gitattributes", ".gitignore", ".repo-health.json"
+      ]
+    }
+  ],
+  "docs/README.md": [
+    {
+      "id": "maintainer-audience",
+      "description": "Declares maintainer-only audience",
+      "type": "regex",
+      "pattern": "not shipped to skill users"
+    },
+    {
+      "id": "links-decisions",
+      "description": "Links to decisions.md",
+      "type": "regex",
+      "pattern": "decisions\\.md"
+    },
+    {
+      "id": "links-research",
+      "description": "Links to research.md",
+      "type": "regex",
+      "pattern": "research\\.md"
+    },
+    {
+      "id": "consolidated-note",
+      "description": "Documents consolidation origin",
+      "type": "regex",
+      "pattern": "consolidated information from"
+    }
+  ]
+}
