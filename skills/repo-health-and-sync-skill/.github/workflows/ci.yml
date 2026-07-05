@@ -1,6 +1,7 @@
 name: ci
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
     paths:
@@ -27,7 +28,7 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
       - name: Self-test — commit trailers
         run: python3 scripts/check-commit-trailers.py --self-test
       - name: Self-test — doc audit
