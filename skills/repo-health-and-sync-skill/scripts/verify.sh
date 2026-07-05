@@ -141,10 +141,8 @@ fi
 # No stale refs to deleted doc files
 stale=0
 for old in PLAN PROPOSALS REPORT USER-SUGGESTIONS; do
-    if grep -rn --include='*.md' "${old}\.md" . 2>/dev/null \
+    if grep -rn --include='*.md' "${old}\\.md" . 2>/dev/null \
         | grep -v '.git/' \
-        | grep -v 'docs/decisions.md' \
-        | grep -v 'docs/research.md' \
         | grep -q .; then
         echo "  STALE  reference to ${old}.md found"
         stale=$((stale + 1))
