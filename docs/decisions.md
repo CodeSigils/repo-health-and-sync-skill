@@ -27,7 +27,7 @@ Phase B gates Phase C: never sync a broken repo.
 
 ### Single-file skill + reference files
 
-**Decision:** SKILL.md is the canonical skill definition (~550 lines). Detail
+**Decision:** SKILL.md is the canonical skill definition (~600 lines). Detail
 lives in `references/` (8 files). No content duplicated between them.
 
 **Why:** Single-file index + pointed references is the ecosystem norm across

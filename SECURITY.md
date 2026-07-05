@@ -8,8 +8,10 @@ There are no versioned releases — always use the latest commit from `main`.
 ## Reporting a Vulnerability
 
 This project contains no runtime dependencies, no secrets, and no network-facing
-service. It ships a single governance skill (`SKILL.md`) with supporting CI
-tooling (`verify.sh`, `doc-audit.py`, and `check-commit-trailers.py`). If you
+service. It ships a single governance skill (`SKILL.md`) with supporting
+scripts (`check-commit-trailers.py`, `verify.sh`, `doc-audit.py`). The
+latter two are root-level CI tooling, not part of the user-installed
+skill. If you
 find an issue with the content or CI configuration, please open a public issue
 on GitHub.
 
