@@ -1,0 +1,38 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'SKILL.md'
+      - 'scripts/**'
+      - 'references/**'
+      - 'AGENTS.md'
+      - 'README.md'
+      - '.github/workflows/ci.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'SKILL.md'
+      - 'scripts/**'
+      - 'references/**'
+      - 'AGENTS.md'
+      - 'README.md'
+      - '.github/workflows/ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Self-test — commit trailers
+        run: python3 scripts/check-commit-trailers.py --self-test
+      - name: Self-test — doc audit
+        run: python3 scripts/doc-audit.py --self-test
+      - name: Self-test — verify.sh
+        run: bash scripts/verify.sh --self-test
+      - name: Full verify
+        run: bash scripts/verify.sh
