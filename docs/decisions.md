@@ -147,7 +147,7 @@ has no BLOCKING items.
 
 ```
 ├── AGENTS.md                 # THIS FILE — how to develop the skill
-├── SKILL.md                  # ~575 lines — canonical skill definition
+├── SKILL.md                  # ~601 lines — canonical skill definition
 ├── README.md                 # User-facing install/quickstart
 ├── LICENSE                   # MIT
 ├── .gitignore                # Agent-artifact patterns + OS/IDE junk
@@ -168,7 +168,7 @@ has no BLOCKING items.
 │   └── sync-targets.md
 └── scripts/
     ├── verify.sh                 # Orchestration (self-consistency)
-    ├── check-commit-trailers.py  # Shared Python checker (10/10 self-test)
+    ├── check-commit-trailers.py  # Shared Python checker (12/12 self-test)
     └── doc-audit.py              # Manifest-driven doc completeness audit
 ```
 

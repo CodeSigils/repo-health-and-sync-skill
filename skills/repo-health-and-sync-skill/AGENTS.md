@@ -117,7 +117,7 @@ Top-level layout:
 - **.repo-health.json** — self-configuration for the skill's own repo
 - **docs/** — 3 files + doc-standards.json: README.md (audience), decisions.md (architecture), research.md (evidence)
 - **references/** — one concern per file
-- **scripts/** — `check-commit-trailers.py` (Python checker, 10/10 self-test), `doc-audit.py` (manifest-driven doc checker)
+- **scripts/** — `check-commit-trailers.py` (Python checker, 12/12 self-test), `doc-audit.py` (manifest-driven doc checker)
 
 Key constraint: maintainer-only paths (`scripts/`, `.github/` if present, `docs/`) are
 never included in Phase C sync targets. See [SKILL.md §C](SKILL.md#c1-detect-targets).
@@ -134,5 +134,5 @@ These are the patterns most likely to cause rework or drift:
    user request will accumulate maintenance debt before value.
 3. **Forgetting to update cross-refs on rename/delete.** A single stale
    `references/` link breaks the skill. Verify with the checklist above.
-4. **Letting SKILL.md grow past 600 lines.** When it approaches this ceiling,
+4. **Letting SKILL.md grow past 700 lines.** When it approaches this ceiling,
    extract to a new reference file or consolidate existing ones.
