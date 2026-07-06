@@ -549,9 +549,10 @@ detection patterns resolved correctly without any hardcoded project metadata.
 1. **GitHub Releases are not created from git tags automatically.** An
    annotated tag is a git object. `gh release create` is a separate step.
 
-2. **Tags are not pushed with `git push` by default.** Use `git push --tags`
-   or `git push --follow-tags` explicitly. Or push each tag individually
-   with `git push origin <tag>`.
+2. **Tags are not pushed with `git push` by default.** Use `git push --follow-tags`
+   (preferred — only pushes annotated tags on the current commit) or push each tag
+   individually with `git push origin <tag>`. Avoid bare `git push --tags` which
+   pushes every local tag, including stale ones.
 
 3. **Multiple remotes require multiple pushes.** `git push` only pushes to
    the default remote. Iterate all defined remotes.
