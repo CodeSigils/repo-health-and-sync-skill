@@ -80,20 +80,30 @@ sync targets, or add a custom consistency check. See
 ## Project structure
 
 ```text
-├── docs/maintaining.md     # Maintainer workflow (replaces AGENTS.md)
 ├── SKILL.md              # Canonical skill definition
+├── README.md             # User-facing install/quickstart
 ├── SECURITY.md           # Security policy and reporting
 ├── .gitattributes        # Git/Linguist configuration
 ├── .gitignore            # B10 target (agent-artifact + OS/IDE patterns)
 ├── LICENSE               # MIT
-├── references/           # Per-check detail and configuration
-├── scripts/              # Enforcement scripts
-├── docs/                 # Maintainer documentation
+├── .repo-health.json     # Self-configuration for the skill's own repo
+├── .github/
+│   └── workflows/
+│       └── ci.yml        # CI pipeline
+├── docs/
 │   ├── README.md         # Audience note
+│   ├── maintaining.md    # Maintainer workflow
 │   ├── decisions.md      # Architecture rationale
 │   ├── research.md       # Evidence base
 │   └── doc-standards.json# Doc completeness manifest
-└── .repo-health.json     # Self-configuration for the skill's own repo
+├── references/           # Per-check detail and configuration
+├── scripts/              # Enforcement scripts
+└── skills/               # Deployable skill package
+    └── repo-health-and-sync-skill/
+        ├── SKILL.md
+        ├── references/    # Per-check detail (subset)
+        └── scripts/
+            └── check-commit-trailers.py
 ```
 
 ---

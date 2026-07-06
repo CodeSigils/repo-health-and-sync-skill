@@ -44,7 +44,7 @@
       "id": "link-maintaining-md",
       "description": "Links to docs/maintaining.md",
       "type": "regex",
-      "pattern": "docs/maintaining\\.md"
+      "pattern": "docs/maintaining\\.md|maintaining\\.md"
     },
     {
       "id": "link-references",
@@ -69,7 +69,7 @@
       "description": "All root committed files appear in README",
       "type": "contains-all",
       "items": [
-        "docs/maintaining.md", "SKILL.md", "README.md", "LICENSE",
+        "maintaining.md", "SKILL.md", "README.md", "LICENSE",
         ".gitattributes", ".gitignore", ".repo-health.json"
       ]
     }
