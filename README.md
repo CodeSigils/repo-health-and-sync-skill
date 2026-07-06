@@ -82,6 +82,7 @@ sync targets, or add a custom consistency check. See
 ```text
 ├── AGENTS.md             # How to develop this skill (for contributors)
 ├── SKILL.md              # Canonical skill definition
+├── SECURITY.md           # Security policy and reporting
 ├── .gitattributes        # Git/Linguist configuration
 ├── .gitignore            # B10 target (agent-artifact + OS/IDE patterns)
 ├── LICENSE               # MIT

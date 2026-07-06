@@ -150,6 +150,7 @@ has no BLOCKING items.
 ├── SKILL.md                  # ~596 lines — canonical skill definition
 ├── README.md                 # User-facing install/quickstart
 ├── LICENSE                   # MIT
+├── SECURITY.md               # Security policy and reporting
 ├── .gitignore                # Agent-artifact patterns + OS/IDE junk
 ├── .gitattributes            # Git/Linguist configuration
 ├── docs/

@@ -538,14 +538,16 @@ projects. It demonstrates that the generic approach works without hardcoding.
 | B1: Remotes           | 1                                                | 1                          | 1                  | 2 (origin, ssh-origin)                   | 1                    |
 | B2: Shell scripts     | `scripts/release.sh`, `staged-install-verify.sh` | 13 across dev/ + scripts/  | 9 scripts          | `build.sh`, `test.sh`, `scripts/check-*` | 0                    |
 | B3: Consistency check | `check-consistency.js`                           | `run-offline-contracts.sh` | `check-*` scripts  | `check-release-readiness.sh`             | `verify.py`          |
-|| B4: Version sources   | `package.json`, `SKILL.md`, README badge         | SKILL.md only              | none               | none                                     | none                 |
-| B5: Tag/Release       | 5 tags, 3 releases (2 orphans)                   | 33 tags, 0 releases        | N/A (no tags)      | 2 tags, 2 releases                       | N/A (no tags)        |
+| B4: Version sources   | `package.json`, `SKILL.md`, README badge         | SKILL.md only              | none               | none                                     | none                 |
+| B5: Tag/Release       | 10 tags, 10 releases                             | 33 tags, 0 releases        | N/A (no tags)      | 3 tags, 3 releases                       | N/A (no tags)        |
 | C1: Sync target       | Hermes skill                                     | HQ directory               | Doom mirror        | build-package (CI)                       | none                 |
 
 Key observation: **hermes-skill-hq has 33+ version tags and zero GitHub
-Releases** — the same category of gap that was recently fixed in
-agents-markdown-formatter. A run of this skill against hermes-skill-hq would
-flag B5 as WARNING and prompt 33 release creations or tag deletions.
+Releases** — the same category of gap that was present in
+agents-markdown-formatter (3 orphan tags) and has since been closed
+by creating Releases for all orphaned tags. A run of this skill against
+hermes-skill-hq would flag B5 as WARNING and prompt 33 release creations
+or tag deletions.
 
 ---
 
