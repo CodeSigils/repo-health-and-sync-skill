@@ -527,23 +527,20 @@ heuristics give wrong results or when explicit control is needed.
 
 ---
 
-## Real-world heuristic examples
+## Real-world heuristic example
 
-The table below shows how the heuristic detection resolves for three surveyed
-projects. It demonstrates that the generic approach works without hardcoding.
+The heuristic detection was verified against `agents-markdown-formatter`: its
+detection patterns resolved correctly without any hardcoded project metadata.
 
-| Signal                | agents-markdown-formatter                        | hermes-doom-config | agent-concepts-study |
-| :-------------------- | :----------------------------------------------- | :----------------- | :------------------- |
-| B1: Branch            | main                                             | main               | main                 |
-| B1: Remotes           | 1                                                | 1                  | 1                    |
-| B2: Shell scripts     | `scripts/release.sh`, `staged-install-verify.sh` | 9 scripts          | 0                    |
-| B3: Consistency check | `check-consistency.js`                           | `check-*` scripts  | `verify.py`          |
-| B4: Version sources   | `package.json`, `SKILL.md`, README badge         | none               | none                 |
-| B5: Tag/Release       | 10 tags, 10 releases                             | N/A (no tags)      | N/A (no tags)        |
-| C1: Sync target       | Hermes skill                                     | Doom mirror        | none                 |
-
-The table demonstrates that the generic heuristic approach works across
-dissimilar projects without hardcoding project names, paths, or commands.
+| Signal                | agents-markdown-formatter                        |
+| :-------------------- | :----------------------------------------------- |
+| B1: Branch            | main                                             |
+| B1: Remotes           | 1                                                |
+| B2: Shell scripts     | `scripts/release.sh`, `staged-install-verify.sh` |
+| B3: Consistency check | `check-consistency.js`                           |
+| B4: Version sources   | `package.json`, `SKILL.md`, README badge         |
+| B5: Tag/Release       | 10 tags, 10 releases                             |
+| C1: Sync target       | Hermes skill                                     |
 
 ---
 
