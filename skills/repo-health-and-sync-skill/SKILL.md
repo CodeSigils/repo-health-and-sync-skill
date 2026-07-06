@@ -529,25 +529,21 @@ heuristics give wrong results or when explicit control is needed.
 
 ## Real-world heuristic examples
 
-The table below shows how the heuristic detection resolves for five surveyed
+The table below shows how the heuristic detection resolves for three surveyed
 projects. It demonstrates that the generic approach works without hardcoding.
 
-| Signal                | agents-markdown-formatter                        | hermes-skill-hq            | hermes-doom-config | neovim-latest-ubuntu                     | agent-concepts-study |
-| :-------------------- | :----------------------------------------------- | :------------------------- | :----------------- | :--------------------------------------- | :------------------- |
-| B1: Branch            | main                                             | master                     | main               | main                                     | main                 |
-| B1: Remotes           | 1                                                | 1                          | 1                  | 2 (origin, ssh-origin)                   | 1                    |
-| B2: Shell scripts     | `scripts/release.sh`, `staged-install-verify.sh` | 13 across dev/ + scripts/  | 9 scripts          | `build.sh`, `test.sh`, `scripts/check-*` | 0                    |
-| B3: Consistency check | `check-consistency.js`                           | `run-offline-contracts.sh` | `check-*` scripts  | `check-release-readiness.sh`             | `verify.py`          |
-| B4: Version sources   | `package.json`, `SKILL.md`, README badge         | SKILL.md only              | none               | none                                     | none                 |
-| B5: Tag/Release       | 10 tags, 10 releases                             | 33 tags, 0 releases        | N/A (no tags)      | 3 tags, 3 releases                       | N/A (no tags)        |
-| C1: Sync target       | Hermes skill                                     | HQ directory               | Doom mirror        | build-package (CI)                       | none                 |
+| Signal                | agents-markdown-formatter                        | hermes-doom-config | agent-concepts-study |
+| :-------------------- | :----------------------------------------------- | :----------------- | :------------------- |
+| B1: Branch            | main                                             | main               | main                 |
+| B1: Remotes           | 1                                                | 1                  | 1                    |
+| B2: Shell scripts     | `scripts/release.sh`, `staged-install-verify.sh` | 9 scripts          | 0                    |
+| B3: Consistency check | `check-consistency.js`                           | `check-*` scripts  | `verify.py`          |
+| B4: Version sources   | `package.json`, `SKILL.md`, README badge         | none               | none                 |
+| B5: Tag/Release       | 10 tags, 10 releases                             | N/A (no tags)      | N/A (no tags)        |
+| C1: Sync target       | Hermes skill                                     | Doom mirror        | none                 |
 
-Key observation: **hermes-skill-hq has 33+ version tags and zero GitHub
-Releases** — the same category of gap that was present in
-agents-markdown-formatter (3 orphan tags) and has since been closed
-by creating Releases for all orphaned tags. A run of this skill against
-hermes-skill-hq would flag B5 as WARNING and prompt 33 release creations
-or tag deletions.
+The table demonstrates that the generic heuristic approach works across
+dissimilar projects without hardcoding project names, paths, or commands.
 
 ---
 
