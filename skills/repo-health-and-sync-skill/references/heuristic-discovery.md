@@ -224,7 +224,7 @@ discovery (same file walk, same exclusion rules).
 
 | Pattern | Detection command | Portable replacement |
 | :------ | :---------------- | :------------------- |
-| `which` | `grep -rn '\bwhich\b' --include='*.sh' .` | `command -v` |
+| `$(which ...)` | `grep -rnE` with `$(which` on `.sh` files | `command -v` |
 | `grep -P` | `grep -rn 'grep.*-P' --include='*.sh' .` | `grep -E` |
 | `sed -i` without backup extension | `grep -rnE 'sed -i[^b ]' --include='*.sh' .` | `sed -i.bak` |
 | `echo` with escape sequences | `grep -rn 'echo.*\\' --include='*.sh' .` | `printf '%s\n'` |

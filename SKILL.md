@@ -249,10 +249,11 @@ by format:
 
 - `type(scope): message` — Conventional Commits (preferred)
 - `type: message` — Conventional Commits, no scope
-- `message` — unstructured
+- `topic: message` — structured (noun phrase before colon)
+- `message` — unstructured (no colon prefix)
 
-Count how many match Conventional Commits. If fewer than 7/10 follow a
-structured format, emit a WARNING. The agent logs the sample and the ratio,
+Count how many follow a structured format (conventional commits + topic-style).
+If fewer than 7/10 are structured, emit a WARNING. The agent logs the sample and the ratio,
 but does NOT require retroactive fixes — this is a culture signal, not a
 block.
 
@@ -537,7 +538,7 @@ projects. It demonstrates that the generic approach works without hardcoding.
 | B1: Remotes           | 1                                                | 1                          | 1                  | 2 (origin, ssh-origin)                   | 1                    |
 | B2: Shell scripts     | `scripts/release.sh`, `staged-install-verify.sh` | 13 across dev/ + scripts/  | 9 scripts          | `build.sh`, `test.sh`, `scripts/check-*` | 0                    |
 | B3: Consistency check | `check-consistency.js`                           | `run-offline-contracts.sh` | `check-*` scripts  | `check-release-readiness.sh`             | `verify.py`          |
-| B4: Version sources   | `package.json`, `SKILL.md`, README badge         | SKILL.md only              | none               | CHANGELOG only                           | none                 |
+|| B4: Version sources   | `package.json`, `SKILL.md`, README badge         | SKILL.md only              | none               | none                                     | none                 |
 | B5: Tag/Release       | 5 tags, 3 releases (2 orphans)                   | 33 tags, 0 releases        | N/A (no tags)      | 2 tags, 2 releases                       | N/A (no tags)        |
 | C1: Sync target       | Hermes skill                                     | HQ directory               | Doom mirror        | build-package (CI)                       | none                 |
 
