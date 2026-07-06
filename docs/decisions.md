@@ -88,7 +88,7 @@ annotated tag" instead of "every change gets a CHANGELOG line."
 
 **Impact:**
 - `verify.sh` no longer checks for `## Unreleased`
-- AGENTS.md checklist item 6 replaced with "Tagged releases"
+- AGENTS.md → docs/maintaining.md: maintainer instructions migrated to docs/
 - SKILL.md references to CHANGELOG remain — they instruct agents about
   checking *other repos'* CHANGELOGs (conceptual, not self-referential)
 
@@ -146,7 +146,7 @@ has no BLOCKING items.
 ## File structure at completion
 
 ```
-├── AGENTS.md                 # THIS FILE — how to develop the skill
+├── docs/maintaining.md     # Maintainer workflow (docs/maintaining.md)
 ├── SKILL.md                  # ~596 lines — canonical skill definition
 ├── README.md                 # User-facing install/quickstart
 ├── LICENSE                   # MIT

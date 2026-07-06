@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # verify.sh — Consistency check for the repo-health-and-sync-skill repo
 #
-# Exercises the verification checklist from AGENTS.md. Exit 0 if everything
+# Exercises the verification checklist from docs/maintaining.md. Exit 0 if everything
 # passes, non-zero with details on first failure. Portable: no GNU-only flags.
 set -euo pipefail
 
@@ -31,7 +31,7 @@ if [ "${1:-}" = "--self-test" ]; then
 
     # 3. Required external files exist
     for f in scripts/doc-audit.py scripts/check-commit-trailers.py \
-             docs/doc-standards.json SKILL.md README.md AGENTS.md; do
+             docs/doc-standards.json SKILL.md README.md docs/maintaining.md; do
         if [ -f "$f" ]; then
             echo "  PASS  $f exists"
         else

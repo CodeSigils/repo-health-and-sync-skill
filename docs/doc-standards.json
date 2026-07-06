@@ -41,10 +41,10 @@
       "pattern": "SKILL\\.md"
     },
     {
-      "id": "link-agents-md",
-      "description": "Links to AGENTS.md",
+      "id": "link-maintaining-md",
+      "description": "Links to docs/maintaining.md",
       "type": "regex",
-      "pattern": "AGENTS\\.md"
+      "pattern": "docs/maintaining\\.md"
     },
     {
       "id": "link-references",
@@ -62,25 +62,14 @@
       "id": "ecosystem-links",
       "description": "Ecosystem links",
       "type": "regex",
-      "pattern": "hermes-agent\\.nousresearch\\.com|CodeSigils/hermes-skill-hq"
+      "pattern": "hermes-agent\\.nousresearch\\.com"
     },
     {
       "id": "tree-lists-all-root-files",
       "description": "All root committed files appear in README",
       "type": "contains-all",
       "items": [
-        "AGENTS.md", "SKILL.md", "README.md", "LICENSE",
-        ".gitattributes", ".gitignore", ".repo-health.json"
-      ]
-    }
-  ],
-  "AGENTS.md": [
-    {
-      "id": "root-files-listed",
-      "description": "All root committed files appear in project structure",
-      "type": "contains-all",
-      "items": [
-        "AGENTS.md", "SKILL.md", "README.md", "LICENSE",
+        "docs/maintaining.md", "SKILL.md", "README.md", "LICENSE",
         ".gitattributes", ".gitignore", ".repo-health.json"
       ]
     }

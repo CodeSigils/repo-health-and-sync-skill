@@ -80,7 +80,7 @@ sync targets, or add a custom consistency check. See
 ## Project structure
 
 ```text
-├── AGENTS.md             # How to develop this skill (for contributors)
+├── docs/maintaining.md     # Maintainer workflow (replaces AGENTS.md)
 ├── SKILL.md              # Canonical skill definition
 ├── SECURITY.md           # Security policy and reporting
 ├── .gitattributes        # Git/Linguist configuration
@@ -113,8 +113,7 @@ Full principles in [SKILL.md §B0](SKILL.md#b0-design-principles-read-before-pha
 
 - [Hermes Agent docs](https://hermes-agent.nousresearch.com/docs) — skills,
   install, configuration
-- [hermes-skill-hq](https://github.com/CodeSigils/hermes-skill-hq) — curated
-  skill catalog
+- [CodeSigils/agents-markdown-formatter](https://github.com/CodeSigils/agents-markdown-formatter) — GFM/MDX formatter with structural guards
 
 ---
 
