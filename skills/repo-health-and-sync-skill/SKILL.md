@@ -101,7 +101,7 @@ that depends on an external quality tool (shellcheck, linters, formatters),
 the agent runs a three-layer availability check:
 
 1. `skill_view(name)` — verify a matching Hermes skill (e.g.
-   `python-best-practices`) exists and loads
+   `python-project-workflow`) exists and loads
 2. Frontmatter tags check — does the skill's declared language/scope match
    the repo being inspected?
 3. Degraded mode — if neither resolves, skip the check and log which checks
