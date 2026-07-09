@@ -15,6 +15,29 @@ sync (C1-C4). Discovers everything at runtime — no hardcoded metadata.
 hermes skills install CodeSigils/repo-health-and-sync-skill
 ```
 
+<details>
+<summary><b>Hermes Agent — live-edit setup (recommended for development)</b></summary>
+
+Clone the repo, then add the `skills/` directory to `skills.external_dirs`
+in `~/.hermes/config.yaml`:
+
+```yaml
+skills:
+  external_dirs:
+    - /path/to/repo-health-and-sync-skill/skills
+```
+
+This loads the skill directly from the repo — every commit is immediately
+reflected without reinstalling. The skill appears as a `local` skill in
+`hermes skills list`.
+
+**Alternative — copy the skill:**
+
+```bash
+cp -r skills/repo-health-and-sync-skill ~/.hermes/skills/
+```
+</details>
+
 ## Quick start
 
 ```bash
