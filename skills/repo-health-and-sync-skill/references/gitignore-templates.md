@@ -41,6 +41,10 @@ CLAUDE.local.md
 AGENT.md
 GEMINI.md
 gemini-debug.log
+.agents/
+.codex/
+.opencode/
+.cursor/
 ```
 
 **Source:** <https://github.com/NousResearch/Agents.gitignore>

@@ -38,9 +38,15 @@ explicit declarations.
 ## Overview — How to use this skill
 
 1. Confirm you're inside the repo root (`git rev-parse --show-toplevel`).
-2. Run Phase B phases in order (B1 through B11).
-3. If any BLOCKING item, stop and fix before continuing.
-4. If the repo has a runtime target, run Phase C (C1 through C4).
+2. **Verify the loaded skill is current.** The agent reads the installed mirror
+   (`~/.hermes/skills/<name>/`), not the repo canonical source. From the repo
+   root, compare source vs installed mirror:
+   `diff -rq skills/<name>/ ~/.hermes/skills/<name>/`
+   (adjust paths per your project layout and Hermes config). If they differ,
+   sync with Phase C first. A stale installed mirror produces stale results.
+3. Run Phase B phases in order (B1 through B12).
+4. If any BLOCKING item, stop and fix before continuing.
+5. If the repo has a runtime target, run Phase C (C1 through C4).
 
 Each phase section lists: **why** it matters, **how** to discover the
 relevant files/config at runtime, **severity** when it fails, and
@@ -89,6 +95,15 @@ maintainer tooling — CI scripts, release infra, development helpers — to a
 user's machine. Phase C enforces this mechanically: sync goes repo→target,
 not the reverse, and maintainer-only files stay in `scripts/`, `.github/`, and `docs/` —
 these are never sync targets.
+
+**Loaded skill may be stale.** A corollary of **Repo as source**. The agent
+reads the installed mirror at load time, but the repo may have updated its
+canonical copy since the last sync (Phase C). Before running any significant
+phase — especially when auditing the skill's own repo or any skill repo with a
+synced runtime target — verify source == mirror. From the repo root:
+`diff -rq skills/<name>/ ~/.hermes/skills/<name>/` (adjust paths per your
+project layout and Hermes config). If they differ, run Phase C first. Do not
+let an unsynced mirror compile unearned results.
 
 **Portable grep in skill code.** Every `grep` command in this SKILL.md and its
 reference files must use POSIX-compatible flags. `-P` (PCRE) is GNU-only and
@@ -420,9 +435,9 @@ in agent behavior.
 | # | What it checks | If missing |
 | :- | :------------- | :--------- |
 | 1 | `.gitignore` exists at repo root | WARNING |
-| 2 | Agent-artifact patterns covered | `.open-mem/`, `.omo/`, `.aider.*`, `CLAUDE.local.md`, `.claude/**/*.log`, `AGENT.md`, `GEMINI.md` |
+| 2 | Agent-artifact patterns covered | `.open-mem/`, `.omo/`, `.aider.*`, `CLAUDE.local.md`, `.claude/**/*.log`, `AGENT.md`, `GEMINI.md`, `.agents/`, `.codex/`, `.opencode/`, `.cursor/` |
 | 3 | OS junk covered | `.DS_Store`, `Thumbs.db`, `*.swp`, `*.swo`, `*~` |
-| 4 | Language build artifacts | `node_modules/`, `__pycache__/`, `*.pyc`, `target/`, `dist/` |
+| 4 | Language build artifacts | `node_modules/`, `__pycache__/`, `*.pyc`, `.pytest_cache/`, `target/`, `dist/`, `build/`, `output/` |
 | 5 | IDE files covered | `.vscode/`, `.idea/`, `*.sublime-*` |
 | 6 | Instruction-file conflicts | Flag if 2+ of `[AGENTS.md, WARP.md, .rules, CLAUDE.md, GEMINI.md, .github/copilot-instructions.md]` co-exist |
 

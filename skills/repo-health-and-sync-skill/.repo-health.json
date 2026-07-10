@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "commit_body_format": {
+    "required_fields": ["what", "why"],
+    "pattern": "^what: .+\\nwhy:  .+$"
+  }
+}
