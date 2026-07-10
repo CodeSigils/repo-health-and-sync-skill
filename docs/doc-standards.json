@@ -72,6 +72,12 @@
         "maintaining.md", "SKILL.md", "README.md", "LICENSE",
         ".gitattributes", ".gitignore", ".repo-health.json"
       ]
+    },
+    {
+      "id": "b9-multiforge-skip",
+      "description": "B9 skip condition is multi-forge",
+      "type": "not-regex",
+      "pattern": "No `\\.github/workflows/`"
     }
   ],
   "docs/README.md": [
@@ -98,6 +104,40 @@
       "description": "Documents consolidation origin",
       "type": "regex",
       "pattern": "consolidated information from"
+    }
+  ],
+  "docs/maintaining.md": [
+    {
+      "id": "skill-line-ceiling-current",
+      "description": "Maintainer line ceiling matches verify.sh",
+      "type": "contains-all",
+      "items": ["≤ 740", "past 740 lines"]
+    },
+    {
+      "id": "no-stale-650-ceiling",
+      "description": "No stale 650-line ceiling",
+      "type": "not-regex",
+      "pattern": "650 lines|≤ 650"
+    }
+  ],
+  "docs/decisions.md": [
+    {
+      "id": "phase-b-includes-b12",
+      "description": "Decisions include B12",
+      "type": "regex",
+      "pattern": "B1-B12"
+    },
+    {
+      "id": "reference-cap-current",
+      "description": "Decisions use current reference cap",
+      "type": "contains-all",
+      "items": ["15-file ceiling", "≤15 files"]
+    },
+    {
+      "id": "no-stale-reference-counts",
+      "description": "No stale reference count claims",
+      "type": "not-regex",
+      "pattern": "8 files|~596|B1-B11|4 sub-steps"
     }
   ]
 }

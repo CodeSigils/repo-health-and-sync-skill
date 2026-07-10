@@ -38,12 +38,12 @@ explicit declarations.
 ## Overview — How to use this skill
 
 1. Confirm you're inside the repo root (`git rev-parse --show-toplevel`).
-2. **Verify the loaded skill is current.** The agent reads the installed mirror
-   (`~/.hermes/skills/<name>/`), not the repo canonical source. From the repo
-   root, compare source vs installed mirror:
-   `diff -rq skills/<name>/ ~/.hermes/skills/<name>/`
-   (adjust paths per your project layout and Hermes config). If they differ,
-   sync with Phase C first. A stale installed mirror produces stale results.
+2. **Verify the loaded skill is current.** The agent may read an installed
+   mirror, external directory, or copied skill directory rather than the repo
+   canonical source. Locate the active skill path with the agent's skill list
+   command or config, then compare it to the repo source with `diff -rq`.
+   If they differ, sync with Phase C first. A stale installed mirror produces
+   stale results.
 3. Run Phase B phases in order (B1 through B12).
 4. If any BLOCKING item, stop and fix before continuing.
 5. If the repo has a runtime target, run Phase C (C1 through C4).
@@ -107,7 +107,7 @@ scripts) must work on any system where the repo builds.
 mechanism (`SKILL.md` + platform-specific CLI registration) is different
 per runtime. To port to another agent runtime, see
 [references/agent-instruction-ecosystem.md](references/agent-instruction-ecosystem.md)
-for the adaptation path and portability tiers. The detection logic in B1-B11
+for the adaptation path and portability tiers. The detection logic in B1-B12
 and C1-C4 is agent-agnostic.
 
 **Quality-skill fallback (quad-layer probe).** Before running a B-phase check
@@ -652,9 +652,10 @@ heuristics give wrong results or when explicit control is needed.
    them in a `.shellcheckrc` or `.repo-health.json` skip filter so they
    don't silently multiply.
 
-5. **Hermes skill reinstall does not reload the current agent session.**
-   After `hermes skills install --force`, run `/reset` or start a new
-   session for the skill to take effect. Inform the user.
+5. **Hermes skill updates do not reload the current agent session.**
+   After `hermes skills install --force`, updating `skills.external_dirs`,
+   or copying files into an installed skill directory, run `/reset` or start
+   a new session for the skill to take effect. Inform the user.
 
 6. **Consistency checks vary widely in quality.** A check that exits 0
    for trivial reasons (empty script, always true) is worse than no check.
@@ -681,14 +682,15 @@ heuristics give wrong results or when explicit control is needed.
    - `.hermes/config.yaml` → `skills.external_dirs` includes the project's
      skill directory (e.g., `/home/sand/projects/repo-health-and-sync-skill`)
    - `hermes skills list` shows the skill as "local" or "external" (not missing)
-   - The synced target (`~/.hermes/skills/<name>/`) matches the repo source
-     (`diff -rq` clean)
+   - The synced target located from `hermes skills list`, configured
+     `skills.external_dirs`, or a targeted `~/.hermes/skills/` search matches
+     the repo source (`diff -rq` clean)
    - No stale symlinks or duplicate installations exist
    
    Mismatched paths cause agents to load stale skill versions while the
    repo has updates. This is a frequent source of "the fix didn't take" reports.
 
-7. **CI trigger paths can silently exclude doc files.** A workflow with
+9. **CI trigger paths can silently exclude doc files.** A workflow with
    path-restricted triggers that omits `README.md`, `SECURITY.md`, or doc
    directories produces green CI on documentation-only changes — even when
    those changes break CI-validated invariants (preflight wording,
@@ -697,12 +699,12 @@ heuristics give wrong results or when explicit control is needed.
    the trigger paths must include the doc files. See B9 trigger-path-completeness
    signal.
 
-8. **`.repo-health.json` is optional.** If absent, the heuristic fallback
+10. **`.repo-health.json` is optional.** If absent, the heuristic fallback
    is used. If present with partial data, missing fields fall back to
    heuristics. A project should only add it when heuristics give wrong
    results or when explicit control is needed.
 
-9. **The Hermes `patch` tool can corrupt GFM table pipes.** When `|`
+11. **The Hermes `patch` tool can corrupt GFM table pipes.** When `|`
    appears in `patch`'s find/replace anchors, the matching layer can
    misalign and produce `||` (adjacent pipes). This is not a formatter
    bug — the markdown formatter handles `||` correctly. If you see

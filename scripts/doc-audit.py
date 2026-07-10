@@ -38,6 +38,14 @@ def check_contains_all(filepath, items):
     return all(item in content for item in items)
 
 
+def check_not_regex(filepath, pattern):
+    """Return True if *pattern* does not match anywhere in *filepath*."""
+    if not filepath.exists():
+        return False
+    content = filepath.read_text(encoding="utf-8")
+    return not bool(re.search(pattern, content))
+
+
 def run_checks(manifest_path, repo_root):
     """Run all checks defined in *manifest_path* against *repo_root* files.
 
@@ -57,6 +65,8 @@ def run_checks(manifest_path, repo_root):
 
             if ctype == "regex":
                 ok = check_regex(filepath, check["pattern"])
+            elif ctype == "not-regex":
+                ok = check_not_regex(filepath, check["pattern"])
             elif ctype == "contains-all":
                 ok = check_contains_all(filepath, check["items"])
             else:
@@ -98,14 +108,14 @@ def self_test():
             if "id" not in check or "type" not in check:
                 print(f"  FAIL  Self-test: check in '{filename}' missing 'id' or 'type'")
                 return 1
-            if check["type"] == "regex":
+            if check["type"] in {"regex", "not-regex"}:
                 if "pattern" not in check:
-                    print(f"  FAIL  Self-test: regex check '{check['id']}' missing 'pattern'")
+                    print(f"  FAIL  Self-test: {check['type']} check '{check['id']}' missing 'pattern'")
                     return 1
                 try:
                     re.compile(check["pattern"])
                 except re.error as e:
-                    print(f"  FAIL  Self-test: regex check '{check['id']}' invalid: {e}")
+                    print(f"  FAIL  Self-test: {check['type']} check '{check['id']}' invalid: {e}")
                     return 1
             elif check["type"] == "contains-all":
                 if "items" not in check or not isinstance(check["items"], list):

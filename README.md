@@ -159,7 +159,7 @@ prevent globbing)
 | **B6** | Format + lint | Project's own formatter config | No config found |
 | **B7** | Commit audit | 5 sub-steps: format, drift, CHANGELOG, version, body fields | Sub-steps degrade gracefully per missing baseline |
 | **B8** | Cross-platform shell | Non-portable patterns (`which`, `grep -P`, `sed -i` without backup) | No `.sh` files |
-| **B9** | CI efficiency | Trigger scoping, caching, artifact separation | No `.github/workflows/` |
+| **B9** | CI efficiency | Trigger scoping, caching, artifact separation | No known CI config |
 | **B10** | .gitignore + meta | 6-category coverage + instruction-file conflicts | — |
 | **B11** | Co-author guard | 4-layer `*-by:` trailer enforcement | Single-contributor repos |
 | **B12** | Cross-agent portability | Agent-specific refs in skill files | No `skills/` directory, intentional single-platform |

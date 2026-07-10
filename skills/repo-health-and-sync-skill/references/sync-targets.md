@@ -51,15 +51,18 @@ Heuristic action per target type:
 
 | Type               | Default action                                      | Preferred if sync script exists                  |
 | :----------------- | :-------------------------------------------------- | :----------------------------------------------- |
-| `hermes-skill`     | `hermes skills install --force --yes <hub-ref>`     | Use the install script in the repo if one exists |
+| `hermes-skill`     | Prefer `skills.external_dirs`; otherwise install by hub id or HTTP(S) `SKILL.md` URL | Use the install/sync script in the repo if one exists |
 | `directory-mirror` | Find and run `scripts/sync-*` or `scripts/*-sync-*` | Same default                                     |
 | `hq-directory`     | `bash scripts/hq-sync.sh`                           | Uses it                                          |
 | `build-package`    | Push a version tag and let CI handle the build      | Notify the user                                  |
 
-For Hermes skills: if the hub hasn't indexed the latest push, fall back to
-installing from a local path. Find the skill directory in the repo (the
-directory containing `SKILL.md`), then run
-`hermes skills install "$(pwd)/<skill-dir>" --force --yes`.
+For Hermes skills: current Hermes CLI installs by hub identifier or direct
+HTTP(S) `SKILL.md` URL; do not assume a local filesystem path is accepted.
+For local development, prefer adding the repo's `skills/` directory to
+`skills.external_dirs` in `~/.hermes/config.yaml`. If a repo intentionally
+uses a copied local install, locate the installed skill with `hermes skills
+list` and verify source-vs-installed drift with `diff -rq` before and after
+copying files.
 
 ---
 
@@ -80,7 +83,7 @@ Drift here means the sync was incomplete, stale, or corrupted.
 
 The strategy depends on sync target type:
 
-- **Hermes skill**: Determine the skill directory in the repo (the directory containing `SKILL.md`). Read the skill name from the `name:` frontmatter field, then locate the installed path at `~/.hermes/skills/<name>/`. Walk all files under the repo's skill directory (excluding `node_modules/`) and check that each exists at the same relative path under the installed directory. Any file present in repo but missing from the installed copy is a drift warning.
+- **Hermes skill**: Determine the skill directory in the repo (the directory containing `SKILL.md`). Read the skill name from the `name:` frontmatter field, then locate the installed path with `hermes skills list`, configured `skills.external_dirs`, or a targeted search under `~/.hermes/skills/`. Do not assume `~/.hermes/skills/<name>/` is the active path. Walk all files under the repo's skill directory (excluding `node_modules/`) and check that each exists at the same relative path under the installed directory. Any file present in repo but missing from the installed copy is a drift warning.
 
 - **Directory mirror**: If `.repo-health.json` declares a `sync_target.path`, run `diff -rq` between the repo root and that path, excluding `.git` and `node_modules`. Report any differing or missing files up to the first 20 lines of diff output.
 

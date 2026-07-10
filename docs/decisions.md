@@ -13,7 +13,7 @@ the architecture and rationale without reading the other docs files.
 
 Two-phase procedure for any git repository:
 
-- **Phase B** — Project health baseline (B1-B11). Inspects the repo at runtime
+- **Phase B** — Project health baseline (B1-B12). Inspects the repo at runtime
   for git hygiene, shell safety, version alignment, commit quality, CI
   efficiency, and metadata integrity.
 - **Phase C** — Reverse sync (C1-C4). Deploys repo content to runtime targets
@@ -27,8 +27,9 @@ Phase B gates Phase C: never sync a broken repo.
 
 ### Single-file skill + reference files
 
-**Decision:** SKILL.md is the canonical skill definition (~600 lines). Detail
-lives in `references/` (8 files). No content duplicated between them.
+**Decision:** SKILL.md is the canonical skill definition (kept under the
+verified 740-line ceiling). Detail lives in `references/`. No content
+duplicated between them.
 
 **Why:** Single-file index + pointed references is the ecosystem norm across
 Hermes, Claude Code, Codex, and Copilot. Inline detail in SKILL.md creates
@@ -45,16 +46,15 @@ maintenance independent of the schema reference file. The running text in
 SKILL.md and `references/repo-health-json-schema.md` serve the same purpose
 without an extra file.
 
-### 8 reference files, not 12
+### Reference files stay capped
 
-**Decision:** Started from 12 candidates, delivered 8. Prioritised by observed
-failure modes.
+**Decision:** Started from a smaller reference set and now keep the directory
+under a 15-file ceiling. Prioritise by observed failure modes.
 
 **Why:** Proportionate anti-drift (B0) — every reference file should trace to
-a specific observed failure or concrete user request. The 4 deferred files
-(release-checklist.md, ci-wiring.md, mature-project-patterns.md,
-script-awareness-chain.md) were not grounded in enough evidence to justify
-their maintenance cost.
+a specific observed failure or concrete user request. Deferred or new
+reference files must be grounded in enough evidence to justify their
+maintenance cost.
 
 ### 15-file ceiling on references/
 
@@ -104,7 +104,7 @@ annotated tag" instead of "every change gets a CHANGELOG line."
 | **Proportionate anti-drift** | Every check traces to an observed failure. Speculative checks accumulate debt before value. |
 | **Repo as source** | The repo is authoritative; deployed targets are derived. Never ship maintainer tooling to users. |
 | **Forge-awareness** | Detection logic is agent-agnostic. Activation mechanism (SKILL.md) is Hermes-specific. Portability tiers documented. |
-| **Quality-skill fallback** | Three-layer probe before depending on external tools: skill_view → frontmatter → degraded mode/skip. |
+| **Quality-skill fallback** | Quad-layer probe before depending on external tools: `command -v` → config/project file → `skill_view` on Hermes → degraded mode/skip. |
 
 ---
 
@@ -118,7 +118,7 @@ annotated tag" instead of "every change gets a CHANGELOG line."
 | B4 | Version alignment | Version skew between manifests is the leading cause of stale-release bugs | WARNING — multi-source skew |
 | B5 | Tag vs Release integrity | Tags and GitHub Releases are separate artifacts; tags can be orphaned | WARNING — actionable |
 | B6 | Format + lint | Consistent formatting reduces diff noise and prevents formatting-only commits | WARNING — advisory |
-| B7 | Commit audit (4 sub-steps) | Unchecked commits accumulate silently until a release fails | WARNING to BLOCKING per sub-step |
+| B7 | Commit audit (5 sub-steps) | Unchecked commits accumulate silently until a release fails | WARNING to BLOCKING per sub-step |
 | B8 | Cross-platform shell | Linux-only patterns break CI on macOS/BSD and block cross-platform contributors | WARNING — project-dependent |
 | B9 | CI efficiency | Docs-only changes should not trigger full builds; tag pushes should not re-run branch CI | WARNING — advisory, project-dependent |
 | B10 | .gitignore + metadata | Build artifacts, OS junk, and agent state leak into commits without .gitignore rules | WARNING — advisory |
@@ -147,7 +147,7 @@ has no BLOCKING items.
 
 ```
 ├── docs/maintaining.md     # Maintainer workflow (docs/maintaining.md)
-├── SKILL.md                  # ~596 lines — canonical skill definition
+├── SKILL.md                  # ≤740 lines — canonical skill definition
 ├── README.md                 # User-facing install/quickstart
 ├── LICENSE                   # MIT
 ├── SECURITY.md               # Security policy and reporting
@@ -158,7 +158,7 @@ has no BLOCKING items.
 │   ├── decisions.md          # What and why
 │   ├── research.md           # Evidence base
 │   └── doc-standards.json    # Doc completeness manifest
-├── references/               # 8 files — one concern each
+├── references/               # ≤15 files — selected core examples below
 │   ├── agent-instruction-ecosystem.md
 │   ├── anti-drift-proportionality.md
 │   ├── co-author-guard.md
