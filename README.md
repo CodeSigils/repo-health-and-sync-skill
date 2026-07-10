@@ -67,11 +67,12 @@ prevent globbing)
 | **B4** | Version alignment | Cross-manifest version consistency | No version sources |
 | **B5** | Tag vs Release | Tags vs GitHub Releases cross-ref | No tags |
 | **B6** | Format + lint | Project's own formatter config | No config found |
-| **B7** | Commit audit | 4 sub-steps: format, drift, CHANGELOG, version | Sub-steps degrade gracefully per missing baseline |
+| **B7** | Commit audit | 5 sub-steps: format, drift, CHANGELOG, version, body fields | Sub-steps degrade gracefully per missing baseline |
 | **B8** | Cross-platform shell | Non-portable patterns (`which`, `grep -P`, `sed -i` without backup) | No `.sh` files |
 | **B9** | CI efficiency | Trigger scoping, caching, artifact separation | No `.github/workflows/` |
 | **B10** | .gitignore + meta | 6-category coverage + instruction-file conflicts | — |
 | **B11** | Co-author guard | 4-layer `*-by:` trailer enforcement | Single-contributor repos |
+| **B12** | Cross-agent portability | Agent-specific refs in skill files | No `skills/` directory, intentional single-platform |
 | **C1** | Detect targets | Heuristic scan or `.repo-health.json` | No sync target clues found |
 | **C2** | Pre-sync verify | Phase B must have no BLOCKING items | — |
 | **C3** | Execute sync | Default copy or declared `install_cmd` | — |

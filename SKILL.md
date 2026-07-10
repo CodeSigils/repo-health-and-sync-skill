@@ -74,6 +74,14 @@ create value. If a check fires and you haven't seen this failure before,
 consider disabling it rather than patching around it. See
 `references/anti-drift-proportionality.md`.
 
+The **two-question test** operationalises this principle before adding any
+new check: (1) "What evidence says this check is necessary at our scale?"
+and (2) "Will a human or runtime catch this failure faster than our CI?"
+If a runtime or human would catch the failure before it causes harm, do not
+add CI for it. Reserve CI for failure modes that have no cheaper validator.
+This prevents infrastructure accretion — each proposed check must justify
+itself against observed failure, not hypothetical risk.
+
 **Repo as source.** The git repository is the authoritative copy of every
 file it tracks. Deployed runtime targets (Hermes skill directories, config
 mirrors, HQ clones, build artifacts) are derived copies. Never ship
@@ -96,24 +104,32 @@ to another agent runtime, see
 for the adaptation path and portability tiers. The detection logic in B1-B11
 and C1-C4 is agent-agnostic.
 
-**Quality-skill fallback (tri-layer probe).** Before running a B-phase check
+**Quality-skill fallback (quad-layer probe).** Before running a B-phase check
 that depends on an external quality tool (shellcheck, linters, formatters),
-the agent runs a three-layer availability check:
+the agent runs a cross-platform availability check:
 
-1. `skill_view(name)` — verify a matching Hermes skill (e.g.
-   `python-project-workflow`) exists and loads
-2. Frontmatter tags check — does the skill's declared language/scope match
-   the repo being inspected?
-3. Degraded mode — if neither resolves, skip the check and log which checks
+1. `command -v <tool>` — check if the quality tool is on PATH directly
+   (works on any system; this is the primary probe)
+2. Config/project file check — look for ecosystem-equivalent config
+   (`.pylintrc`, `.flake8`, `.ruff.toml`, `.prettierrc`, etc.) and run
+   the tool directly if found
+3. `skill_view(name)` — Hermes-specific optimization: verify a matching
+   skill exists and loads. Skip this step on non-Hermes agents.
+4. Degraded mode — if none resolve, skip the check and log which checks
    were skipped and why
 
-Per-check degraded mode:
+If a step resolves, use it. Do not chain further: `command -v` succeeding
+means the tool is used directly; only fall through to config-file probe
+when the binary is absent, and to `skill_view()` only when both prior
+probes fail and the agent is Hermes.
 
-| Check | Depends on | Fallback when absent |
-| :---- | :--------- | :------------------- |
-| B2 Shellcheck | `shellcheck` binary | Skip, log reason |
-| B3 Lint | equivalent language lint skill | Probe availability, then look for `.pylintrc`/`.flake8`/`.ruff.toml` / ecosystem-equivalent config file and run tool directly |
-| B6 Format | `prettier` / `black` / `rustfmt` etc. | `command -v` probe — use whatever is available on PATH |
+Per-check availability table:
+
+| Check | Depends on | Fallback chain |
+| :---- | :--------- | :------------- |
+| B2 Shellcheck | `shellcheck` binary | `command -v shellcheck` → skip, log reason |
+| B3 Lint | language lint tool | `command -v <tool>` → project config file → `skill_view(name)` → skip, log reason |
+| B6 Format | `prettier` / `black` / `rustfmt` etc. | `command -v <tool>` → project config file → `skill_view(name)` → skip, log reason |
 
 If the quality tool is genuinely unavailable (not installed, not on PATH),
 skip the check. Do not fabricate a pass or a fail — log the skip clearly.
@@ -240,7 +256,8 @@ before they compound.
 | B7a      | Commit message format consistency | WARNING |
 | B7b      | Runtime files changed but CHANGELOG didn't | Depends on commit quality (see below) |
 | B7c      | No `## Unreleased` section despite commits since last tag | Depends on commit quality (see below) |
-| B7d      | Source files changed but version unchanged | INFO (advisory) |
+|| B7d      | Source files changed but version unchanged | INFO (advisory) |
+|| B7e      | Commit body missing required fields (what:/why:) | WARNING |
 
 #### B7a: Commit message audit
 
@@ -310,6 +327,21 @@ whether a version bump is warranted.
 **How:** Count source file changes between baseline and HEAD via
 `git diff --name-only`, compare against version field changes in the
 primary manifest.
+
+#### B7e: Commit body format
+
+Check that commit messages in the range have required body fields
+(e.g., `what:` and `why:`). Configured via `.repo-health.json` →
+`commit_body_format.required_fields` (default: none, so this check is
+a no-op unless explicitly configured).
+
+**How:** Run `scripts/check-commit-body.py --range origin/main..HEAD`
+(or the configured baseline). The checker reads `.repo-health.json` for
+`required_fields` and `pattern`. Violations are WARNING by default
+(configurable via `.repo-health.json`).
+
+**Remediation:** Add the required fields to commit bodies. Bypass with
+`ALLOW_ATTRIBUTION_TRAILERS=1` if needed.
 
 ---
 
@@ -492,6 +524,58 @@ reference file for details and `.repo-health.json` skip configuration.
 
 ---
 
+### B12: Cross-agent portability
+
+**Why:** Agent skill files that reference platform-specific tools
+(`skill_view`, `hermes skills`, `Claude()`, `.cursor/rules/`) break
+silently on other runtimes. No runtime validates this — a Hermes agent
+never complains about Hermes-specific refs, but a Codex agent silently
+misreads the skill. Unlike B8 (shell portability), this checks the
+skill instructions themselves, not helper scripts.
+
+**Severity:** BLOCKING. A single agent-specific reference makes the skill
+unusable on other runtimes, and the failure is invisible to the authoring
+agent.
+
+**Decision guidance — when to skip B12:** Platform-specific skills that
+intentionally target one runtime do not need a portability gate. The check
+should be skipped when the project frontmatter explicitly declares a single
+target (e.g. `compatibility: hermes`) AND the body references are
+intentional (documenting a platform-specific CLI, config path, or hook
+mechanism). The agents-markdown-formatter is a validated example:
+`compatibility: hermes` frontmatter, `~/.hermes/skills/` path references
+in body, Hermes post-write hook config — all intentional. Adding a
+portability gate to such a skill creates exemptions-driven noise with no
+benefit.
+
+When in doubt, apply the two-question test from B0: (1) "What evidence
+says this check is necessary?" and (2) "Will a runtime catch this faster
+than our CI?" If the skill is intentionally platform-specific, the answer
+to (1) is "no evidence — this is a design choice, not drift."
+
+**How:** Walk `skills/` for all `*.md` files and scan for forbidden
+patterns. See [references/cross-agent-portability.md](references/cross-agent-portability.md)
+for the full pattern table, severity rationale, and implementation
+reference (generalized from skill-discovery's `ci-check.py`).
+
+**What to check:**
+- Hermes tool names (`skill_view`, `skill_manage`)
+- Hermes config paths (`~/.hermes/`)
+- Hermes CLI commands (`hermes skills`, `hermes config`)
+- Claude Code tools (`Claude()`)
+- Codex CLI commands (`codex run`, `$skill-installer`)
+- Gemini CLI commands (`gemini skills`)
+- Platform adapter directory paths (`.claude/`, `.cursor/`, `.codex/`, `.gemini/`)
+
+Each match is BLOCKING. Report the file, line, and matched pattern.
+If no skill files are found, skip this step.
+
+**Content companion:** B12 checks portability. For skill *content quality* review
+— rule schema compliance, example correctness, validation infrastructure
+coverage, and router-table alignment — see `references/skill-content-review.md`.
+
+---
+
 ## Phase C — Reverse Sync
 
 **Why:** Many projects produce runtime artifacts deployed to system directories
@@ -569,10 +653,55 @@ detection patterns resolved correctly without any hardcoded project metadata.
    for trivial reasons (empty script, always true) is worse than no check.
    Audit the actual coverage of each project's check script before trusting it.
 
-7. **`.repo-health.json` is optional.** If absent, the heuristic fallback
+7. **Investigate CI/workflows/pre-commit/hooks before suggesting a version release tag.**
+   Before proposing a release, the agent MUST verify:
+   - All CI workflows pass (check `.github/workflows/*.yml`, `.gitlab-ci.yml`, etc.)
+   - Pre-commit hooks run cleanly (`pre-commit run --all-files` or equivalent)
+   - Commit-msg hooks pass (including co-author guard, commit body format checks)
+   - Any project-specific consistency check (`scripts/check-consistency.js`, `make test`, etc.) exits 0
+   - No uncommitted changes remain (`git status --porcelain` empty)
+   - Version alignment check passes (B4)
+   - Tag/release integrity passes (B5)
+   
+   Skipping this investigation leads to releasing broken builds — the most
+   common observed failure mode. The agent should run Phase B checks explicitly
+   and confirm all BLOCKING/WARNING items are resolved before suggesting
+   `git tag -a` or `gh release create`.
+
+8. **Verify installed skill paths match `.hermes/config.yaml` external_dirs.**
+   Hermes loads skills from multiple locations. Before syncing (Phase C) or
+   recommending installs, confirm:
+   - `.hermes/config.yaml` → `skills.external_dirs` includes the project's
+     skill directory (e.g., `/home/sand/projects/repo-health-and-sync-skill`)
+   - `hermes skills list` shows the skill as "local" or "external" (not missing)
+   - The synced target (`~/.hermes/skills/<name>/`) matches the repo source
+     (`diff -rq` clean)
+   - No stale symlinks or duplicate installations exist
+   
+   Mismatched paths cause agents to load stale skill versions while the
+   repo has updates. This is a frequent source of "the fix didn't take" reports.
+
+7. **CI trigger paths can silently exclude doc files.** A workflow with
+   path-restricted triggers that omits `README.md`, `SECURITY.md`, or doc
+   directories produces green CI on documentation-only changes — even when
+   those changes break CI-validated invariants (preflight wording,
+   frontmatter schema, URL freshness). Cross-reference the file types each
+   CI job validates against the trigger path list. If a job validates docs,
+   the trigger paths must include the doc files. See B9 trigger-path-completeness
+   signal.
+
+8. **`.repo-health.json` is optional.** If absent, the heuristic fallback
    is used. If present with partial data, missing fields fall back to
    heuristics. A project should only add it when heuristics give wrong
    results or when explicit control is needed.
+
+9. **The Hermes `patch` tool can corrupt GFM table pipes.** When `|`
+   appears in `patch`'s find/replace anchors, the matching layer can
+   misalign and produce `||` (adjacent pipes). This is not a formatter
+   bug — the markdown formatter handles `||` correctly. If you see
+   unexplained double-pipe corruption in table rows after a `patch` call,
+   check `references/patch-tool-table-corruption.md` for diagnosis and
+   defense layers.
 
 ---
 
@@ -581,8 +710,13 @@ detection patterns resolved correctly without any hardcoded project metadata.
 - [Agent Instruction Ecosystem](references/agent-instruction-ecosystem.md) — Portability tiers and adaptation paths for multi-forge projects
 - [Anti-Drift Proportionality](references/anti-drift-proportionality.md) — When to add a check vs when to wait
 - [Co-Author Guard](references/co-author-guard.md) — Four-layer enforcement for attribution trailers
+- [Cross-Agent Portability](references/cross-agent-portability.md) — Detection patterns and CI enforcement for B12; companion script at `scripts/check-portability.py`
+- [Cross-Agent Refactoring](references/cross-agent-refactoring.md) — Converting a platform-specific skill to cross-agent consumption (companion to B12)
 - [Drift Pairs](references/drift-pairs.md) — Reusable cross-commit detection patterns
-- [Heuristic Discovery](references/heuristic-discovery.md) — B1-B11 and B8 detection tables, severity, remediation
+- [Format Consistency Audit](references/format-consistency-audit.md) — Document-internal structure checks (extends B10)
+- [Heuristic Discovery](references/heuristic-discovery.md) — B1-B12 detection tables, severity, remediation
+- [Skill Content Review](references/skill-content-review.md) — Rule schema compliance, example correctness, validation infrastructure for skill repos (companion to B12)
+- [Skill Repo Publication Checklist](references/skill-repo-publication-checklist.md) — P1-P8 checks for making a skill repo public (extends B1-B12)
 - [.gitignore Templates](references/gitignore-templates.md) — Official templates, agent-artifact patterns, per-language recommendations
 - [Repo Health JSON Schema](references/repo-health-json-schema.md) — Full schema specification and field documentation
 - [Sync Targets](references/sync-targets.md) — C1-C4 procedures and target types

@@ -36,6 +36,10 @@ supported — missing fields fall back to heuristic detection.
   "consistency_check": "node scripts/check-consistency.js",
   "format_check": "npm run format:check",
   "format_fix": "npm run format",
+  "commit_body_format": {
+    "required_fields": ["what", "why"],
+    "pattern": "^what: .+\\\\nwhy:  .+$"
+  },
   "sync_target": {
     "type": "hermes-skill",
     "name": "markdown-formatter",
@@ -60,8 +64,9 @@ supported — missing fields fall back to heuristic detection.
 | `version_files`          | object[]         | no       | Custom version sources. Each entry has `path` and `extract`.    |
 | `consistency_check`      | string           | no       | Override the B3 consistency check command.                      |
 | `format_check`           | string           | no       | Override the B6 format check command.                           |
-| `format_fix`             | string           | no       | Override the B6 format fix command.                             |
-| `sync_target`            | object           | no       | Declare a sync target explicitly. See below.                    |
+| `format_fix`           | string           | no       | Override the B6 format fix command.                             |
+| `commit_body_format`   | object           | no       | Enforce commit body format. Fields: `required_fields` (string[]), `pattern` (regex). Default: none. |
+| `sync_target`          | object           | no       | Declare a sync target explicitly. See below.                    |
 
 ### `sync_target` fields
 

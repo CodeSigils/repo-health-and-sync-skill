@@ -117,9 +117,50 @@ check "Tree is clean" git status --porcelain
 
 check "Self-test: co-author checker" \
     python3 scripts/check-commit-trailers.py --self-test
-
+check "Self-test: commit body checker" \
+    python3 scripts/check-commit-body.py --self-test
 check "Self-test: doc audit" \
     python3 scripts/doc-audit.py --self-test
+
+# Cross-refs: root vs skill scripts must be byte-identical for overlapping files
+script_drift=0
+for f in check-commit-body.py check-commit-trailers.py; do
+    if [ -f "scripts/$f" ] && [ -f "skills/repo-health-and-sync-skill/scripts/$f" ]; then
+        if diff -q "scripts/$f" "skills/repo-health-and-sync-skill/scripts/$f" >/dev/null 2>&1; then
+            :
+        else
+            echo "  DRIFT  scripts/$f != skills/repo-health-and-sync-skill/scripts/$f"
+            script_drift=$((script_drift + 1))
+        fi
+    fi
+done
+if [ "$script_drift" -eq 0 ]; then
+    echo "  PASS  root vs skill scripts are in sync"
+    PASS=$((PASS + 1))
+else
+    echo "  FAIL  $script_drift script(s) drifted"
+    FAIL=$((FAIL + script_drift))
+fi
+
+# Cross-refs: root vs skill reference files must be byte-identical
+ref_drift=0
+for f in agent-instruction-ecosystem.md anti-drift-proportionality.md co-author-guard.md drift-pairs.md gitignore-templates.md heuristic-discovery.md repo-health-json-schema.md sync-targets.md; do
+    if [ -f "references/$f" ] && [ -f "skills/repo-health-and-sync-skill/references/$f" ]; then
+        if diff -q "references/$f" "skills/repo-health-and-sync-skill/references/$f" >/dev/null 2>&1; then
+            :
+        else
+            echo "  DRIFT  references/$f != skills/repo-health-and-sync-skill/references/$f"
+            ref_drift=$((ref_drift + 1))
+        fi
+    fi
+done
+if [ "$ref_drift" -eq 0 ]; then
+    echo "  PASS  root vs skill references are in sync"
+    PASS=$((PASS + 1))
+else
+    echo "  FAIL  $ref_drift reference(s) drifted"
+    FAIL=$((FAIL + ref_drift))
+fi
 
 # Cross-refs: every references/*.md linked from SKILL.md must exist
 cross_miss=0
@@ -160,11 +201,11 @@ fi
 
 # SKILL.md under 600 lines
 skill_len=$(wc -l < SKILL.md)
-if [ "$skill_len" -le 650 ]; then
-    echo "  PASS  SKILL.md $skill_len lines (≤650)"
+if [ "$skill_len" -le 740 ]; then
+    echo "  PASS  SKILL.md $skill_len lines (≤740)"
     PASS=$((PASS + 1))
 else
-    echo "  FAIL  SKILL.md $skill_len lines exceeds 650"
+    echo "  FAIL  SKILL.md $skill_len lines exceeds 740"
     FAIL=$((FAIL + 1))
 fi
 

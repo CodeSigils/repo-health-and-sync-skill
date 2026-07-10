@@ -9,6 +9,11 @@ on:
       - 'scripts/**'
       - 'references/**'
       - 'skills/**'
+      - 'docs/**'
+      - 'README.md'
+      - 'SECURITY.md'
+      - 'LICENSE'
+      - '.gitignore'
       - '.repo-health.json'
       - '.github/workflows/ci.yml'
   pull_request:
@@ -18,6 +23,11 @@ on:
       - 'scripts/**'
       - 'references/**'
       - 'skills/**'
+      - 'docs/**'
+      - 'README.md'
+      - 'SECURITY.md'
+      - 'LICENSE'
+      - '.gitignore'
       - '.repo-health.json'
       - '.github/workflows/ci.yml'
 
@@ -33,9 +43,17 @@ jobs:
           fetch-depth: 0
       - name: Self-test — commit trailers
         run: python3 scripts/check-commit-trailers.py --self-test
+      - name: Self-test — commit body checker
+        run: python3 scripts/check-commit-body.py --self-test
       - name: Self-test — doc audit
         run: python3 scripts/doc-audit.py --self-test
       - name: Self-test — verify.sh
         run: bash scripts/verify.sh --self-test
       - name: Full verify
         run: bash scripts/verify.sh
+      - name: Phase B — Pre-release gate
+        run: |
+          echo "=== Phase B: Pre-release health check ==="
+          python3 scripts/check-commit-body.py --range origin/main..HEAD || echo "WARNING: commit body format violations"
+          python3 scripts/check-commit-trailers.py --range origin/main..HEAD || echo "WARNING: unauthorized trailers"
+          git status --porcelain | read && echo "BLOCKING: dirty tree" && exit 1 || echo "PASS: clean tree"

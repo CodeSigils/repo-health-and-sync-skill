@@ -1,5 +1,9 @@
 {
   "version": 1,
   "expected_branch": "main",
-  "consistency_check": "bash scripts/verify.sh"
+  "consistency_check": "bash scripts/verify.sh",
+  "commit_body_format": {
+    "required_fields": ["what", "why"],
+    "pattern": "^what:.*"
+  }
 }

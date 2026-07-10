@@ -131,7 +131,12 @@ Collect all found versions into a list.
 
 **Remediation:**
 
-Bump `package.json` version first, then update:
+When the README badge is a hardcoded version (e.g. `vX.Y.Z-blue.svg`), consider
+replacing it with a **dynamic GitHub Release badge** that auto-fetches the latest
+tag: `https://img.shields.io/github/v/release/user/repo`. This eliminates the
+manual bump step and removes a common drift surface entirely.
+
+For manual bumps: bump `package.json` version first, then update:
 
 - `SKILL.md` frontmatter (if present)
 - `README.md` badge URL (if present)
@@ -191,6 +196,9 @@ If the project has no v\* tags, skip this step.
 3. `Cargo.toml` → `cargo fmt --check`.
 4. `pyproject.toml` with `[tool.ruff]` section → `ruff format --check .`; with `[tool.black]` section → `black --check .`.
 5. `Makefile` with `format-check` or `format:check` target → `make format-check`.
+6. `package.json` `scripts` field with `format:check` or `format-check` key
+   → `npm run format:check`. Catches projects that bundle their own formatter
+   (e.g. skill repos with a custom CLI) rather than using a standard external tool.
 
 Collect all detected formatter commands and run each. A project may have
 multiple formatters (e.g., oxfmt for Markdown + prettier for JS).
@@ -215,7 +223,119 @@ catches it as BLOCKING.
 
 ---
 
-## B8: Cross-platform shell audit
+## B7: Commit audit
+
+**Discovery (runtime):** Sample the last 10 commits with `git log --oneline -10` for format classification (B7a). For drift checks (B7b-B7e), use `git diff --name-only` between baseline (latest tag or `origin/main`) and HEAD.
+
+**Severity mapping:**
+
+| Sub-step | What it checks | Severity |
+| :------- | :------------- | :------- |
+| B7a      | Commit message subject format consistency | WARNING |
+| B7b      | Runtime files changed but CHANGELOG didn't | Depends on commit quality (see below) |
+| B7c      | No `## Unreleased` section despite commits since last tag | Depends on commit quality (see below) |
+| B7d      | Source files changed but version unchanged | INFO (advisory) |
+| B7e      | Commit body missing required fields (what:/why:) | WARNING |
+
+#### B7a: Commit message subject audit
+
+Sample the last 10 commits with `git log --oneline -10` and classify each
+by format:
+
+- `type(scope): message` — Conventional Commits (preferred)
+- `type: message` — Conventional Commits, no scope
+- `topic: message` — structured (noun phrase before colon)
+- `message` — unstructured (no colon prefix)
+
+Count how many follow a structured format (conventional commits + topic-style).
+If fewer than 7/10 are structured, emit a WARNING. The agent logs the sample and the ratio,
+but does NOT require retroactive fixes — this is a culture signal, not a
+block.
+
+**Remediation:** Suggest adopting Conventional Commits for new commits.
+For the current batch, consider whether to squash-merge into a single
+well-formed commit before release.
+
+#### B7b: Cross-commit drift
+
+Detect when runtime source files (under `skills/`, `src/`, `lib/`, `app/`)
+were modified but `CHANGELOG.md` was not. Severity depends on whether the
+repo's commit log already serves as its release record:
+
+1. **Check if CHANGELOG.md exists** — if not, proceed to commit quality gate
+2. **If CHANGELOG.md exists:** Run `git diff --name-only` between the
+   baseline (latest tag or `origin/main`) and HEAD. If runtime paths
+   changed but CHANGELOG.md didn't, emit BLOCKING.
+3. **If no CHANGELOG.md:** Sample the last 10 commits (same method as B7a).
+   If ≥7/10 have structured what/why bodies → emit INFO
+   ("No CHANGELOG; commit log serves as release record").
+   If <7/10 → emit WARNING
+   ("No CHANGELOG and commit messages are unstructured — consider
+   either improving commit quality or adding a CHANGELOG").
+
+Per B0, git log is authoritative — skip CHANGELOG enforcement when
+commit quality is high.
+
+See [references/drift-pairs.md](references/drift-pairs.md) for the full
+detection script and `.repo-health.json` configuration options.
+
+#### B7c: CHANGELOG completeness
+
+Check that `## Unreleased` exists in CHANGELOG.md when there are commits
+since the last release tag. Same commit-quality gating as B7b:
+
+1. **If CHANGELOG.md exists** — check for `## Unreleased` when there are
+   commits since the latest tag. Missing section → WARNING.
+2. **If no CHANGELOG.md** — rely on commit quality assessment from B7b.
+   If commit quality is high → skip silently (commit log is the record).
+   If commit quality is low → INFO ("consider adding a CHANGELOG or
+   improving commit message structure").
+
+**How:** Determine the latest `v*` tag, count commits since it, then check
+CHANGELOG.md for `## Unreleased`. If no tags exist but a CHANGELOG.md does,
+check it has an Unreleased section as a hygiene signal.
+
+#### B7d: Version-bump awareness (advisory)
+
+Emit INFO when source files changed but the version field in `package.json`
+(or whatever version source the project uses) did not. This is advisory only
+— many commits are not releases — but it alerts the agent to consider
+whether a version bump is warranted.
+
+**How:** Count source file changes between baseline and HEAD via
+`git diff --name-only`, compare against version field changes in the
+primary manifest.
+
+#### B7e: Commit body format
+
+Check that commit messages in the range have required body fields
+(e.g., `what:` and `why:`). Configured via `.repo-health.json` →
+`commit_body_format.required_fields` (default: none, so this check is
+a no-op unless explicitly configured).
+
+**How:** Run `python3 scripts/check-commit-body.py --range origin/main..HEAD`
+(or the configured baseline). The checker reads `.repo-health.json` for
+`required_fields` and `pattern`. Violations are WARNING by default
+(configurable via `.repo-health.json`).
+
+**Remediation:** Add the required fields to commit bodies. Bypass with
+`ALLOW_ATTRIBUTION_TRAILERS=1` if needed.
+
+**Configuration via `.repo-health.json`:**
+
+```json
+{
+  "commit_body_format": {
+    "required_fields": ["what", "why"],
+    "pattern": "^what: .+\\nwhy:  .+$"
+  }
+}
+```
+
+If `commit_body_format` is absent or `required_fields` is empty, this check
+is skipped entirely.
+
+---
 
 Scan `.sh` files for non-portable shell constructs. Runs after B2's file
 discovery (same file walk, same exclusion rules).
