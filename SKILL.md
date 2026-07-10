@@ -98,8 +98,8 @@ detection commands the agent runs (B8 heuristic-discovery table, drift-pairs
 scripts) must work on any system where the repo builds.
 
 **Forge-awareness.** These checks work on any git repo. The skill activation
-mechanism (`SKILL.md`, `hermes skills install`) is Hermes-specific. To port
-to another agent runtime, see
+mechanism (`SKILL.md` + platform-specific CLI registration) is different
+per runtime. To port to another agent runtime, see
 [references/agent-instruction-ecosystem.md](references/agent-instruction-ecosystem.md)
 for the adaptation path and portability tiers. The detection logic in B1-B11
 and C1-C4 is agent-agnostic.

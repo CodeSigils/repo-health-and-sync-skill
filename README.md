@@ -3,23 +3,28 @@
 [![Release](https://img.shields.io/github/v/release/CodeSigils/repo-health-and-sync-skill?label=release)](https://github.com/CodeSigils/repo-health-and-sync-skill/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-*For Hermes agents and skill maintainers.* A two-phase procedure the agent
-runs inside any git repository: health baseline checks (B1-B11) and reverse
-sync (C1-C4). Discovers everything at runtime — no hardcoded metadata.
+A two-phase procedure the agent runs inside any git repository: health
+baseline checks (B1-B12) and reverse sync (C1-C4). Works on any
+agentskills.io-compatible agent. Discovers everything at runtime — no
+hardcoded metadata.
 
 ---
 
 ## Install
 
+Clone this repo and make the skill discoverable:
+
 ```bash
-hermes skills install CodeSigils/repo-health-and-sync-skill
+git clone --filter=blob:none https://github.com/CodeSigils/repo-health-and-sync-skill
 ```
 
-<details>
-<summary><b>Hermes Agent — live-edit setup (recommended for development)</b></summary>
+Then choose your platform:
 
-Clone the repo, then add the `skills/` directory to `skills.external_dirs`
-in `~/.hermes/config.yaml`:
+<details>
+<summary><b>Hermes Agent</b></summary>
+
+**Recommended for development:** Add the `skills/` directory to
+`skills.external_dirs` in `~/.hermes/config.yaml`:
 
 ```yaml
 skills:
@@ -28,13 +33,85 @@ skills:
 ```
 
 This loads the skill directly from the repo — every commit is immediately
-reflected without reinstalling. The skill appears as a `local` skill in
-`hermes skills list`.
+reflected without reinstalling. The skill appears as a `local` skill.
 
-**Alternative — copy the skill:**
+**Alternative — install via CLI:**
+
+```bash
+hermes skills install CodeSigils/repo-health-and-sync-skill
+```
+
+**Or copy directly:**
 
 ```bash
 cp -r skills/repo-health-and-sync-skill ~/.hermes/skills/
+```
+</details>
+
+<details>
+<summary><b>Claude Code (Anthropic)</b></summary>
+
+```bash
+cp -r repo-health-and-sync-skill/skills/repo-health-and-sync-skill .claude/skills/
+```
+
+Claude Code discovers skills by scanning `.claude/skills/` for SKILL.md files.
+</details>
+
+<details>
+<summary><b>Codex CLI (OpenAI)</b></summary>
+
+```bash
+cp -r repo-health-and-sync-skill/skills/repo-health-and-sync-skill .codex/skills/
+```
+
+Codex CLI discovers skills in `.codex/skills/` via filesystem walk.
+</details>
+
+<details>
+<summary><b>OpenCode CLI</b></summary>
+
+```bash
+cp -r repo-health-and-sync-skill/skills/repo-health-and-sync-skill .opencode/skills/
+```
+
+Or create a symlink (zero-maintenance pointer):
+
+```bash
+ln -s /path/to/repo-health-and-sync-skill/skills/repo-health-and-sync-skill .opencode/skills/
+```
+</details>
+
+<details>
+<summary><b>Gemini CLI (Google)</b></summary>
+
+```bash
+cp -r repo-health-and-sync-skill/skills/repo-health-and-sync-skill .agents/skills/
+```
+
+Gemini CLI explicitly supports `.agents/skills/` as a cross-tool path.
+</details>
+
+<details>
+<summary><b>Cursor</b></summary>
+
+```bash
+cp -r repo-health-and-sync-skill/skills/repo-health-and-sync-skill .cursor/rules/
+```
+
+Note: Cursor applies rules as chat context, not via invocation-based
+discovery like CLI-focused agents.
+</details>
+
+<details>
+<summary><b>Generic agentskills.io client</b></summary>
+
+Copy the skill to your agent's configured skills directory. Most clients
+that support the agentskills.io standard scan a `skills/` or
+`.agents/skills/` directory.
+
+```bash
+cp -r repo-health-and-sync-skill/skills/repo-health-and-sync-skill <your-skills-dir>/
 ```
 </details>
 
@@ -42,8 +119,8 @@ cp -r skills/repo-health-and-sync-skill ~/.hermes/skills/
 
 ```bash
 cd /path/to/some/repo
-hermes skills load repo-health-and-sync-skill
-# The agent then runs: Phase B (B1→B11), fix blocking items, continue.
+# Load the skill via your agent's skill system, then:
+# The agent runs Phase B (B1→B12), fixes blocking items, continues.
 ```
 
 The skill is self-guiding. The agent reads [SKILL.md](SKILL.md) and walks
@@ -54,6 +131,19 @@ Example output when B2 finds a shell script issue:
 WARNING  B2: Shellcheck — scripts/deploy.sh (SC2086: double quote to
 prevent globbing)
 ```
+
+---
+
+## What this repo does NOT include
+
+| Excluded | Reason |
+|----------|--------|
+| Static skill collection | This is a methodology, not a collection. It teaches agents how to audit any repo. |
+| Install scripts | Every platform provides native skill consumption paths. A script would compete and drift. |
+| Platform adapter files (`.claude/`, `.cursor/`, `.codex/` etc.) | User-side setup only. The repo ships only `skills/*/SKILL.md` and its references. |
+| Plugin manifest | No marketplace distribution. Filesystem discovery is sufficient at 1 skill. |
+| Hermes-specific procedure logic | B0 quad-layer probe starts with `command -v`. `skill_view()` is Hermes-only third step. |
+| Development artifacts | `scripts/`, `.github/`, `docs/` are maintainer tooling, not shipped runtime. See [`docs/README.md`](docs/README.md) for the scripts boundary. |
 
 ---
 

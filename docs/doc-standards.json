@@ -4,7 +4,7 @@
       "id": "audience",
       "description": "Audience declared",
       "type": "regex",
-      "pattern": "For Hermes|For skill maintainers"
+      "pattern": "agentskills\\.io-compatible|For Hermes|For skill maintainers"
     },
     {
       "id": "self-guiding",
@@ -26,11 +26,11 @@
     },
     {
       "id": "phase-table",
-      "description": "Phase table covers all B1-B11 + C1-C4",
+      "description": "Phase table covers all B1-B12 + C1-C4",
       "type": "contains-all",
       "items": [
         "**B1**", "**B2**", "**B3**", "**B4**", "**B5**", "**B6**",
-        "**B7**", "**B8**", "**B9**", "**B10**", "**B11**",
+        "**B7**", "**B8**", "**B9**", "**B10**", "**B11**", "**B12**",
         "**C1**", "**C2**", "**C3**", "**C4**"
       ]
     },
