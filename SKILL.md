@@ -38,9 +38,15 @@ explicit declarations.
 ## Overview — How to use this skill
 
 1. Confirm you're inside the repo root (`git rev-parse --show-toplevel`).
-2. Run Phase B phases in order (B1 through B11).
-3. If any BLOCKING item, stop and fix before continuing.
-4. If the repo has a runtime target, run Phase C (C1 through C4).
+2. **Verify the loaded skill is current.** The agent reads the installed mirror
+   (`~/.hermes/skills/<name>/`), not the repo canonical source. From the repo
+   root, compare source vs installed mirror:
+   `diff -rq skills/<name>/ ~/.hermes/skills/<name>/`
+   (adjust paths per your project layout and Hermes config). If they differ,
+   sync with Phase C first. A stale installed mirror produces stale results.
+3. Run Phase B phases in order (B1 through B12).
+4. If any BLOCKING item, stop and fix before continuing.
+5. If the repo has a runtime target, run Phase C (C1 through C4).
 
 Each phase section lists: **why** it matters, **how** to discover the
 relevant files/config at runtime, **severity** when it fails, and
@@ -180,9 +186,10 @@ shape, CI structure. A generic procedure cannot know these a priori. The
 project's own check script (if one exists) is the authority.
 
 **How:** Try these in precedence order:
-`.repo-health.json` → `check-consistency.js` → `check-all.js` →
-`check-release-readiness.sh` → `run-offline-contracts.sh` → `verify.py` →
-`verify-release.sh` → `make test` → any `scripts/check-*.sh`.
+`.repo-health.json` → package-manager scripts (`npm test`, `npm run check`,
+ecosystem equivalents) → language manifests (`pyproject.toml`, `Cargo.toml`,
+`go.mod`, etc.) → `Makefile` test/check targets → project-specific
+`check-*`, `verify-*`, and `consistency-*` scripts.
 
 See [references/heuristic-discovery.md](references/heuristic-discovery.md) for
 the full discovery order, severity table, and remediation.
@@ -198,8 +205,10 @@ and version alignment (see B4).
 bugs. Industry practice from semver + Keep a Changelog.
 
 **How:** Inspect these files in order: `package.json`, `Cargo.toml`,
-`pyproject.toml`, `SKILL.md` frontmatter, `CHANGELOG.md` latest heading,
-`README.md` badge URL. Collect all found versions into a list.
+`pyproject.toml`, `setup.py`, `setup.cfg`, `go.mod`, `composer.json`,
+`mix.exs`, Gradle/Maven manifests, `SKILL.md` frontmatter, `CHANGELOG.md`
+latest heading, and `README.md` badge URL. Collect all found versions into
+a list.
 
 See [references/heuristic-discovery.md](references/heuristic-discovery.md) for
 extraction commands, evaluation criteria, and full remediation steps.
@@ -229,14 +238,16 @@ If no tags are found, skip this step.
 **Why:** Consistent formatting across docs reduces noise in diffs and prevents
 formatting-only commits. Run what the project defines.
 
-**How:** Detect formatter config files in precedence order: `.oxfmtrc.json`,
-`.prettierrc*`, `Cargo.toml`, `pyproject.toml` (`[tool.ruff]` or
-`[tool.black]`), `Makefile` with `format-check` target.
+**How:** Detect formatter and linter config files in precedence order:
+project-defined format scripts first, then ecosystem configs such as
+`.oxfmtrc.json`, `.prettierrc*`, `Cargo.toml`, `pyproject.toml`,
+ESLint/Stylelint configs, Go/Ruby/PHP/Kotlin lint configs, and `Makefile`
+format targets.
 
 See [references/heuristic-discovery.md](references/heuristic-discovery.md) for
 the full detection order, severity table, and format-fix commands.
 
-Format failures are WARNING, not BLOCKING, unless the project's own
+Format/lint failures are WARNING, not BLOCKING, unless the project's own
 consistency check (B3) also enforces them — in which case B3 already
 catches it as BLOCKING.
 
@@ -256,8 +267,8 @@ before they compound.
 | B7a      | Commit message format consistency | WARNING |
 | B7b      | Runtime files changed but CHANGELOG didn't | Depends on commit quality (see below) |
 | B7c      | No `## Unreleased` section despite commits since last tag | Depends on commit quality (see below) |
-|| B7d      | Source files changed but version unchanged | INFO (advisory) |
-|| B7e      | Commit body missing required fields (what:/why:) | WARNING |
+| B7d      | Source files changed but version unchanged | INFO (advisory) |
+| B7e      | Commit body missing required fields (what:/why:) | WARNING |
 
 #### B7a: Commit message audit
 
@@ -332,8 +343,8 @@ primary manifest.
 
 Check that commit messages in the range have required body fields
 (e.g., `what:` and `why:`). Configured via `.repo-health.json` →
-`commit_body_format.required_fields` (default: none, so this check is
-a no-op unless explicitly configured).
+`commit_body_format.required_fields` (default: `["what", "why"]`). To opt
+out, explicitly set `required_fields: []` in `.repo-health.json`.
 
 **How:** Run `scripts/check-commit-body.py --range origin/main..HEAD`
 (or the configured baseline). The checker reads `.repo-health.json` for
@@ -358,6 +369,10 @@ gets a pattern check; any match is flagged.
 
 **Severity:** WARNING — portability is project-dependent. Projects that
 target Linux exclusively may reject portable patterns that add complexity.
+If shell scripts exist and CI is configured, also check for at least one
+cross-platform runner path (`macos-latest` or both `ubuntu-latest` and
+`windows-latest`). Missing cross-platform coverage is INFO unless the project
+claims cross-platform support.
 
 The 8 detection patterns (`which`, `grep -P`, `sed -i` without backup,
 `echo` with escapes, hardcoded `/bin/bash`, octal `\012`, `find -exit`,
@@ -378,7 +393,9 @@ minutes, energy, and attention. Documentation-only changes should not
 trigger full test suites. Tag pushes should not re-run branch CI.
 Advisory only — every project's CI budget is different.
 
-**How:** Inspect `.github/workflows/*.yml` for efficiency signals.
+**How:** Inspect CI config across forges: `.github/workflows/*.yml`,
+`.gitlab-ci.yml`, `.circleci/config.yml`, `azure-pipelines.yml`,
+`bitbucket-pipelines.yml`, `.drone.yml`, and `.woodpecker.yml`.
 
 **Severity:** WARNING — advisory. CI efficiency is project-dependent and
 there is no single correct configuration.
@@ -393,8 +410,9 @@ Signals evaluated:
 | Caching | `actions/cache` for dependencies | No cache — fresh install every run |
 | Guard workflow independence | Standalone guard workflow (e.g. trailer check) | Guard embedded in main build — doc-only pushes skip it |
 | Artifact separation | Ship/release workflow separate from test | Tests and shipping in same workflow |
+| Trigger path completeness | Path list covers docs and metadata that CI validates | Path list omits validated files, so doc-only changes skip CI |
 
-If no `.github/workflows/` directory is found, skip this step.
+If no known CI config is found, skip this step.
 
 ---
 
@@ -411,9 +429,9 @@ in agent behavior.
 | # | What it checks | If missing |
 | :- | :------------- | :--------- |
 | 1 | `.gitignore` exists at repo root | WARNING |
-| 2 | Agent-artifact patterns covered | `.open-mem/`, `.omo/`, `.aider.*`, `CLAUDE.local.md`, `.claude/**/*.log`, `AGENT.md`, `GEMINI.md` |
+| 2 | Agent-artifact patterns covered | `.open-mem/`, `.omo/`, `.aider.*`, `CLAUDE.local.md`, `.claude/**/*.log`, `AGENT.md`, `GEMINI.md`, `.agents/`, `.codex/`, `.opencode/`, `.cursor/`, `.codeium/`, `.supermaven/`, `.tabnine/`, `.continue/`, `.avante/`, `.cursor-agent/`, `.windsurf/` |
 | 3 | OS junk covered | `.DS_Store`, `Thumbs.db`, `*.swp`, `*.swo`, `*~` |
-| 4 | Language build artifacts | `node_modules/`, `__pycache__/`, `*.pyc`, `target/`, `dist/` |
+| 4 | Language build artifacts | `node_modules/`, `__pycache__/`, `*.pyc`, `.pytest_cache/`, `target/`, `dist/`, `build/`, `output/` |
 | 5 | IDE files covered | `.vscode/`, `.idea/`, `*.sublime-*` |
 | 6 | Instruction-file conflicts | Flag if 2+ of `[AGENTS.md, WARP.md, .rules, CLAUDE.md, GEMINI.md, .github/copilot-instructions.md]` co-exist |
 
@@ -436,6 +454,11 @@ For instruction-file conflicts, pick one primary file and reference the
 other from it, or document the precedence order in a comment.
 
 If `.gitignore` already covers a pattern, skip that check silently.
+
+See also [references/format-consistency-audit.md](references/format-consistency-audit.md)
+for a complementary check on file-internal structure (frontmatter,
+code-fence labels, forbidden paths, required sections) that extends B10's
+surface-level metadata audit into document-internal conventions.
 
 ---
 
@@ -533,9 +556,9 @@ never complains about Hermes-specific refs, but a Codex agent silently
 misreads the skill. Unlike B8 (shell portability), this checks the
 skill instructions themselves, not helper scripts.
 
-**Severity:** BLOCKING. A single agent-specific reference makes the skill
-unusable on other runtimes, and the failure is invisible to the authoring
-agent.
+**Severity:** BLOCKING only for skills that claim multi-agent portability
+(`compatibility: all` or multiple runtime targets). INFO/SKIP for skills that
+declare a single target such as `compatibility: hermes`.
 
 **Decision guidance — when to skip B12:** Platform-specific skills that
 intentionally target one runtime do not need a portability gate. The check
@@ -553,10 +576,13 @@ says this check is necessary?" and (2) "Will a runtime catch this faster
 than our CI?" If the skill is intentionally platform-specific, the answer
 to (1) is "no evidence — this is a design choice, not drift."
 
-**How:** Walk `skills/` for all `*.md` files and scan for forbidden
-patterns. See [references/cross-agent-portability.md](references/cross-agent-portability.md)
-for the full pattern table, severity rationale, and implementation
-reference (generalized from skill-discovery's `ci-check.py`).
+**How:** Read `SKILL.md` frontmatter before scanning. If compatibility names a
+single runtime (`hermes`, `codex`, `claude`, `gemini`, etc.), emit INFO:
+"Platform-specific skill — B12 skipped per B0 guidance" and stop. Only walk
+`skills/` for all `*.md` files and scan for forbidden patterns when the skill
+declares `compatibility: all`, multiple targets, or no explicit target. See
+[references/cross-agent-portability.md](references/cross-agent-portability.md)
+for the full pattern table, severity rationale, and implementation reference.
 
 **What to check:**
 - Hermes tool names (`skill_view`, `skill_manage`)
@@ -608,25 +634,6 @@ for the full schema specification, field descriptions, and usage notes.
 If absent → all heuristics used. If present with partial data → missing
 fields fall back to heuristics. A project should only add this file when
 heuristics give wrong results or when explicit control is needed.
-
----
-
-## Real-world heuristic example
-
-The heuristic detection was verified against `agents-markdown-formatter`: its
-detection patterns resolved correctly without any hardcoded project metadata.
-
-| Signal                | agents-markdown-formatter                        |
-| :-------------------- | :----------------------------------------------- |
-| B1: Branch            | main                                             |
-| B1: Remotes           | 1                                                |
-| B2: Shell scripts     | `scripts/release.sh`, `staged-install-verify.sh` |
-| B3: Consistency check | `check-consistency.js`                           |
-| B4: Version sources   | `package.json`, `SKILL.md`, README badge         |
-| B5: Tag/Release       | 10 tags, 10 releases                             |
-| C1: Sync target       | Hermes skill                                     |
-
----
 
 ## Common pitfalls
 
@@ -714,7 +721,7 @@ detection patterns resolved correctly without any hardcoded project metadata.
 - [Cross-Agent Refactoring](references/cross-agent-refactoring.md) — Converting a platform-specific skill to cross-agent consumption (companion to B12)
 - [Drift Pairs](references/drift-pairs.md) — Reusable cross-commit detection patterns
 - [Format Consistency Audit](references/format-consistency-audit.md) — Document-internal structure checks (extends B10)
-- [Heuristic Discovery](references/heuristic-discovery.md) — B1-B12 detection tables, severity, remediation
+- [Heuristic Discovery](references/heuristic-discovery.md) — B1-B9 detection tables, severity, remediation
 - [Skill Content Review](references/skill-content-review.md) — Rule schema compliance, example correctness, validation infrastructure for skill repos (companion to B12)
 - [Skill Repo Publication Checklist](references/skill-repo-publication-checklist.md) — P1-P8 checks for making a skill repo public (extends B1-B12)
 - [.gitignore Templates](references/gitignore-templates.md) — Official templates, agent-artifact patterns, per-language recommendations

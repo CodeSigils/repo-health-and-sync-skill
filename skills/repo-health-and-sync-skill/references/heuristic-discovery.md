@@ -1,11 +1,11 @@
 ---
-title: Heuristic Discovery — B1-B8 Detection Patterns
-description: Runtime detection patterns for Phase B project health baseline checks (B1-B8).
+title: Heuristic Discovery — B1-B9 Detection Patterns
+description: Runtime detection patterns for Phase B project health baseline checks (B1-B9).
 status: reference
-supersedes: inline sections in SKILL.md B1-B8
+supersedes: inline sections in SKILL.md B1-B9
 ---
 
-# Heuristic Discovery — B1-B8 Detection Patterns
+# Heuristic Discovery — B1-B9 Detection Patterns
 
 This file contains the detailed detection tables, severity mappings, and
 remediation steps for Phase B checks. SKILL.md points here instead of
@@ -82,18 +82,26 @@ If no `.sh` files are found, skip this step.
 **Discovery (runtime) — try these in precedence order:**
 
 1. `.repo-health.json` → `consistency_check` value.
-2. `check-consistency.js` → run with `node`.
-3. `check-all.js` → run with `node`.
-4. `check-release-readiness.sh` → run with `bash`.
-5. `run-offline-contracts.sh` → run with `bash`.
-6. `verify.py` → run with `python3`.
-7. `verify-release.sh` → run with `bash`.
-8. `Makefile test target` → `make test`.
-9. Any `scripts/check-*.sh` file → run the first one found.
-
-Heuristic: look for files named `check-*`, `verify-*`, or `consistency-*`
-under `scripts/`, `dev/`, or the repo root. Prefer the most specific match
-(longest filename) over a generic `check.sh`.
+2. `package.json` scripts, in this order: `check`, `test`, `lint`, then
+   package-manager-specific equivalents (`npm`, `pnpm`, or `yarn` based on
+   lockfile).
+3. `pyproject.toml`, `tox.ini`, or `noxfile.py` → prefer `tox`, then `nox`,
+   then configured tool checks such as `pytest`, `ruff check .`, `mypy .`,
+   or `hatch run test`.
+4. `Cargo.toml` → `cargo test`; also run `cargo clippy -- -D warnings` when
+   Clippy is installed or configured.
+5. `go.mod` → `go test ./...`.
+6. `composer.json` with `scripts.test` or `scripts.check` → `composer test`
+   or `composer check`.
+7. `mix.exs` → `mix test`.
+8. `build.gradle`, `build.gradle.kts`, or `pom.xml` → `./gradlew test` when
+   the wrapper exists, otherwise `gradle test` or `mvn test`.
+9. `Makefile` test/check target → `make test` or `make check`.
+10. Project-specific scripts: `check-consistency.js`, `check-all.js`,
+    `check-release-readiness.sh`, `run-offline-contracts.sh`, `verify.py`,
+    `verify-release.sh`, or files named `check-*`, `verify-*`, or
+    `consistency-*` under `scripts/`, `dev/`, or the repo root. Prefer the
+    most specific match (longest filename) over a generic `check.sh`.
 
 **Severity:**
 
@@ -117,11 +125,24 @@ working tree is clean and version sources align (see B4).
 - `package.json`: read the `version` field via `node -p`.
 - `Cargo.toml`: grep for `^version =`.
 - `pyproject.toml`: grep for the `version` line under `[project]`.
+- `setup.py`: grep for `version=` in `setup()` call.
+- `setup.cfg`: grep for `version =` under `[metadata]`.
+- `go.mod`: record the module path and Go directive. Go modules often do not
+  carry an application version, so do not compare this to semver sources
+  unless `.repo-health.json` declares it version-bearing.
+- `composer.json`: read the `version` field.
+- `mix.exs`: grep for `@version`.
+- `build.gradle` / `build.gradle.kts`: grep for `version =`.
+- `pom.xml`: grep for `<version>`.
+- `CMakeLists.txt`: grep for `VERSION`.
+- `meson.build`: grep for `version:`.
 - `SKILL.md` (or `skills/*/SKILL.md`): read the `version:` field from YAML frontmatter via `awk`.
 - `CHANGELOG.md`: take the latest heading matching `## v*`.
 - `README.md` badge: extract the version from any `vX.Y.Z-blue` badge URL.
 
-Collect all found versions into a list.
+Collect all found versions into a list. Compare semver-bearing sources only;
+some ecosystem manifests identify the module/package without declaring a
+release version.
 
 **Evaluation:**
 
@@ -194,30 +215,49 @@ If the project has no v\* tags, skip this step.
 1. `.oxfmtrc.json` or `oxfmt` in `package.json` dependencies → check if `npm run format:check` is defined in `package.json` scripts.
 2. `.prettierrc*`, `.prettierignore`, or `prettier` in `package.json` → `npx prettier --check .`.
 3. `Cargo.toml` → `cargo fmt --check`.
-4. `pyproject.toml` with `[tool.ruff]` section → `ruff format --check .`; with `[tool.black]` section → `black --check .`.
+4. `pyproject.toml` with `[tool.ruff]` section → `ruff format --check .` and
+   `ruff check .`; with `[tool.black]` section → `black --check .`.
 5. `Makefile` with `format-check` or `format:check` target → `make format-check`.
 6. `package.json` `scripts` field with `format:check` or `format-check` key
    → `npm run format:check`. Catches projects that bundle their own formatter
    (e.g. skill repos with a custom CLI) rather than using a standard external tool.
+7. `.ruff.toml` or `ruff.toml` → `ruff check .` and `ruff format --check .`.
+8. `pyproject.toml` with `[tool.mypy]` or `[tool.pyright]` → `mypy .` or
+   `pyright` (lint).
+9. `.eslintrc*`, `eslint.config.js`, or `eslint` in `package.json` →
+   `npx eslint .`.
+10. `.stylelintrc*`, `stylelint` in `package.json` →
+    `npx stylelint "**/*.{css,scss}"`.
+11. `gofmt` sources plus Go files → `gofmt -w` only as a fix command;
+    use `gofmt -l .` for checking. `golangci-lint` config
+    (`.golangci.yml`, `.golangci.yaml`, `.golangci.toml`) →
+    `golangci-lint run`.
+12. `ktlint` / `detekt` config → `ktlint` / `detekt`.
+13. `php-cs-fixer` (`.php-cs-fixer.php` / `.php-cs-fixer.dist.php`) →
+    `php-cs-fixer fix --dry-run --diff`.
+14. `phpstan` (`phpstan.neon`) → `phpstan analyse`.
+15. `.rubocop.yml` → `rubocop`.
+16. `.clang-format` → `clang-format --dry-run --Werror`.
+17. `buf.yaml` / `buf.gen.yaml` → `buf format --diff` (protobuf).
 
-Collect all detected formatter commands and run each. A project may have
-multiple formatters (e.g., oxfmt for Markdown + prettier for JS).
+Collect all detected formatter/linter commands and run each. A project may have
+multiple formatters/linters (e.g., oxfmt for Markdown + prettier for JS + ruff for Python).
 
 **Severity:**
 
-| Outcome                         | Severity                                                   |
-| :------------------------------ | :--------------------------------------------------------- |
-| No formatter config found       | INFO — suggest adding one                                  |
-| All detected format checks pass | OK                                                         |
-| Any detected format check fails | WARNING — run fix or update `.repo-health.json` to exclude |
+| Outcome                             | Severity                                                   |
+| :---------------------------------- | :--------------------------------------------------------- |
+| No formatter/lint config found      | INFO — suggest adding one                                  |
+| All detected format/lint checks pass | OK                                                        |
+| Any detected format/lint check fails | WARNING — run fix or update `.repo-health.json` to exclude |
 
 **Remediation:**
 
 Run the project's format-fix command, discovered analogously to the check
 command above (e.g., `npm run format`, `prettier --write .`, `cargo fmt`,
-`ruff format .`).
+`ruff format .`, `eslint --fix .`, `golangci-lint run --fix`).
 
-Format failures are WARNING, not BLOCKING, unless the project's own
+Format/lint failures are WARNING, not BLOCKING, unless the project's own
 consistency check (B3) also enforces them — in which case B3 already
 catches it as BLOCKING.
 
@@ -310,8 +350,7 @@ primary manifest.
 
 Check that commit messages in the range have required body fields
 (e.g., `what:` and `why:`). Configured via `.repo-health.json` →
-`commit_body_format.required_fields` (default: none, so this check is
-a no-op unless explicitly configured).
+`commit_body_format.required_fields` (default: `["what", "why"]`).
 
 **How:** Run `python3 scripts/check-commit-body.py --range origin/main..HEAD`
 (or the configured baseline). The checker reads `.repo-health.json` for
@@ -332,13 +371,13 @@ a no-op unless explicitly configured).
 }
 ```
 
-If `commit_body_format` is absent or `required_fields` is empty, this check
-is skipped entirely.
+If `commit_body_format` is absent, the default is `["what", "why"]` with no
+extra regex pattern. To disable, explicitly set `required_fields: []` in
+`.repo-health.json`.
 
 ---
 
-Scan `.sh` files for non-portable shell constructs. Runs after B2's file
-discovery (same file walk, same exclusion rules).
+## B8: Cross-platform shell audit
 
 ### Detection patterns
 
@@ -353,6 +392,20 @@ discovery (same file walk, same exclusion rules).
 | `find -exit` (non-POSIX) | `grep -rn 'find.*-exit' --include='*.sh' .` | `find ... -exec ... \;` |
 | `flock` (Linux-only) | `grep -rn '\bflock\b' --include='*.sh' .` | `mkdir .lock || exit 1` |
 
+### B8b: CI cross-platform guard
+
+When `.sh` files exist and CI is configured, check whether at least one
+workflow/job exercises a non-Linux runner (`macos-latest`) or both Linux and
+Windows runners (`ubuntu-latest` plus `windows-latest`). This is a guard
+against "looks portable" scripts that only ever run on Linux.
+
+**Severity:** INFO by default. Elevate to WARNING only when the project
+declares cross-platform support or `.repo-health.json` sets
+`require_cross_platform_ci: true`.
+
+**Skip conditions:** no shell scripts, no CI config, or an explicitly
+Linux-only project.
+
 ### Remediation
 
 For each match, replace with the portable alternative and re-run shellcheck
@@ -365,3 +418,35 @@ exclusively, add `skip_portability_check` to `.repo-health.json`:
 }
 ```
 
+---
+
+## B9: CI efficiency and coverage audit
+
+**Discovery (runtime):** Detect CI configuration across common forges:
+
+| Forge | Config path |
+| :---- | :---------- |
+| GitHub Actions | `.github/workflows/*.yml`, `.github/workflows/*.yaml` |
+| GitLab CI | `.gitlab-ci.yml` |
+| CircleCI | `.circleci/config.yml` |
+| Azure Pipelines | `azure-pipelines.yml`, `.azure-pipelines/*.yml` |
+| Bitbucket Pipelines | `bitbucket-pipelines.yml` |
+| Drone | `.drone.yml` |
+| Woodpecker | `.woodpecker.yml`, `.woodpecker/*.yml` |
+
+Evaluate efficiency only for the CI system present. Do not require every
+forge file. If no known CI config exists, skip with INFO.
+
+**Signals:**
+
+| Signal | Efficient | Inefficient |
+| :----- | :-------- | :---------- |
+| Trigger scoping | Separate docs/CI/release paths | Monolithic workflow for every change |
+| Trigger path completeness | Validated files appear in trigger paths | Docs or metadata validated by CI are omitted |
+| Tag handling | Tag pushes route to release workflow | Tag pushes rerun full branch CI |
+| Dependency caching | Native cache for the forge/ecosystem | Fresh dependency install on every run |
+| Guard independence | Commit/trailer guards run on all commit-bearing changes | Guards are hidden behind path filters |
+
+**Severity:** WARNING for clear inefficiency or missing coverage in a present
+CI config; INFO when no CI config exists or when the project intentionally
+does not use hosted CI.

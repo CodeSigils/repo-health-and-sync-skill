@@ -34,7 +34,6 @@ They should be present in every repo, regardless of language.
 .open-mem/
 .omo/
 .aider*
-.aider*
 CLAUDE.local.md
 .claude/*.local.*
 .claude/**/*.log
@@ -45,6 +44,14 @@ gemini-debug.log
 .codex/
 .opencode/
 .cursor/
+.codeium/
+.supermaven/
+.tabnine/
+.continue/
+.avante/
+.cursor-agent/
+.windsurf/
+.aider/
 ```
 
 **Source:** <https://github.com/NousResearch/Agents.gitignore>
