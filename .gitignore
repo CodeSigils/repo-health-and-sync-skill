@@ -20,6 +20,10 @@ GEMINI.md
 gemini-debug.log
 .open-mem/
 .omo/
+.agents/
+.codex/
+.opencode/
+.cursor/
 
 # Build artifacts (if any)
 node_modules/
@@ -28,5 +32,7 @@ build/
 target/
 __pycache__/
 *.pyc
+.pytest_cache/
+output/
 .venv/
 venv/
