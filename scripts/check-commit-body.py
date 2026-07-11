@@ -72,7 +72,7 @@ def extract_body(message: str) -> str:
             break
     body_lines = lines[body_start:]
     # Strip comment lines and trailing whitespace
-    body_lines = [l for l in body_lines if not l.startswith("#")]
+    body_lines = [line for line in body_lines if not line.startswith("#")]
     return "\n".join(body_lines).strip()
 
 

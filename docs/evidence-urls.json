@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "description": "Machine-readable URL evidence index for documentation references.",
+  "urls": [
+    {
+      "name": "GitHub gitignore templates",
+      "url": "https://github.com/github/gitignore",
+      "expected_statuses": [200],
+      "source_section": "docs/gitignore-templates.md",
+      "notes": "Primary source for language-specific .gitignore templates"
+    },
+    {
+      "name": "GitHub gitignore Python template",
+      "url": "https://github.com/github/gitignore/blob/main/Python.gitignore",
+      "expected_statuses": [200],
+      "source_section": "docs/gitignore-templates.md",
+      "notes": "Official Python .gitignore template"
+    },
+    {
+      "name": "GitHub gitignore Node template",
+      "url": "https://github.com/github/gitignore/blob/main/Node.gitignore",
+      "expected_statuses": [200],
+      "source_section": "docs/gitignore-templates.md",
+      "notes": "Official Node.js .gitignore template"
+    },
+    {
+      "name": "GitHub gitignore Rust template",
+      "url": "https://github.com/github/gitignore/blob/main/Rust.gitignore",
+      "expected_statuses": [200],
+      "source_section": "docs/gitignore-templates.md",
+      "notes": "Official Rust .gitignore template"
+    },
+    {
+      "name": "GitHub gitignore Go template",
+      "url": "https://github.com/github/gitignore/blob/main/Go.gitignore",
+      "expected_statuses": [200],
+      "source_section": "docs/gitignore-templates.md",
+      "notes": "Official Go .gitignore template"
+    },
+    {
+      "name": "NousResearch Agents gitignore",
+      "url": "https://github.com/NousResearch/Agents.gitignore",
+      "expected_statuses": [200, 404],
+      "source_section": "references/gitignore-templates.md",
+      "notes": "Community agent gitignore reference"
+    },
+    {
+      "name": "GFM Tables spec",
+      "url": "https://github.github.com/gfm/#tables-extension-",
+      "expected_statuses": [200],
+      "source_section": "references/patch-tool-table-corruption.md",
+      "notes": "GitHub Flavored Markdown specification for table parsing"
+    },
+    {
+      "name": "npm registry API",
+      "url": "https://registry.npmjs.org/",
+      "expected_statuses": [200],
+      "source_section": "references/npm-publishing-for-agent-skills.md",
+      "notes": "npm package registry API"
+    },
+    {
+      "name": "npm downloads API",
+      "url": "https://api.npmjs.org/downloads/point/last-month/lodash",
+      "expected_statuses": [200],
+      "source_section": "references/npm-publishing-for-agent-skills.md",
+      "notes": "npm package download statistics API"
+    },
+    {
+      "name": "CodeSigils GitHub",
+      "url": "https://github.com/CodeSigils",
+      "expected_statuses": [200],
+      "source_section": "references/portability-migration.md",
+      "notes": "CodeSigils organization on GitHub"
+    }
+  ]
+}
