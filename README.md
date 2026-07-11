@@ -23,29 +23,21 @@ Then choose your platform:
 <details>
 <summary><b>Hermes Agent</b></summary>
 
-**Recommended for development:** Add the `skills/` directory to
-`skills.external_dirs` in `~/.hermes/config.yaml`:
-
+**Recommended for development — clone the repo and add to `external_dirs`:**
 ```yaml
 skills:
   external_dirs:
     - /path/to/repo-health-and-sync-skill/skills
 ```
-
 This loads the skill directly from the repo — every commit is immediately
 reflected without reinstalling. The skill appears as a `local` skill.
 
-**Alternative — install via CLI:**
-
+**For end users — install from hub:**
 ```bash
 hermes skills install CodeSigils/repo-health-and-sync-skill
 ```
 
-**Or copy directly:**
-
-```bash
-cp -r skills/repo-health-and-sync-skill ~/.hermes/skills/
-```
+*Other agents: see sections below for their native setup commands.*
 </details>
 
 <details>
