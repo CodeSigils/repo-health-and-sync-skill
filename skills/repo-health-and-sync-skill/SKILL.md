@@ -1,5 +1,4 @@
 ---
-# portability: allow-platform-ref
 name: repo-health-and-sync-skill
 description: >-
   Generic two-phase procedure: project health baseline (Phase B) and runtime
@@ -21,10 +20,7 @@ metadata:
     - reverse-sync
     - health-audit
     - cross-project
-# portability: allow-platform-ref
 ---
-
-# portability: allow-platform-ref
 
 # Repo Health Audit and Reverse Sync
 

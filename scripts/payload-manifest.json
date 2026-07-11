@@ -8,7 +8,8 @@
   "scripts": [
     "check-commit-body.py",
     "check-commit-trailers.py",
-    "check-portability.py"
+    "check-portability.py",
+    "verify-urls.py"
   ],
   "references": "*"
 }

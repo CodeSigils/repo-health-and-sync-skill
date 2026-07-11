@@ -22,7 +22,14 @@ if [ ! -f "$MANIFEST" ]; then
     exit 1
 fi
 
-echo "Syncing skill payload from manifest..."
+if $CI_MODE; then
+    SYNC_DIR=$(mktemp -d /tmp/repo-health-payload-check-XXXXXX)
+    trap 'rm -rf "$SYNC_DIR"' EXIT HUP INT TERM
+    echo "Checking skill payload against manifest..."
+else
+    SYNC_DIR="$PAYLOAD_DIR"
+    echo "Syncing skill payload from manifest..."
+fi
 DRIFT=false
 
 # Helper: compute relative path and check if file is covered by manifest
@@ -55,7 +62,7 @@ d=json.load(open('$MANIFEST'))
 print('\n'.join(str(x) for x in d.get('files',[])))
 " 2>/dev/null); do
     source="$ROOT/$f"
-    target="$PAYLOAD_DIR/$f"
+    target="$SYNC_DIR/$f"
     if [ ! -f "$source" ]; then
         echo "    MISSING source: $f"
         DRIFT=true
@@ -73,7 +80,7 @@ d=json.load(open('$MANIFEST'))
 print('\n'.join(str(x) for x in d.get('scripts',[])))
 " 2>/dev/null); do
     source="$ROOT/scripts/$s"
-    target="$PAYLOAD_DIR/scripts/$s"
+    target="$SYNC_DIR/scripts/$s"
     if [ ! -f "$source" ]; then
         echo "    MISSING source: scripts/$s"
         DRIFT=true
@@ -98,28 +105,40 @@ if isinstance(r,str) and r == '*':
 " 2>/dev/null)
 if [ "$ref_mode" = "mirror" ]; then
     echo "  References (mirror)..."
-    mkdir -p "$PAYLOAD_DIR/references"
+    mkdir -p "$SYNC_DIR/references"
     # Remove existing reference files first to catch deletions
-    find "$PAYLOAD_DIR/references" -type f -delete 2>/dev/null || true
-    cp "$ROOT/references/"*.md "$PAYLOAD_DIR/references/"
+    find "$SYNC_DIR/references" -type f -delete 2>/dev/null || true
+    cp "$ROOT/references/"*.md "$SYNC_DIR/references/"
 fi
 
 # --- Remove orphaned files ---
-echo "  Cleaning orphaned files..."
-orphans=0
-while IFS= read -r -d '' f; do
-    relpath="$f"
-    # shellcheck disable=SC2295
-    rel="${relpath#$PAYLOAD_DIR/}"
-    if ! is_covered "$rel"; then
-        echo "    ORPHANED: $rel"
-        rm -f "$f"
-        orphans=$((orphans + 1))
+if $CI_MODE; then
+    echo "  Comparing payload..."
+    if ! diff -rq "$SYNC_DIR" "$PAYLOAD_DIR" >/tmp/repo-health-payload-diff.$$ 2>&1; then
+        sed 's/^/    /' /tmp/repo-health-payload-diff.$$
+        rm -f /tmp/repo-health-payload-diff.$$
+        DRIFT=true
+    else
+        rm -f /tmp/repo-health-payload-diff.$$
     fi
-done < <(find "$PAYLOAD_DIR" -type f -print0)
+    orphans=0
+else
+    echo "  Cleaning orphaned files..."
+    orphans=0
+    while IFS= read -r -d '' f; do
+        relpath="$f"
+        # shellcheck disable=SC2295
+        rel="${relpath#$PAYLOAD_DIR/}"
+        if ! is_covered "$rel"; then
+            echo "    ORPHANED: $rel"
+            rm -f "$f"
+            orphans=$((orphans + 1))
+        fi
+    done < <(find "$PAYLOAD_DIR" -type f -print0)
 
-# Clean empty directories
-find "$PAYLOAD_DIR" -type d -empty -delete 2>/dev/null || true
+    # Clean empty directories
+    find "$PAYLOAD_DIR" -type d -empty -delete 2>/dev/null || true
+fi
 
 echo ""
 if [ "$orphans" -gt 0 ]; then

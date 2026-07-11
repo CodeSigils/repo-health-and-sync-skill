@@ -8,19 +8,23 @@ Scans all skills/**/*.md for platform-specific tool names, CLI commands,
 config paths, and directory patterns that would silently break non-Hermes
 agents (Claude Code, Codex CLI, Gemini CLI, OpenCode, Cursor).
 
-Lines containing '# portability: allow-platform-ref' are exempted for
-documentation-only platform references.
+Single-runtime skills are allowed to mention their own platform. Portable
+skills can exempt documentation-only references with
+'# portability: allow-platform-ref'.
 
 """
 
 from __future__ import annotations
 
+import json
 import re
 import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SKILLS_DIR = REPO_ROOT / "skills"
+CONFIG_PATH = REPO_ROOT / ".repo-health.json"
+SINGLE_RUNTIME_COMPAT = {"hermes", "codex", "claude", "gemini", "opencode", "cursor"}
 
 FORBIDDEN_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("Hermes tool name", re.compile(r"\bskill_(?:view|manage)\b", re.IGNORECASE)),
@@ -43,8 +47,52 @@ FORBIDDEN_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
 )
 
 
+def repo_allows_platform_refs() -> bool:
+    """Return true when the repo explicitly declares platform refs intentional."""
+    try:
+        data = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return False
+    portability = data.get("portability", {})
+    return isinstance(portability, dict) and portability.get("allow_platform_ref") is True
+
+
+def frontmatter_value(text: str, key: str) -> str | None:
+    """Extract a simple top-level YAML frontmatter value."""
+    if not text.startswith("---\n"):
+        return None
+    parts = text.split("---", 2)
+    if len(parts) < 3:
+        return None
+    for line in parts[1].splitlines():
+        match = re.match(rf"^{re.escape(key)}:\s*['\"]?([^'\"\s#]+)", line)
+        if match:
+            return match.group(1).strip().lower()
+    return None
+
+
+def is_single_runtime_skill(path: Path) -> bool:
+    """Return true when this markdown file belongs to a declared single-runtime skill."""
+    try:
+        rel = path.relative_to(SKILLS_DIR)
+    except ValueError:
+        return False
+    parts = rel.parts
+    if not parts:
+        return False
+    skill_file = SKILLS_DIR / parts[0] / "SKILL.md"
+    try:
+        skill_text = skill_file.read_text(encoding="utf-8")
+    except OSError:
+        return False
+    compatibility = frontmatter_value(skill_text, "compatibility")
+    return compatibility in SINGLE_RUNTIME_COMPAT
+
+
 def scan_file(path: Path) -> list[tuple[Path, int, str, str]]:
     violations: list[tuple[Path, int, str, str]] = []
+    if is_single_runtime_skill(path):
+        return violations
     text = path.read_text(encoding="utf-8")
     lines = text.splitlines()
     # File-level exemption: if marker appears in first 3 lines (frontmatter), skip entire file
@@ -62,6 +110,10 @@ def scan_file(path: Path) -> list[tuple[Path, int, str, str]]:
 
 
 def main() -> int:
+    if repo_allows_platform_refs():
+        print("PASS: platform-specific references explicitly allowed by .repo-health.json")
+        return 0
+
     violations: list[tuple[Path, int, str, str]] = []
     for path in sorted(SKILLS_DIR.rglob("*.md")):
         try:

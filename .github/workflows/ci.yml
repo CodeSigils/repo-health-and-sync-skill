@@ -94,8 +94,11 @@ jobs:
         with:
           fetch-depth: 0
       - name: Phase B — Pre-release health check
+        env:
+          COMMIT_RANGE: ${{ github.event.before }}..HEAD
         run: |
           echo "=== Phase B: Pre-release health check ==="
-          python3 scripts/check-commit-body.py --range origin/main..HEAD || echo "WARNING: commit body format violations"
-          python3 scripts/check-commit-trailers.py --range origin/main..HEAD || echo "WARNING: unauthorized trailers"
+          echo "Checking commit range: ${COMMIT_RANGE}"
+          python3 scripts/check-commit-body.py --range "${COMMIT_RANGE}" || echo "WARNING: commit body format violations"
+          python3 scripts/check-commit-trailers.py --range "${COMMIT_RANGE}"
           git status --porcelain | read && echo "BLOCKING: dirty tree" && exit 1 || echo "PASS: clean tree"

@@ -163,6 +163,7 @@ def check_commit_range(base: str, head: str) -> int:
     # Parse the output: SHA followed by message body
     current_sha = None
     current_body = []
+    exit_code = 0
     for line in log_result.stdout.splitlines():
         if re.match(r"^[a-f0-9]{40}$", line):
             # New commit SHA

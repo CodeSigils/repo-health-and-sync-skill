@@ -27,34 +27,36 @@ import os
 import re
 import subprocess
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 
 # Default configuration
 DEFAULT_REQUIRED_FIELDS = ["what", "why"]
-DEFAULT_PATTERN = None  # e.g., r"^what: .+\nwhy:  .+$"
+DEFAULT_PATTERN: re.Pattern[str] | None = None  # e.g., r"^what: .+\nwhy:  .+$"
 
 
-def load_config() -> dict:
-    """Load commit_body_format config from .repo-health.json."""
-    config_path = Path(".repo-health.json")
-    if not config_path.is_file():
-        return {"required_fields": DEFAULT_REQUIRED_FIELDS, "pattern": DEFAULT_PATTERN}
-    try:
-        with open(config_path, encoding="utf-8") as f:
-            data = json.load(f)
-        body_format = data.get("commit_body_format", {})
-        required = body_format.get("required_fields", DEFAULT_REQUIRED_FIELDS)
-        pattern = body_format.get("pattern", DEFAULT_PATTERN)
-        if pattern:
-            pattern = re.compile(pattern, re.MULTILINE)
-        return {"required_fields": required, "pattern": pattern}
-    except Exception:
-        return {"required_fields": DEFAULT_REQUIRED_FIELDS, "pattern": DEFAULT_PATTERN}
+@dataclass(frozen=True)
+class CommitBodyConfig:
+    """Immutable configuration for commit body validation."""
+    required_fields: list[str]
+    pattern: re.Pattern[str] | None
 
+    @classmethod
+    def from_file(cls, config_path: Path) -> CommitBodyConfig:
+        """Load configuration from .repo-health.json."""
+        if not config_path.is_file():
+            return cls(DEFAULT_REQUIRED_FIELDS, DEFAULT_PATTERN)
 
-CONFIG = load_config()
-REQUIRED_FIELDS = CONFIG["required_fields"]
-PATTERN = CONFIG["pattern"]
+        try:
+            with open(config_path, encoding="utf-8") as f:
+                data = json.load(f)
+            body_format = data.get("commit_body_format", {})
+            required = body_format.get("required_fields", ["what", "why"])
+            pattern = body_format.get("pattern")
+            compiled = re.compile(pattern, re.MULTILINE) if pattern else None
+            return cls(required, compiled)
+        except (OSError, json.JSONDecodeError, re.error):
+            return cls(DEFAULT_REQUIRED_FIELDS, None)
 
 
 def is_bypass() -> bool:
@@ -64,20 +66,18 @@ def is_bypass() -> bool:
 def extract_body(message: str) -> str:
     """Extract commit body (lines after first blank line, excluding comments)."""
     lines = message.splitlines()
-    # Find first blank line
     body_start = 0
     for i, line in enumerate(lines):
         if line.strip() == "":
             body_start = i + 1
             break
     body_lines = lines[body_start:]
-    # Strip comment lines and trailing whitespace
     body_lines = [line for line in body_lines if not line.startswith("#")]
     return "\n".join(body_lines).strip()
 
 
-def find_violations(message: str) -> list[str]:
-    """Return list of violation descriptions for a commit message."""
+def find_violations(message: str, config: CommitBodyConfig) -> list[str]:
+    """Return list of violation descriptions for a commit message with explicit config."""
     if is_bypass():
         return []
 
@@ -89,13 +89,13 @@ def find_violations(message: str) -> list[str]:
         return violations
 
     # Check required fields
-    for field in REQUIRED_FIELDS:
+    for field in config.required_fields:
         if not re.search(rf"^{re.escape(field)}:", body, re.MULTILINE):
             violations.append(f"missing required field: '{field}:'")
 
     # Check pattern if configured
-    if PATTERN and not PATTERN.search(body):
-        violations.append(f"body does not match required pattern: {PATTERN.pattern}")
+    if config.pattern and not config.pattern.search(body):
+        violations.append(f"body does not match required pattern: {config.pattern.pattern}")
 
     return violations
 
@@ -103,79 +103,71 @@ def find_violations(message: str) -> list[str]:
 def do_self_test() -> int:
     """Run internal unit tests. Returns 0 on pass, 1 on fail."""
     tests = [
-        # (label, message, expected_violation_count)
+        # (label, message, config, expected_violation_count)
         (
             "valid what/why",
             "feat: add widget\n\nwhat: added widget\nwhy: user requested it\n",
+            CommitBodyConfig(["what", "why"], None),
             0,
         ),
         (
             "missing what",
             "feat: add widget\n\nwhy: user requested it\n",
+            CommitBodyConfig(["what", "why"], None),
             1,
         ),
         (
             "missing why",
             "feat: add widget\n\nwhat: added widget\n",
+            CommitBodyConfig(["what", "why"], None),
             1,
         ),
         (
             "missing both",
             "feat: add widget\n\nadded widget\n",
+            CommitBodyConfig(["what", "why"], None),
             2,
         ),
         (
             "empty body",
             "feat: add widget\n",
+            CommitBodyConfig(["what", "why"], None),
             2,
         ),
         (
             "extra fields allowed",
             "feat: add widget\n\nwhat: added widget\nwhy: user requested it\nref: #123\n",
+            CommitBodyConfig(["what", "why"], None),
             0,
         ),
-        ("case sensitive field names", "feat: x\n\nWhat: a\nWhy: b\n", 2),
-        ("pattern mismatch", "feat: x\n\nwhat: a\nwhy: b\n", 0),  # pattern is None by default
+        ("case sensitive field names", "feat: x\n\nWhat: a\nWhy: b\n", CommitBodyConfig(["what", "why"], None), 2),
+        ("pattern mismatch (default no pattern)", "feat: x\n\nwhat: a\nwhy: b\n", CommitBodyConfig(["what", "why"], None), 0),
     ]
 
     # Test with custom pattern
     custom_pattern = re.compile(r"^what: .+\nwhy:  .+$", re.MULTILINE)
     tests_pattern = [
-        ("pattern matches", "feat: x\n\nwhat: added thing\nwhy:  reason\n", 0),
-        ("pattern fails spacing", "feat: x\n\nwhat: added thing\nwhy: reason\n", 1),
+        ("pattern matches", "feat: x\n\nwhat: added thing\nwhy:  reason\n", CommitBodyConfig(["what", "why"], custom_pattern), 0),
+        ("pattern fails spacing", "feat: x\n\nwhat: added thing\nwhy: reason\n", CommitBodyConfig(["what", "why"], custom_pattern), 1),
     ]
 
     failures = 0
 
-    # Save original config
-    orig_required, orig_pattern = REQUIRED_FIELDS, PATTERN
-
-    # Run default config tests
-    globals()["REQUIRED_FIELDS"] = ["what", "why"]
-    globals()["PATTERN"] = None
-
-    for label, msg, expected in tests:
-        result = find_violations(msg)
+    for label, msg, config, expected in tests:
+        result = find_violations(msg, config)
         if len(result) != expected:
             print(f"  FAIL  {label}: expected {expected} violations, got {len(result)}: {result}")
             failures += 1
         else:
             print(f"  PASS  {label}")
 
-    # Run pattern tests
-    globals()["PATTERN"] = custom_pattern
-
-    for label, msg, expected in tests_pattern:
-        result = find_violations(msg)
+    for label, msg, config, expected in tests_pattern:
+        result = find_violations(msg, config)
         if len(result) != expected:
             print(f"  FAIL  {label}: expected {expected} violations, got {len(result)}: {result}")
             failures += 1
         else:
             print(f"  PASS  {label}")
-
-    # Restore
-    globals()["REQUIRED_FIELDS"] = orig_required
-    globals()["PATTERN"] = orig_pattern
 
     if failures:
         print(f"\n--- Self-test: {failures} failure(s) ---")
@@ -199,7 +191,8 @@ def check_message(message: str) -> int:
     """Check a commit message string for violations. Returns exit code."""
     if is_bypass():
         return 0
-    violations = find_violations(message)
+    config = CommitBodyConfig.from_file(Path(".repo-health.json"))
+    violations = find_violations(message, config)
     if not violations:
         return 0
     print("BLOCKING: commit body format violations:")
@@ -213,6 +206,7 @@ def check_commit_range(base: str, head: str) -> int:
     """Check all commits in range base..head. Returns exit code."""
     if is_bypass():
         return 0
+    config = CommitBodyConfig.from_file(Path(".repo-health.json"))
     result = subprocess.run(
         ["git", "log", "--format=%H %s", f"{base}..{head}"],
         capture_output=True,
@@ -243,11 +237,13 @@ def check_commit_range(base: str, head: str) -> int:
     # Parse the output: SHA followed by message body
     current_sha = None
     current_body = []
+    exit_code = 0
+
     for line in log_result.stdout.splitlines():
         if re.match(r"^[a-f0-9]{40}$", line):
             # New commit SHA
             if current_sha is not None:
-                violations = find_violations("\n".join(current_body))
+                violations = find_violations("\n".join(current_body), config)
                 if violations:
                     print(f"BLOCKING: {current_sha} {' '.join(current_body[0].split()[:5])}")
                     for v in violations:
@@ -260,7 +256,7 @@ def check_commit_range(base: str, head: str) -> int:
 
     # Check last commit
     if current_sha is not None:
-        violations = find_violations("\n".join(current_body))
+        violations = find_violations("\n".join(current_body), config)
         if violations:
             print(f"BLOCKING: {current_sha} {' '.join(current_body[0].split()[:5])}")
             for v in violations:
