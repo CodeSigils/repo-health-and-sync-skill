@@ -8,7 +8,10 @@ with failure details otherwise.
 Usage:
     python3 scripts/doc-audit.py               # default: docs/doc-standards.json
     python3 scripts/doc-audit.py --self-test   # verify manifest + self-integrity
+
 """
+
+from __future__ import annotations
 
 import json
 import re
@@ -16,38 +19,38 @@ import sys
 from pathlib import Path
 
 
-def load_manifest(manifest_path):
+def load_manifest(manifest_path: Path) -> dict:
     """Load and return the JSON manifest as a dict."""
     with open(manifest_path, encoding="utf-8") as f:
         return json.load(f)
 
 
-def check_regex(filepath, pattern):
-    """Return True if *pattern* (as regex) matches anywhere in *filepath*."""
+def check_regex(filepath: Path, pattern: str) -> bool:
+    """Return True if pattern (as regex) matches anywhere in filepath."""
     if not filepath.exists():
         return False
     content = filepath.read_text(encoding="utf-8")
     return bool(re.search(pattern, content))
 
 
-def check_contains_all(filepath, items):
-    """Return True if all *items* appear as literal substrings in *filepath*."""
+def check_contains_all(filepath: Path, items: list[str]) -> bool:
+    """Return True if all items appear as literal substrings in filepath."""
     if not filepath.exists():
         return False
     content = filepath.read_text(encoding="utf-8")
     return all(item in content for item in items)
 
 
-def check_not_regex(filepath, pattern):
-    """Return True if *pattern* does not match anywhere in *filepath*."""
+def check_not_regex(filepath: Path, pattern: str) -> bool:
+    """Return True if pattern does not match anywhere in filepath."""
     if not filepath.exists():
         return False
     content = filepath.read_text(encoding="utf-8")
     return not bool(re.search(pattern, content))
 
 
-def run_checks(manifest_path, repo_root):
-    """Run all checks defined in *manifest_path* against *repo_root* files.
+def run_checks(manifest_path: Path, repo_root: Path) -> tuple[int, int]:
+    """Run all checks defined in manifest_path against repo_root files.
 
     Returns (passed: int, failed: int).
     """
@@ -84,7 +87,7 @@ def run_checks(manifest_path, repo_root):
     return passed, failed
 
 
-def self_test():
+def self_test() -> int:
     """Validate manifest schema and self-integrity. Exit 0 on success."""
     script_dir = Path(__file__).resolve().parent
     repo_root = script_dir.parent
@@ -126,22 +129,22 @@ def self_test():
     return 0
 
 
-def main():
+def main() -> int:
     if "--self-test" in sys.argv:
-        sys.exit(self_test())
+        return self_test()
 
     script_dir = Path(__file__).resolve().parent
-    repo_root = script_dir.parent                     # scripts/ is one level deep
+    repo_root = script_dir.parent
     manifest_path = repo_root / "docs" / "doc-standards.json"
 
     if not manifest_path.exists():
         print(f"  FAIL  Manifest not found: {manifest_path}")
-        sys.exit(1)
+        return 1
 
     passed, failed = run_checks(manifest_path, repo_root)
     print(f"  ({passed}/{passed + failed} doc checks pass)")
-    sys.exit(1 if failed > 0 else 0)
+    return 1 if failed > 0 else 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

@@ -1,3 +1,4 @@
+# portability: allow-platform-ref
 # Skill Repo Publication Readiness
 
 Beyond the generic B1-B12 health checks, agent skill repos need

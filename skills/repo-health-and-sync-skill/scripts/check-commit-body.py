@@ -15,10 +15,12 @@ Environment:
   ALLOW_ATTRIBUTION_TRAILERS=1 — bypass all checking
 
 Configuration:
-  Reads .repo-health.json → commit_body_format:
+  Reads .repo-health.json -> commit_body_format:
     - required_fields: list of field names (e.g., ["what", "why"])
     - pattern: optional regex to match the entire body
 """
+
+from __future__ import annotations
 
 import json
 import os
@@ -38,7 +40,7 @@ def load_config() -> dict:
     if not config_path.is_file():
         return {"required_fields": DEFAULT_REQUIRED_FIELDS, "pattern": DEFAULT_PATTERN}
     try:
-        with open(config_path) as f:
+        with open(config_path, encoding="utf-8") as f:
             data = json.load(f)
         body_format = data.get("commit_body_format", {})
         required = body_format.get("required_fields", DEFAULT_REQUIRED_FIELDS)
@@ -145,14 +147,12 @@ def do_self_test() -> int:
 
     failures = 0
 
-    # Save and restore config
-    global CONFIG, REQUIRED_FIELDS, PATTERN
+    # Save original config
     orig_required, orig_pattern = REQUIRED_FIELDS, PATTERN
 
     # Run default config tests
-    CONFIG = {"required_fields": ["what", "why"], "pattern": None}
-    REQUIRED_FIELDS = CONFIG["required_fields"]
-    PATTERN = CONFIG["pattern"]
+    globals()["REQUIRED_FIELDS"] = DEFAULT_REQUIRED_FIELDS
+    globals()["PATTERN"] = None
 
     for label, msg, expected in tests:
         result = find_violations(msg)
@@ -163,9 +163,7 @@ def do_self_test() -> int:
             print(f"  PASS  {label}")
 
     # Run pattern tests
-    CONFIG = {"required_fields": ["what", "why"], "pattern": custom_pattern}
-    REQUIRED_FIELDS = CONFIG["required_fields"]
-    PATTERN = CONFIG["pattern"]
+    globals()["PATTERN"] = custom_pattern
 
     for label, msg, expected in tests_pattern:
         result = find_violations(msg)
@@ -176,9 +174,8 @@ def do_self_test() -> int:
             print(f"  PASS  {label}")
 
     # Restore
-    CONFIG = {"required_fields": orig_required, "pattern": orig_pattern}
-    REQUIRED_FIELDS = CONFIG["required_fields"]
-    PATTERN = CONFIG["pattern"]
+    globals()["REQUIRED_FIELDS"] = orig_required
+    globals()["PATTERN"] = orig_pattern
 
     if failures:
         print(f"\n--- Self-test: {failures} failure(s) ---")
@@ -189,10 +186,11 @@ def do_self_test() -> int:
 
 def check_file(path: str) -> int:
     """Check a commit message file for violations. Returns exit code."""
-    if not os.path.isfile(path):
+    path_obj = Path(path)
+    if not path_obj.is_file():
         print(f"error: file not found: {path}", file=sys.stderr)
         return 2
-    with open(path) as f:
+    with open(path_obj, encoding="utf-8") as f:
         message = f.read()
     return check_message(message)
 
@@ -225,20 +223,50 @@ def check_commit_range(base: str, head: str) -> int:
         return 2
     if not result.stdout.strip():
         return 0
+
     exit_code = 0
-    for line in result.stdout.strip().split("\n"):
-        sha, _, subject = line.partition(" ")
-        commit_msg = subprocess.run(
-            ["git", "log", "--format=%B", "-1", sha],
-            capture_output=True,
-            text=True,
-        ).stdout
-        violations = find_violations(commit_msg)
+    # Fetch all commit messages in one call instead of per-commit
+    commit_shas = [line.partition(" ")[0] for line in result.stdout.strip().split("\n")]
+    if not commit_shas:
+        return 0
+
+    # Single git log call to get all bodies
+    log_result = subprocess.run(
+        ["git", "log", "--format=%H%n%B", "--no-walk"] + commit_shas,
+        capture_output=True,
+        text=True,
+    )
+    if log_result.returncode != 0:
+        print(f"error: git log failed: {log_result.stderr.strip()}", file=sys.stderr)
+        return 2
+
+    # Parse the output: SHA followed by message body
+    current_sha = None
+    current_body = []
+    for line in log_result.stdout.splitlines():
+        if re.match(r"^[a-f0-9]{40}$", line):
+            # New commit SHA
+            if current_sha is not None:
+                violations = find_violations("\n".join(current_body))
+                if violations:
+                    print(f"BLOCKING: {current_sha} {' '.join(current_body[0].split()[:5])}")
+                    for v in violations:
+                        print(f"  {v}")
+                    exit_code = 1
+            current_sha = line
+            current_body = []
+        else:
+            current_body.append(line)
+
+    # Check last commit
+    if current_sha is not None:
+        violations = find_violations("\n".join(current_body))
         if violations:
-            print(f"BLOCKING: {sha} {subject}")
+            print(f"BLOCKING: {current_sha} {' '.join(current_body[0].split()[:5])}")
             for v in violations:
                 print(f"  {v}")
             exit_code = 1
+
     return exit_code
 
 

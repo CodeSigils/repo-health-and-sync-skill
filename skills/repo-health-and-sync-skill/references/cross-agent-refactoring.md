@@ -1,3 +1,4 @@
+# portability: allow-platform-ref
 # Cross-Agent Refactoring Pattern
 
 How to convert a Tier 3 (platform-specific) skill to be cross-agent

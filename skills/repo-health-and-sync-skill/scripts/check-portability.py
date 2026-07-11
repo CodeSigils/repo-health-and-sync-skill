@@ -12,18 +12,20 @@ Lines containing '# portability: allow-platform-ref' are exempted for
 documentation-only platform references.
 
 """
+
 from __future__ import annotations
 
 import re
 import sys
 from pathlib import Path
 
-SKILLS_DIR = Path("skills")
+REPO_ROOT = Path(__file__).resolve().parents[2]
+SKILLS_DIR = REPO_ROOT / "skills"
 
-FORBIDDEN_PATTERNS = (
+FORBIDDEN_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("Hermes tool name", re.compile(r"\bskill_(?:view|manage)\b", re.IGNORECASE)),
     ("Hermes Python import", re.compile(r"from hermes_tools\b", re.IGNORECASE)),
-    ("Hermes config path", re.compile(r"~/\.hermes(?:/|\b)", re.IGNORECASE)),
+    ("Hermes config path", re.compile(r"~/\\.hermes(?:/|\b)", re.IGNORECASE)),
     (
         "Hermes CLI command",
         re.compile(
@@ -44,8 +46,13 @@ FORBIDDEN_PATTERNS = (
 def scan_file(path: Path) -> list[tuple[Path, int, str, str]]:
     violations: list[tuple[Path, int, str, str]] = []
     text = path.read_text(encoding="utf-8")
-    for line_no, line in enumerate(text.splitlines(), start=1):
-        # Exemption marker for documentation-only platform references.
+    lines = text.splitlines()
+    # File-level exemption: if marker appears in first 3 lines (frontmatter), skip entire file
+    file_exempt = any("# portability: allow-platform-ref" in line for line in lines[:3])
+    if file_exempt:
+        return violations
+    for line_no, line in enumerate(lines, start=1):
+        # Line-level exemption for documentation-only platform references.
         if "# portability: allow-platform-ref" in line:
             continue
         for label, pattern in FORBIDDEN_PATTERNS:

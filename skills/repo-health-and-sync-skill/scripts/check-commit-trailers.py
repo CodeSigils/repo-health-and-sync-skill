@@ -14,9 +14,13 @@ Exit codes:
   2 — internal error (file not found, etc.)
 """
 
+from __future__ import annotations
+
 import os
 import re
+import subprocess
 import sys
+from pathlib import Path
 
 TRAILER_PATTERN = re.compile(
     r"^[A-Za-z][A-Za-z0-9-]*:[ \t]*\S[^\r\n]*$",
@@ -102,10 +106,11 @@ def do_self_test() -> int:
 
 def check_file(path: str) -> int:
     """Check a commit message file for violations. Returns exit code."""
-    if not os.path.isfile(path):
+    path_obj = Path(path)
+    if not path_obj.is_file():
         print(f"error: file not found: {path}", file=sys.stderr)
         return 2
-    with open(path) as f:
+    with open(path_obj, encoding="utf-8") as f:
         message = f.read()
     return check_message(message)
 
@@ -126,31 +131,62 @@ def check_message(message: str) -> int:
 
 def check_commit_range(base: str, head: str) -> int:
     """Check all commits in range base..head. Returns exit code."""
-    import subprocess
     if is_bypass():
         return 0
     result = subprocess.run(
         ["git", "log", "--format=%H %s", f"{base}..{head}"],
-        capture_output=True, text=True,
+        capture_output=True,
+        text=True,
     )
     if result.returncode != 0:
         print(f"error: git log failed: {result.stderr.strip()}", file=sys.stderr)
         return 2
     if not result.stdout.strip():
         return 0
+
     exit_code = 0
-    for line in result.stdout.strip().split("\n"):
-        sha, _, subject = line.partition(" ")
-        commit_msg = subprocess.run(
-            ["git", "log", "--format=%B", "-1", sha],
-            capture_output=True, text=True,
-        ).stdout
-        violations = find_violations(commit_msg)
+    # Fetch all commit messages in one call instead of per-commit
+    commit_shas = [line.partition(" ")[0] for line in result.stdout.strip().split("\n")]
+    if not commit_shas:
+        return 0
+
+    # Single git log call to get all bodies
+    log_result = subprocess.run(
+        ["git", "log", "--format=%H%n%B", "--no-walk"] + commit_shas,
+        capture_output=True,
+        text=True,
+    )
+    if log_result.returncode != 0:
+        print(f"error: git log failed: {log_result.stderr.strip()}", file=sys.stderr)
+        return 2
+
+    # Parse the output: SHA followed by message body
+    current_sha = None
+    current_body = []
+    for line in log_result.stdout.splitlines():
+        if re.match(r"^[a-f0-9]{40}$", line):
+            # New commit SHA
+            if current_sha is not None:
+                violations = find_violations("\n".join(current_body))
+                if violations:
+                    print(f"BLOCKING: {current_sha} {' '.join(current_body[0].split()[:5])}")
+                    for v in violations:
+                        print(f"  {v}")
+                    exit_code = 1
+            current_sha = line
+            current_body = []
+        else:
+            current_body.append(line)
+
+    # Check last commit
+    if current_sha is not None:
+        violations = find_violations("\n".join(current_body))
         if violations:
-            print(f"BLOCKING: {sha} {subject}")
+            print(f"BLOCKING: {current_sha} {' '.join(current_body[0].split()[:5])}")
             for v in violations:
                 print(f"  {v}")
             exit_code = 1
+
     return exit_code
 
 

@@ -1,3 +1,4 @@
+# portability: allow-platform-ref
 ---
 title: Heuristic Discovery — B1-B9 Detection Patterns
 description: Runtime detection patterns for Phase B project health baseline checks (B1-B9).

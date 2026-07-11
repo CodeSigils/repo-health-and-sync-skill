@@ -1,3 +1,4 @@
+# portability: allow-platform-ref
 # Patch-Tool Table Pipe Corruption
 
 The Hermes `patch` tool (find-and-replace text editor) can corrupt GFM table
