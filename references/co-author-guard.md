@@ -1,3 +1,4 @@
+# portability: allow-platform-ref
 ---
 title: Co-Author Guard — B11 Reference
 description: Four-layer enforcement pattern for preventing unauthorized attribution trailers in commits.

@@ -1,3 +1,4 @@
+# portability: allow-platform-ref
 # Format Consistency Audit
 
 Scan markdown files against a project-defined template standard.

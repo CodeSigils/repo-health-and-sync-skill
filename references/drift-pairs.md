@@ -1,3 +1,4 @@
+# portability: allow-platform-ref
 ---
 title: Drift Pairs — Cross-commit Detection Patterns
 description: Reusable diff-based patterns for detecting drift between file change sets and expected side-effects (CHANGELOG updates, version bumps, script consistency).

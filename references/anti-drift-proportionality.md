@@ -1,3 +1,4 @@
+# portability: allow-platform-ref
 ---
 title: Proportionate Anti-Drift
 description: Principles for keeping speculative checks from accumulating maintenance debt.

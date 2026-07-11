@@ -1,3 +1,4 @@
+# portability: allow-platform-ref
 ---
 title: Agent Instruction Ecosystem
 description: Canonical instruction files across major agent platforms, guidance on portability tiers, and adaptation paths for multi-forge projects.

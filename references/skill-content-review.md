@@ -1,3 +1,4 @@
+# portability: allow-platform-ref
 # Skill Content Review
 
 Use alongside B12 (Cross-Agent Portability) when reviewing an agent skill

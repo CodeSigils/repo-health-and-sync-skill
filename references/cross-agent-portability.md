@@ -1,3 +1,4 @@
+# portability: allow-platform-ref
 # Cross-Agent Portability Check
 
 Detect agent-specific references in shipped SKILL.md files.

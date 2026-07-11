@@ -1,3 +1,4 @@
+# portability: allow-platform-ref
 ---
 title: Sync Targets — Phase C Target Types and Verification
 description: Runtime sync target detection, execution, and post-sync verification for Phase C.

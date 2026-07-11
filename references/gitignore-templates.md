@@ -1,3 +1,4 @@
+# portability: allow-platform-ref
 ---
 title: .gitignore Templates Reference
 description: Official .gitignore templates per language, agent-artifact patterns from Agents.gitignore, and per-language recommendations.

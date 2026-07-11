@@ -1,3 +1,4 @@
+# portability: allow-platform-ref
 ---
 title: .repo-health.json Schema
 description: Schema specification and usage for the per-project override file.
