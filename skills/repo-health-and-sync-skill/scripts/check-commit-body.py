@@ -72,7 +72,7 @@ def extract_body(message: str) -> str:
             break
     body_lines = lines[body_start:]
     # Strip comment lines and trailing whitespace
-    body_lines = [l for l in body_lines if not l.startswith("#")]
+    body_lines = [line for line in body_lines if not line.startswith("#")]
     return "\n".join(body_lines).strip()
 
 
@@ -151,7 +151,7 @@ def do_self_test() -> int:
     orig_required, orig_pattern = REQUIRED_FIELDS, PATTERN
 
     # Run default config tests
-    globals()["REQUIRED_FIELDS"] = DEFAULT_REQUIRED_FIELDS
+    globals()["REQUIRED_FIELDS"] = ["what", "why"]
     globals()["PATTERN"] = None
 
     for label, msg, expected in tests:
