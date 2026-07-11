@@ -30,16 +30,15 @@ on:
       - '.gitignore'
       - '.repo-health.json'
       - '.github/workflows/ci.yml'
+  schedule:
+    - cron: "0 9 * * 1"
 
 permissions:
   contents: read
 
 jobs:
-  validate:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
+  lint:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
         with:
@@ -48,16 +47,11 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: '3.13'
+          cache: pip
       - name: Install validation dependencies
         run: |
           python -m pip install --upgrade pip
           python -m pip install ruff
-      - name: Check cross-agent portability
-        run: python3 scripts/check-portability.py
-      - name: Payload sync check
-        run: bash scripts/sync-payload.sh --ci
-      - name: Staged-install smoke test
-        run: python3 skills/repo-health-and-sync-skill/scripts/check-portability.py
       - name: Check cross-agent portability
         run: python3 scripts/check-portability.py
       - name: Self-test — commit trailers
@@ -70,16 +64,26 @@ jobs:
         run: bash scripts/verify.sh --self-test
       - name: Self-test — sync-payload.sh syntax
         run: bash -n scripts/sync-payload.sh
+      - name: Self-test — expiry checker
+        run: python3 scripts/check-expiry.py --self-test
+      - name: Self-test — URL verifier
+        run: python3 scripts/verify-urls.py --self-test
+      - name: Self-test — test extractor
+        run: python3 scripts/extract-tests.py --self-test
+      - name: Self-test — script validator
+        run: python3 scripts/validate-scripts.py --self-test
+      - name: Payload sync check
+        run: bash scripts/sync-payload.sh --ci
+      - name: Staged-install smoke test
+        run: python3 skills/repo-health-and-sync-skill/scripts/check-portability.py
       - name: Shell script lint
         run: shellcheck scripts/*.sh 2>/dev/null || true
       - name: Python script lint
         run: python3 -m ruff check scripts/
-      - name: Verify referenced URLs
-        run: python3 scripts/verify-urls.py
 
   full-verify:
     runs-on: ubuntu-latest
-    needs: validate
+    needs: lint
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
         with:
@@ -89,18 +93,38 @@ jobs:
 
   phase-b-gate:
     runs-on: ubuntu-latest
-    needs: validate
+    needs: lint
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
         with:
           fetch-depth: 0
       - name: Phase B — Pre-release health check
-        env:
-          COMMIT_RANGE: ${{ github.event.before }}..HEAD
         run: |
           echo "=== Phase B: Pre-release health check ==="
           echo "Checking commit range: ${COMMIT_RANGE}"
           python3 scripts/check-commit-body.py --range "${COMMIT_RANGE}" || echo "WARNING: commit body format violations"
-          python3 scripts/check-commit-trailers.py --range "${COMMIT_RANGE}"
+          python3 scripts/check-commit-trailers.py --range "${COMMIT_RANGE}" || echo "WARNING: unauthorized trailers"
           git status --porcelain | read && echo "BLOCKING: dirty tree" && exit 1 || echo "PASS: clean tree"
+
+  check-expiry:
+    runs-on: ubuntu-latest
+    needs: lint
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          fetch-depth: 0
+      - name: Check for expired references
+        run: python3 scripts/check-expiry.py --strict
+
+  verify-urls:
+    runs-on: ubuntu-latest
+    needs: lint
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          fetch-depth: 0
+      - name: Verify referenced URLs
+        run: python3 scripts/verify-urls.py

@@ -1,0 +1,204 @@
+[
+  {
+    "name": "valid what/why",
+    "python_version": "3.13",
+    "maturity": "automation",
+    "toolchain": [
+      "ruff",
+      "shellcheck"
+    ],
+    "changed_files": [
+      {
+        "path": "scripts/--script",
+        "content": "feat: add widget\n\nwhat: added widget\nwhy: user requested it\n"
+      }
+    ],
+    "expected_scripts": [
+      "check-commit-body"
+    ],
+    "expected_rules": []
+  },
+  {
+    "name": "missing what",
+    "python_version": "3.13",
+    "maturity": "automation",
+    "toolchain": [
+      "ruff",
+      "shellcheck"
+    ],
+    "changed_files": [
+      {
+        "path": "scripts/--script",
+        "content": "feat: add widget\n\nwhy: user requested it\n"
+      }
+    ],
+    "expected_scripts": [
+      "check-commit-body"
+    ],
+    "expected_rules": [
+      "missing-what"
+    ]
+  },
+  {
+    "name": "missing why",
+    "python_version": "3.13",
+    "maturity": "automation",
+    "toolchain": [
+      "ruff",
+      "shellcheck"
+    ],
+    "changed_files": [
+      {
+        "path": "scripts/--script",
+        "content": "feat: add widget\n\nwhat: added widget\n"
+      }
+    ],
+    "expected_scripts": [
+      "check-commit-body"
+    ],
+    "expected_rules": [
+      "missing-why"
+    ]
+  },
+  {
+    "name": "missing both",
+    "python_version": "3.13",
+    "maturity": "automation",
+    "toolchain": [
+      "ruff",
+      "shellcheck"
+    ],
+    "changed_files": [
+      {
+        "path": "scripts/--script",
+        "content": "feat: add widget\n\nadded widget\n"
+      }
+    ],
+    "expected_scripts": [
+      "check-commit-body"
+    ],
+    "expected_rules": [
+      "missing-both"
+    ]
+  },
+  {
+    "name": "empty body",
+    "python_version": "3.13",
+    "maturity": "automation",
+    "toolchain": [
+      "ruff",
+      "shellcheck"
+    ],
+    "changed_files": [
+      {
+        "path": "scripts/--script",
+        "content": "feat: add widget\n"
+      }
+    ],
+    "expected_scripts": [
+      "check-commit-body"
+    ],
+    "expected_rules": [
+      "empty-body"
+    ]
+  },
+  {
+    "name": "extra fields allowed",
+    "python_version": "3.13",
+    "maturity": "automation",
+    "toolchain": [
+      "ruff",
+      "shellcheck"
+    ],
+    "changed_files": [
+      {
+        "path": "scripts/--script",
+        "content": "feat: add widget\n\nwhat: added widget\nwhy: user requested it\nref: #123\n"
+      }
+    ],
+    "expected_scripts": [
+      "check-commit-body"
+    ],
+    "expected_rules": []
+  },
+  {
+    "name": "case sensitive field names",
+    "python_version": "3.13",
+    "maturity": "automation",
+    "toolchain": [
+      "ruff",
+      "shellcheck"
+    ],
+    "changed_files": [
+      {
+        "path": "scripts/--script",
+        "content": "feat: x\n\nWhat: a\nWhy: b\n"
+      }
+    ],
+    "expected_scripts": [
+      "check-commit-body"
+    ],
+    "expected_rules": [
+      "case-sensitive-field-names"
+    ]
+  },
+  {
+    "name": "pattern mismatch (default no pattern)",
+    "python_version": "3.13",
+    "maturity": "automation",
+    "toolchain": [
+      "ruff",
+      "shellcheck"
+    ],
+    "changed_files": [
+      {
+        "path": "scripts/--script",
+        "content": "feat: x\n\nwhat: a\nwhy: b\n"
+      }
+    ],
+    "expected_scripts": [
+      "check-commit-body"
+    ],
+    "expected_rules": []
+  },
+  {
+    "name": "pattern matches",
+    "python_version": "3.13",
+    "maturity": "automation",
+    "toolchain": [
+      "ruff",
+      "shellcheck"
+    ],
+    "changed_files": [
+      {
+        "path": "scripts/--script",
+        "content": "feat: x\n\nwhat: added thing\nwhy:  reason\n"
+      }
+    ],
+    "expected_scripts": [
+      "check-commit-body"
+    ],
+    "expected_rules": []
+  },
+  {
+    "name": "pattern fails spacing",
+    "python_version": "3.13",
+    "maturity": "automation",
+    "toolchain": [
+      "ruff",
+      "shellcheck"
+    ],
+    "changed_files": [
+      {
+        "path": "scripts/--script",
+        "content": "feat: x\n\nwhat: added thing\nwhy: reason\n"
+      }
+    ],
+    "expected_scripts": [
+      "check-commit-body"
+    ],
+    "expected_rules": [
+      "pattern-fails-spacing"
+    ]
+  }
+]

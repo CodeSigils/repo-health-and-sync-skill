@@ -9,7 +9,17 @@
     "check-commit-body.py",
     "check-commit-trailers.py",
     "check-portability.py",
-    "verify-urls.py"
+    "check-expiry.py",
+    "doc-audit.py",
+    "extract-tests.py",
+    "verify-urls.py",
+    "verify.sh",
+    "sync-payload.sh",
+    "validate-scripts.py",
+    "check-expiry.py",
+    "doc-audit.py",
+    "extract-tests.py",
+    "validate-scripts.py"
   ],
   "references": "*"
 }

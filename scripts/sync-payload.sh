@@ -108,7 +108,8 @@ if [ "$ref_mode" = "mirror" ]; then
     mkdir -p "$SYNC_DIR/references"
     # Remove existing reference files first to catch deletions
     find "$SYNC_DIR/references" -type f -delete 2>/dev/null || true
-    cp "$ROOT/skills/repo-health-and-sync-skill/references/"*.md "$SYNC_DIR/references/"
+    # Copy from the canonical references directory at repo root
+    cp "$ROOT/references/"*.md "$SYNC_DIR/references/"
 fi
 
 # --- Remove orphaned files ---

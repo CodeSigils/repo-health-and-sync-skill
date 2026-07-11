@@ -7,6 +7,7 @@ that manifest instead of editing this script's code.
 
 Usage:
   python3 scripts/verify-urls.py
+  python3 scripts/verify-urls.py --self-test
 
 Outputs a table of URL -> final status with drift annotations.
 Exit code 0 = all URLs match documented expected state.
@@ -63,7 +64,7 @@ def check_url(url: str, content_type: str | None = None) -> tuple[int | str, int
     request = urllib.request.Request(
         url,
         method="GET",
-        headers={"User-Agent": "repo-health-and-sync-skill-url-verify"},
+        headers={"User-Agent": "repo-health-and-sync-skill-url-check"},
     )
 
     try:
@@ -97,7 +98,49 @@ def classify_status(status: int | str, expected_statuses: list[int]) -> str:
     return "DRIFT"
 
 
+def check_self_test() -> int:
+    """Run internal self-tests for the validation logic."""
+    # Test classify_status
+    assert classify_status(200, [200]) == "OK"
+    assert classify_status(404, [200]) == "DRIFT"
+    assert classify_status("ERROR", [200]) == "DRIFT"
+    assert classify_status(200, [200, 201]) == "OK"
+    assert classify_status(201, [200, 201]) == "OK"
+    print("  PASS  classify_status")
+
+    # Test validate_entry
+    try:
+        validate_entry({"name": "test", "url": "https://example.com", "expected_statuses": [200]})
+        print("  PASS  validate_entry valid")
+    except ValueError:
+        assert False, "should not fail"
+
+    try:
+        validate_entry({"url": "https://example.com"})  # missing name
+        assert False, "should have failed"
+    except ValueError:
+        print("  PASS  validate_entry missing field")
+
+    try:
+        validate_entry({"name": "test", "url": "https://example.com", "expected_statuses": []})
+        assert False, "should have failed"
+    except ValueError:
+        print("  PASS  validate_entry empty statuses")
+
+    try:
+        validate_entry({"name": "test", "url": "https://example.com", "expected_statuses": ["200"]})
+        assert False, "should have failed"
+    except ValueError:
+        print("  PASS  validate_entry non-int status")
+
+    print("  PASS  verify-urls.py self-tests")
+    return 0
+
+
 def main() -> int:
+    if "--self-test" in sys.argv:
+        return check_self_test()
+
     entries = load_manifest()
 
     print("=== Evidence URL Re-verification ===")
@@ -144,4 +187,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    raise SystemExit(main())

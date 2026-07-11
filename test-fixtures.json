@@ -1,0 +1,142 @@
+[
+  {
+    "name": "valid commit with what and why",
+    "python_version": "3.13",
+    "maturity": "automation",
+    "toolchain": ["ruff", "shellcheck"],
+    "changed_files": [
+      {
+        "path": "scripts/check-commit-body.py",
+        "content": "feat: add sync-payload manifest support\n\nwhat: add payload manifest to declare shipping boundary\nwhy: enables CI to verify payload drift before release\n"
+      }
+    ],
+    "expected_scripts": ["check-commit-body", "check-commit-trailers"],
+    "expected_rules": ["required-what-field", "required-why-field"]
+  },
+  {
+    "name": "missing what field",
+    "python_version": "3.13",
+    "maturity": "automation",
+    "toolchain": ["ruff", "shellcheck"],
+    "changed_files": [
+      {
+        "path": "scripts/sync-payload.sh",
+        "content": "fix: update sync-payload logic\n\nwhy: fix drift detection in CI mode\n"
+      }
+    ],
+    "expected_scripts": ["check-commit-body"],
+    "expected_rules": ["missing-what-field"]
+  },
+  {
+    "name": "missing why field",
+    "python_version": "3.13",
+    "maturity": "automation",
+    "toolchain": ["ruff", "shellcheck"],
+    "changed_files": [
+      {
+        "path": "scripts/verify-urls.py",
+        "content": "refactor: improve URL verification\n\nwhat: add URL classification for better drift detection\n"
+      }
+    ],
+    "expected_scripts": ["check-commit-body"],
+    "expected_rules": ["missing-why-field"]
+  },
+  {
+    "name": "empty commit body",
+    "python_version": "3.13",
+    "maturity": "automation",
+    "toolchain": ["ruff", "shellcheck"],
+    "changed_files": [
+      {
+        "path": "README.md",
+        "content": "docs: update installation instructions\n"
+      }
+    ],
+    "expected_scripts": ["check-commit-body"],
+    "expected_rules": ["empty-body"]
+  },
+  {
+    "name": "valid trailer - signed-off-by",
+    "python_version": "3.13",
+    "maturity": "automation",
+    "toolchain": ["ruff", "shellcheck"],
+    "changed_files": [
+      {
+        "path": "scripts/check-portability.py",
+        "content": "feat: add platform-specific path detection\n\nwhat: add Windows/macOS/Linux path checks\nwhy: improve cross-platform compatibility\n\nSigned-off-by: Developer Name <dev@example.com>\n"
+      }
+    ],
+    "expected_scripts": ["check-commit-trailers"],
+    "expected_rules": ["allowed-signed-off-by"]
+  },
+  {
+    "name": "unauthorized trailer - co-authored-by",
+    "python_version": "3.13",
+    "maturity": "automation",
+    "toolchain": ["ruff", "shellcheck"],
+    "changed_files": [
+      {
+        "path": "scripts/verify-urls.py",
+        "content": "refactor: improve URL classification\n\nwhat: add URL categorization\nwhy: better drift detection\n\nCo-authored-by: AI Assistant <ai@example.com>\n"
+      }
+    ],
+    "expected_scripts": ["check-commit-trailers"],
+    "expected_rules": ["unauthorized-co-authored-by"]
+  },
+  {
+    "name": "multiple unauthorized trailers",
+    "python_version": "3.13",
+    "maturity": "automation",
+    "toolchain": ["ruff", "shellcheck"],
+    "changed_files": [
+      {
+        "path": "scripts/verify.sh",
+        "content": "fix: improve shell script robustness\n\nwhat: add proper error handling\nwhy: prevent silent failures\n\nCo-authored-by: AI <ai@example.com>\nHelped-by: Bot <bot@example.com>\n"
+      }
+    ],
+    "expected_scripts": ["check-commit-trailers"],
+    "expected_rules": ["unauthorized-co-authored-by", "unauthorized-helped-by"]
+  },
+  {
+    "name": "valid trailer - fixes",
+    "python_version": "3.13",
+    "maturity": "automation",
+    "toolchain": ["ruff", "shellcheck"],
+    "changed_files": [
+      {
+        "path": "scripts/check-expiry.py",
+        "content": "feat: add expiry checking for references\n\nwhat: add expiry date validation\nwhy: prevent stale references in docs\n\nFixes: #123\n"
+      }
+    ],
+    "expected_scripts": ["check-commit-trailers"],
+    "expected_rules": ["allowed-fixes"]
+  },
+  {
+    "name": "missing both what and why",
+    "python_version": "3.13",
+    "maturity": "automation",
+    "toolchain": ["ruff", "shellcheck"],
+    "changed_files": [
+      {
+        "path": "docs/maintaining.md",
+        "content": "docs: add troubleshooting section\n\nAdded troubleshooting guide for common CI failures\n"
+      }
+    ],
+    "expected_scripts": ["check-commit-body"],
+    "expected_rules": ["missing-what-field", "missing-why-field"]
+  },
+  {
+    "name": "case-sensitive field names",
+    "python_version": "3.13",
+    "maturity": "automation",
+    "toolchain": ["ruff", "shellcheck"],
+    "changed_files": [
+      {
+        "path": "scripts/check-portability.py",
+        "content": "refactor: improve portability checks\n\nWhat: add macOS-specific checks\nWhy: catch macOS-specific path issues\n"
+      }
+    ],
+    "expected_scripts": ["check-commit-body"],
+    "expected_rules": ["case-sensitive-field-names"]
+  }
+]
