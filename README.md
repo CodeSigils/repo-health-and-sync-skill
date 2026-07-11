@@ -217,7 +217,9 @@ sync targets, or add a custom consistency check. See
         ├── SKILL.md
         ├── references/    # Per-check detail (subset)
         └── scripts/
-            └── check-commit-trailers.py
+            ├── check-commit-body.py
+            ├── check-commit-trailers.py
+            └── check-portability.py
 ```
 
 ---

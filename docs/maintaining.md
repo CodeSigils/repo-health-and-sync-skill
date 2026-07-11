@@ -36,12 +36,13 @@ Before marking work done, run through in order:
 2. **Self-tests pass** — `python3 scripts/check-commit-trailers.py --self-test`,
    `python3 scripts/doc-audit.py --self-test`, and
    `bash scripts/verify.sh --self-test`
-3. **Cross-refs resolve** — `bash scripts/verify.sh` checks every `references/*.md`
+3. **Payload is in sync** — `bash scripts/sync-payload.sh --ci` exits 0
+4. **Cross-refs resolve** — `bash scripts/verify.sh` checks every `references/*.md`
    linked from SKILL.md and validates `docs/doc-standards.json` schema
-4. **No stale refs** — `grep -rn --include='*.md' 'PLAN\.md\|PROPOSALS\.md\|REPORT\.md\|USER-SUGGESTIONS\.md' . | grep -v '.git/'` returns nothing
-5. **SKILL.md under 740 lines** — `wc -l < SKILL.md` must be ≤ 740
-6. **Tagged releases** — every user-facing change gets an annotated tag (`git tag -a`)
-7. **Shellcheck clean** — on any modified `.sh` files
+5. **No stale refs** — `grep -rn --include='*.md' 'PLAN\.md\|PROPOSALS\.md\|REPORT\.md\|USER-SUGGESTIONS\.md' . | grep -v '.git/'` returns nothing
+6. **SKILL.md under 740 lines** — `wc -l < SKILL.md` must be ≤ 740
+7. **Tagged releases** — every user-facing change gets an annotated tag (`git tag -a`)
+8. **Shellcheck clean** — on any modified `.sh` files
 
 ## How to add or modify a B-check
 

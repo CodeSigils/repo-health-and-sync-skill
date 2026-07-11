@@ -124,7 +124,7 @@ check "Self-test: doc audit" \
 
 # Cross-refs: root vs skill scripts must be byte-identical for overlapping files
 script_drift=0
-for f in check-commit-body.py check-commit-trailers.py; do
+for f in check-commit-body.py check-commit-trailers.py check-portability.py; do
     if [ -f "scripts/$f" ] && [ -f "skills/repo-health-and-sync-skill/scripts/$f" ]; then
         if diff -q "scripts/$f" "skills/repo-health-and-sync-skill/scripts/$f" >/dev/null 2>&1; then
             :
@@ -160,6 +160,16 @@ if [ "$ref_drift" -eq 0 ]; then
 else
     echo "  FAIL  $ref_drift reference(s) drifted"
     FAIL=$((FAIL + ref_drift))
+fi
+
+# Payload manifest: verify sync-payload.sh --ci confirms no drift
+echo "  Payload manifest check..."
+if bash scripts/sync-payload.sh --ci > /dev/null 2>&1; then
+    echo "  PASS  payload matches manifest"
+    PASS=$((PASS + 1))
+else
+    echo "  FAIL  payload drift detected (run bash scripts/sync-payload.sh)"
+    FAIL=$((FAIL + 1))
 fi
 
 # Cross-refs: every references/*.md linked from SKILL.md must exist

@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "description": "Declares which files belong in the Hermes skill payload. Sync with bash scripts/sync-payload.sh",
+  "files": [
+    "SKILL.md",
+    ".repo-health.json"
+  ],
+  "scripts": [
+    "check-commit-body.py",
+    "check-commit-trailers.py",
+    "check-portability.py"
+  ],
+  "references": "*"
+}

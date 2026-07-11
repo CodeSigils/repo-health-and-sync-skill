@@ -49,6 +49,14 @@ jobs:
         run: python3 scripts/doc-audit.py --self-test
       - name: Self-test — verify.sh
         run: bash scripts/verify.sh --self-test
+      - name: Self-test — sync-payload.sh syntax
+        run: bash -n scripts/sync-payload.sh
+      - name: Payload sync check
+        run: bash scripts/sync-payload.sh --ci
+      - name: Staged-install smoke test
+        run: |
+          python3 skills/repo-health-and-sync-skill/scripts/check-commit-trailers.py --self-test
+          python3 skills/repo-health-and-sync-skill/scripts/check-commit-body.py --self-test
       - name: Full verify
         run: bash scripts/verify.sh
       - name: Phase B — Pre-release gate

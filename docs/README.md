@@ -10,7 +10,7 @@ The repo has two script locations, each with a different purpose:
 
 | Location | Shipped? | Purpose |
 | :------- | :------- | :------ |
-| `scripts/` | No — dev-only | Maintainer tooling: `verify.sh` (CI gate), `doc-audit.py`, `check-commit-body.py`, `check-commit-trailers.py` |
+| `scripts/` | No — dev-only | Maintainer tooling: `verify.sh` (CI gate), `doc-audit.py`, `sync-payload.sh`, `payload-manifest.json` |
 | `skills/repo-health-and-sync-skill/scripts/` | Yes — runtime | Shipped scripts the skill instructions reference: `check-commit-trailers.py` (B11), `check-commit-body.py` (B7e), `check-portability.py` (B12) |
 
 When `scripts/` and `skills/*/scripts/` share a filename (e.g. `check-commit-trailers.py`),
