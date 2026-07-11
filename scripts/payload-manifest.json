@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "description": "Declares which files belong in the Hermes skill payload. Sync with bash scripts/sync-payload.sh",
+  "description": "Declares which files belong in the deployable skill payload. Sync with bash scripts/sync-payload.sh --ci",
   "files": [
     "SKILL.md",
     ".repo-health.json"

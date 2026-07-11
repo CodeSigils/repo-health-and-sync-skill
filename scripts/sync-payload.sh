@@ -108,7 +108,7 @@ if [ "$ref_mode" = "mirror" ]; then
     mkdir -p "$SYNC_DIR/references"
     # Remove existing reference files first to catch deletions
     find "$SYNC_DIR/references" -type f -delete 2>/dev/null || true
-    cp "$ROOT/references/"*.md "$SYNC_DIR/references/"
+    cp "$ROOT/skills/repo-health-and-sync-skill/references/"*.md "$SYNC_DIR/references/"
 fi
 
 # --- Remove orphaned files ---

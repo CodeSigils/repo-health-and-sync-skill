@@ -1,6 +1,4 @@
 {
-  "version": 1,
-  "description": "Repository health configuration for repo-health-and-sync-skill",
   "commit_body_format": {
     "required_fields": ["what", "why"],
     "pattern": "^what: .+\\nwhy:  .+$"
@@ -9,9 +7,12 @@
     "signed-off-by",
     "reviewed-by",
     "tested-by",
-    "suggested-by"
+    "suggested-by",
+    "co-authored-by",
+    "helped-by"
   ],
   "portability": {
     "allow_platform_ref": true
-  }
+  },
+  "sync_targets": ["skills/repo-health-and-sync-skill/"]
 }

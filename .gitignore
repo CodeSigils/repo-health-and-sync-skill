@@ -36,3 +36,6 @@ __pycache__/
 output/
 .venv/
 venv/
+
+# Skill payload (installed copy - source of truth is repo)
+skills/repo-health-and-sync-skill/
