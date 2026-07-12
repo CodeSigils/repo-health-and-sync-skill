@@ -69,7 +69,6 @@ copies to maintain.
 │   ├── validate-scripts.py
 │   ├── verify-urls.py
 │   └── verify.sh
-├── test-fixtures.json
 └── skills/
     └── repo-health-and-sync-skill/
         └── SKILL.md               # The entire skill

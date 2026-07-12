@@ -178,7 +178,6 @@ to use, or a custom consistency check.
 │   ├── validate-scripts.py
 │   ├── verify-urls.py
 │   └── verify.sh
-├── test-fixtures.json
 └── skills/
     └── repo-health-and-sync-skill/
         └── SKILL.md      # The entire skill — one file, nothing else
