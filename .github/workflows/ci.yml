@@ -67,6 +67,8 @@ jobs:
         run: shellcheck scripts/*.sh 2>/dev/null || true
       - name: Python script lint
         run: python3 -m ruff check scripts/ skills/
+      - name: Version consistency check
+        run: python3 scripts/check-version-consistency.py
 
   full-verify:
     runs-on: ubuntu-latest

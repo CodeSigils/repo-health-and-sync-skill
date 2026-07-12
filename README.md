@@ -132,7 +132,6 @@ cp -r repo-health-and-sync-skill/skills/repo-health-and-sync-skill <your-skills-
 | Install scripts | Every platform provides native skill consumption paths. A script would compete and drift. |
 | Platform adapter files | User-side setup only. The repo ships only `skills/repo-health-and-sync-skill/SKILL.md`. |
 | Plugin manifest | Filesystem discovery is sufficient at 1 skill. |
-| Hermes-specific logic | The methodology is agent-agnostic. No `skill_view()`, no Hermes config paths. |
 
 ---
 
@@ -159,7 +158,6 @@ to use, or a custom consistency check.
 │   └── workflows/
 │       └── ci.yml        # CI pipeline
 ├── .gitignore
-├── .repo-health.json
 ├── CITATION.cff
 ├── LICENSE
 ├── README.md
@@ -173,14 +171,16 @@ to use, or a custom consistency check.
 ├── scripts/              # CI-only tooling (not shipped)
 │   ├── check-expiry.py
 │   ├── check-portability.py
+│   ├── check-version-consistency.py
 │   ├── doc-audit.py
 │   ├── extract-tests.py
 │   ├── validate-scripts.py
-│   ├── verify-urls.py
-│   └── verify.sh
-└── skills/
-    └── repo-health-and-sync-skill/
-        └── SKILL.md      # The entire skill — one file, nothing else
+│   ├── verify.sh
+│   └── verify-urls.py
+├── SECURITY.md
+├── skills/
+│   └── repo-health-and-sync-skill/
+│       └── SKILL.md      # The entire skill — one file, nothing else
 ```
 
 ---
@@ -194,13 +194,16 @@ judgments.
 **Every invariant traces to a concrete failure.** If you cannot describe
 the harm a broken invariant would cause, the check is speculative. Skip it.
 
-**Run once, observe broadly.** One `git log`, one `find`, one `ls` should
-give the repo's shape. Do not chain five commands to confirm what the
-first two already show.
+**Run once, observe broadly.** One `ls`, one `find`, one `git log`
+should give you the repo's shape. Do not chain five commands to
+confirm what the first two already showed.
 
-**Ship the methodology, not the collection.** The agent already has the
-tools to check repo health. What it needs is a framework for deciding
-what to check. That framework fits in one SKILL.md.
+**Write the profile before the checks.** If you don't know the repo's
+languages, tools, commit culture, and CI system, you cannot meaningfully
+assess its health. Step 1 is not optional.
+
+**The right number of checks is the one the repo needs, not the
+one the skill defines.**
 
 ---
 

@@ -82,16 +82,16 @@ a PASS/FAIL for things the repo does not need.
 
 | Dimension | Ask | Relevant when |
 |-----------|-----|---------------|
-|| **History hygiene** | Is the working tree clean? Are there unpushed commits? | Always — cheap, universal |
-|| **Shell correctness** | Do .sh files pass shellcheck with no SC-level issues? | Any .sh files exist |
-|| **Version alignment** | Do version fields across manifests agree? | 2+ version sources |
-|| **Tag/release integrity** | Do git tags and GitHub releases overlap? | Any tags exist |
-|| **Commit quality** | Are messages structured? Are bodies informative? | Commits on this branch |
-|| **CI efficiency** | Is CI scoped to what changed? | CI config exists |
-|| **Cross-platform** | Do scripts use portable constructs? | .sh files + any macOS/BSD users |
-|| **Attribution drift** | Are unauthorized `Co-authored-by:` trailers present? | Any commits on this branch |
-|| **File coverage** | Does .gitignore cover agent/OS/build artifacts? | .gitignore exists |
-|| **External reference health** | Do all `https://` refs in docs/config resolve? | `REPO_HEALTH_VERIFY_REFS=1` env var (opt-in) |
+| **History hygiene** | Is the working tree clean? Are there unpushed commits? | Always — cheap, universal |
+| **Shell correctness** | Do .sh files pass shellcheck with no SC-level issues? | Any .sh files exist |
+| **Version alignment** | Do version fields across manifests agree? | 2+ version sources |
+| **Tag/release integrity** | Do git tags and GitHub releases overlap? | Any tags exist |
+| **Commit quality** | Are messages structured? Are bodies informative? | Commits on this branch |
+| **CI efficiency** | Is CI scoped to what changed? | CI config exists |
+| **Cross-platform** | Do scripts use portable constructs? | .sh files + any macOS/BSD users |
+| **Attribution drift** | Are unauthorized `Co-authored-by:` trailers present? | Commits on this branch |
+| **File coverage** | Does .gitignore cover agent/OS/build artifacts? | .gitignore exists |
+| **External reference health** | Do all `https://` refs in docs/config resolve? | `REPO_HEALTH_VERIFY_REFS=1` env var (opt-in) |
 
 For each relevant dimension, run exactly ONE command to check it:
 
@@ -218,6 +218,30 @@ check replaces the default probe for that dimension.
 - It does not gate Phase C. Reverse sync is a separate concern from
   health scanning. If the repo needs a sync step, the agent designs
   it from the repo's sync targets, not from a pre-written procedure.
+
+---
+
+## Design principles (read before Step 1)
+
+**The repo tells you what it needs.** Do not bring expectations. A
+10-year-old project with 10K commits and no tags is valid if that's
+how they work. Judge drift from local invariants, not from a universal
+standard.
+
+**Every invariant traces to a concrete failure.** If you cannot think
+of a specific problem that would occur when this invariant breaks, the
+check is speculative. Skip it.
+
+**Run once, observe broadly.** One `ls`, one `find`, one `git log`
+should give you the repo's shape. Do not chain five commands to
+confirm what the first two already showed.
+
+**Write the profile before the checks.** If you don't know the repo's
+languages, tools, commit culture, and CI system, you cannot meaningfully
+assess its health. Step 1 is not optional.
+
+**The right number of checks is the one the repo needs, not the
+one the skill defines.**
 
 ---
 
