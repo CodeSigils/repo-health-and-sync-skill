@@ -204,6 +204,17 @@ sync targets, or add a custom consistency check. See
 │   └── doc-standards.json# Doc completeness manifest
 ├── references/           # Per-check detail and configuration
 ├── scripts/              # Enforcement scripts
+│   ├── check-commit-body.py
+│   ├── check-commit-trailers.py
+│   ├── check-expiry.py
+│   ├── check-portability.py
+│   ├── doc-audit.py
+│   ├── extract-tests.py
+│   ├── payload-manifest.json
+│   ├── sync-payload.sh
+│   ├── validate-scripts.py
+│   ├── verify-urls.py
+│   └── verify.sh
 └── skills/               # Deployable skill package
     └── repo-health-and-sync-skill/
         ├── SKILL.md
@@ -211,7 +222,14 @@ sync targets, or add a custom consistency check. See
         └── scripts/
             ├── check-commit-body.py
             ├── check-commit-trailers.py
-            └── check-portability.py
+            ├── check-expiry.py
+            ├── check-portability.py
+            ├── doc-audit.py
+            ├── extract-tests.py
+            ├── sync-payload.sh
+            ├── validate-scripts.py
+            ├── verify-urls.py
+            └── verify.sh
 ```
 
 ---
