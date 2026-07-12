@@ -4,35 +4,13 @@
       "id": "audience",
       "description": "Audience declared",
       "type": "regex",
-      "pattern": "agentskills\\.io-compatible|For Hermes|For skill maintainers"
-    },
-    {
-      "id": "self-guiding",
-      "description": "Self-guiding claim",
-      "type": "regex",
-      "pattern": "self-guiding"
+      "pattern": "agentskills\\.io-compatible|agentskills\\.io client"
     },
     {
       "id": "quickstart-bash",
-      "description": "Quickstart bash block",
+      "description": "Install bash block",
       "type": "regex",
       "pattern": "```bash"
-    },
-    {
-      "id": "example-output",
-      "description": "Example B-check output",
-      "type": "regex",
-      "pattern": "WARNING.*B[0-9]"
-    },
-    {
-      "id": "phase-table",
-      "description": "Phase table covers all B1-B12 + C1-C4",
-      "type": "contains-all",
-      "items": [
-        "**B1**", "**B2**", "**B3**", "**B4**", "**B5**", "**B6**",
-        "**B7**", "**B8**", "**B9**", "**B10**", "**B11**", "**B12**",
-        "**C1**", "**C2**", "**C3**", "**C4**"
-      ]
     },
     {
       "id": "link-skills-md",
@@ -41,43 +19,46 @@
       "pattern": "SKILL\\.md"
     },
     {
-      "id": "link-maintaining-md",
-      "description": "Links to docs/maintaining.md",
-      "type": "regex",
-      "pattern": "docs/maintaining\\.md|maintaining\\.md"
-    },
-    {
-      "id": "link-references",
-      "description": "Links to references/",
-      "type": "regex",
-      "pattern": "references/"
-    },
-    {
       "id": "see-also",
       "description": "See also section",
       "type": "regex",
       "pattern": "## See also"
     },
     {
-      "id": "ecosystem-links",
-      "description": "Ecosystem links",
+      "id": "license-section",
+      "description": "License section",
       "type": "regex",
-      "pattern": "hermes-agent\\.nousresearch\\.com"
+      "pattern": "## License"
     },
     {
-      "id": "tree-lists-all-root-files",
-      "description": "All root committed files appear in README",
-      "type": "contains-all",
-      "items": [
-        "maintaining.md", "SKILL.md", "README.md", "LICENSE",
-        ".gitattributes", ".gitignore", ".repo-health.json"
-      ]
+      "id": "excludes-table",
+      "description": "What this repo does NOT include table",
+      "type": "regex",
+      "pattern": "What this repo does NOT include"
     },
     {
-      "id": "b9-multiforge-skip",
-      "description": "B9 skip condition is multi-forge",
-      "type": "not-regex",
-      "pattern": "No `\\.github/workflows/`"
+      "id": "project-structure",
+      "description": "Project structure tree",
+      "type": "regex",
+      "pattern": "## Project structure"
+    },
+    {
+      "id": "design-principles",
+      "description": "Design principles section",
+      "type": "regex",
+      "pattern": "## Design principles"
+    },
+    {
+      "id": "how-it-works",
+      "description": "How it works section",
+      "type": "regex",
+      "pattern": "## How it works"
+    },
+    {
+      "id": "dependencies-section",
+      "description": "Dependencies section",
+      "type": "regex",
+      "pattern": "## Dependencies"
     }
   ],
   "docs/README.md": [
@@ -98,46 +79,28 @@
       "description": "Links to research.md",
       "type": "regex",
       "pattern": "research\\.md"
-    },
-    {
-      "id": "consolidated-note",
-      "description": "Documents consolidation origin",
-      "type": "regex",
-      "pattern": "consolidated information from"
     }
   ],
   "docs/maintaining.md": [
     {
-      "id": "skill-line-ceiling-current",
-      "description": "Maintainer line ceiling matches verify.sh",
-      "type": "contains-all",
-      "items": ["≤ 740", "past 740 lines"]
+      "id": "commit-format",
+      "description": "Commit convention documented",
+      "type": "regex",
+      "pattern": "what:"
     },
     {
-      "id": "no-stale-650-ceiling",
-      "description": "No stale 650-line ceiling",
-      "type": "not-regex",
-      "pattern": "650 lines|≤ 650"
+      "id": "verification-checklist",
+      "description": "Verification checklist section",
+      "type": "regex",
+      "pattern": "## Verification checklist"
     }
   ],
   "docs/decisions.md": [
     {
-      "id": "phase-b-includes-b12",
-      "description": "Decisions include B12",
+      "id": "v020-note",
+      "description": "v0.2.0 evolution note",
       "type": "regex",
-      "pattern": "B1-B12"
-    },
-    {
-      "id": "reference-cap-current",
-      "description": "Decisions use current reference cap",
-      "type": "contains-all",
-      "items": ["15-file ceiling", "≤15 files"]
-    },
-    {
-      "id": "no-stale-reference-counts",
-      "description": "No stale reference count claims",
-      "type": "not-regex",
-      "pattern": "8 files|~596|B1-B11|4 sub-steps"
+      "pattern": "v0\\.2\\.0 note"
     }
   ]
 }
