@@ -5,7 +5,9 @@
 > skill (v0.2.0) is a methodology-only single SKILL.md. The research evidence
 > here — ecosystem surveys, portability patterns, co-author guard analysis —
 > still informed the methodology's design principles. None of the reference
-> files cited below exist in the current repo.
+> files cited below exist in the current repo. B-check labels in this file
+> refer to the old architecture; they are kept here as historical cross-references
+> to the original design decisions, not as active instructions.
 
 **Purpose:** Evidence base that informed the decisions in `docs/decisions.md`.
 Contains survey data, ecosystem tables, and research findings. This file is
@@ -176,7 +178,7 @@ All 16 user suggestions mapped to implementation or explicit design position:
 | # | Suggestion | Status | Where landed |
 | :- | :--------- | :----- | :----------- |
 | 1 | Mature projects survey | Research | Survey table in this file; real-world table in SKILL.md |
-| 2 | Anthropic/OpenAI practices | Reference | Agent ecosystem table in this file; `references/agent-instruction-ecosystem.md` |
+|| 2 | Anthropic/OpenAI practices | Reference | Agent ecosystem table in this file |
 | 3 | Commit messages over CHANGELOG | Implemented | B0 commit-log-first + B7a-B7c |
 | 4 | Cross-platform portability | Implemented | B8 (8 patterns) + this file §3 |
 | 5 | Canonical script naming | Implemented | B2 verb-noun check + this file §6 |
@@ -187,7 +189,7 @@ All 16 user suggestions mapped to implementation or explicit design position:
 | 10 | Version tag anti-drift | Implemented | B5 tag vs release |
 | 11 | .gitignore + repo metadata | Implemented | B10 (6 categories) + this file §5 |
 | 12 | Co-author guard | Implemented | B11 (4-layer) + this file §4 |
-| 13 | Agent concepts study | Reference | `references/anti-drift-proportionality.md` cites study notes |
+|| 13 | Agent concepts study | Reference | `agent-concepts-study` study notes on proportionate anti-drift |
 | 14 | Cross-agent portability | Implemented | B0 forge-awareness + ecosystem reference |
 | 15 | Templates with caution | Principle | AP8 — no `templates/` directory exists |
 | 16 | Don't re-invent wheel | Principle | AP7/AP9 — 17-file discipline, scope bounded |
