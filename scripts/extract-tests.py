@@ -5,8 +5,8 @@ Parses the do_self_test() function of a script and extracts test cases
 into the review-fixtures.json format.
 
 Usage:
-    python3 scripts/extract-tests.py --script check-commit-body.py --output test-fixtures.json
-    python3 scripts/extract-tests.py --script check-commit-body.py --output test-fixtures.json
+    python3 scripts/extract-tests.py --script check-portability.py --output test-fixtures.json
+    python3 scripts/extract-tests.py --script check-expiry.py --output test-fixtures.json
 """
 
 from __future__ import annotations
@@ -79,7 +79,7 @@ def create_fixtures(script_name: str, tests: list[dict]) -> list[dict]:
                     "content": message
                 }
             ],
-            "expected_scripts": ["check-commit-body"],
+            "expected_scripts": ["check-portability"],
             "expected_rules": [],
         }
 
