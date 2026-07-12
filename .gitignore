@@ -37,5 +37,5 @@ output/
 .venv/
 venv/
 
-# Skill payload (installed copy - source of truth is repo)
-skills/repo-health-and-sync-skill/
+# Skill payload generated scripts (build artifacts)
+skills/repo-health-and-sync-skill/scripts/

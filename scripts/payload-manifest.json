@@ -15,10 +15,6 @@
     "verify-urls.py",
     "verify.sh",
     "sync-payload.sh",
-    "validate-scripts.py",
-    "check-expiry.py",
-    "doc-audit.py",
-    "extract-tests.py",
     "validate-scripts.py"
   ],
   "references": "*"
