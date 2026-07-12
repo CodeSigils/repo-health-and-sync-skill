@@ -50,7 +50,7 @@ copies to maintain.
 ```text
 ├── .github/workflows/ci.yml
 ├── .gitignore
-├── .repo-health.json
+├── .gitattributes
 ├── CITATION.cff
 ├── LICENSE
 ├── README.md
@@ -79,9 +79,11 @@ copies to maintain.
 
 1. **Speculative checks.** A methodology addition needs an observed failure
    or a documented ecosystem pattern, not "seems useful."
-2. **Over-instruction.** If the SKILL.md exceeds 100 lines, the methodology
-   may be drifting toward a checklist. Extract to a reference or trust the
-   agent's judgment.
+2. **Over-instruction.** The methodology should be compact enough that the agent
+   can read and apply it in one pass. If the SKILL.md grows significantly,
+   trim the methodology back rather than adding reference files. Trust the
+   agent's judgment for details; the methodology teaches *how to decide*,
+   not *what to check*.
 3. **Ecosystem drift.** The tools on PATH change over time. Verify that
    detection commands in SKILL.md still work against current tool versions.
 4. **Platform-specific commands in an all-platform skill.** The skill claims
