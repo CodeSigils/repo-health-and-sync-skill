@@ -2,7 +2,7 @@
 """
 check-expiry.py — Scan for expired references in documentation and config files.
 
-Scans .repo-health.json, SKILL.md, docs/, and references/ for Expires: fields.
+Scans .repo-health.json, SKILL.md, docs/ for Expires: fields.
 Fails if any expired references are found.
 
 Usage:

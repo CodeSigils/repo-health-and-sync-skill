@@ -13,24 +13,20 @@ SCRIPTS_DIR = Path(__file__).resolve().parent
 # Python scripts that should have --self-test
 PY_SCRIPTS_WITH_SELF_TEST = [
     "check-portability.py",
-    "check-commit-body.py",
-    "check-commit-trailers.py",
     "verify-urls.py",
     "doc-audit.py",
     "check-expiry.py",
+    "extract-tests.py",
 ]
 
 # All scripts to check for quality
 ALL_SCRIPTS = [
     "check-portability.py",
-    "check-commit-body.py",
-    "check-commit-trailers.py",
     "verify-urls.py",
     "doc-audit.py",
     "check-expiry.py",
     "extract-tests.py",
     "verify.sh",
-    "sync-payload.sh",
 ]
 
 REQUIRED_PATTERNS = [
@@ -45,7 +41,7 @@ FORBIDDEN_PATTERNS = [
     (r"subprocess\.run\([^)]*shell=True", "shell=True without justification"),
 ]
 
-SHELL_SCRIPTS = {"verify.sh", "sync-payload.sh"}
+SHELL_SCRIPTS = {"verify.sh"}
 
 
 def check_script(script_path: Path) -> list[str]:
@@ -75,7 +71,6 @@ def check_script(script_path: Path) -> list[str]:
     open_calls = re.findall(r"open\([^)]+\)", content)
     for call in open_calls:
         # Check if this is urllib.request.urlopen (not a plain open() call)
-        # The regex captures only the open(...) portion, so check the full line
         for i, line in enumerate(lines, 1):
             if call in line:
                 # Skip if this is urllib.request.urlopen
@@ -95,7 +90,7 @@ def check_script(script_path: Path) -> list[str]:
 def run_self_tests() -> list[str]:
     """Run --self-test on all scripts that should have it and verify they pass."""
     errors = []
-    for script in ["check-portability.py", "check-commit-body.py", "check-commit-trailers.py", "verify-urls.py", "doc-audit.py", "check-expiry.py", "extract-tests.py"]:
+    for script in PY_SCRIPTS_WITH_SELF_TEST:
         script_path = SCRIPTS_DIR / script
         if not script_path.exists():
             continue

@@ -19,7 +19,7 @@ methodology is the only artifact.
 3. The agent runs three steps — discover → infer → verify — and reports
    what it finds with judgment proportional to actual harm.
 
-See [SKILL.md](SKILL.md) for the full three-step procedure.
+See [SKILL.md](skills/repo-health-and-sync-skill/SKILL.md) for the full three-step procedure.
 
 ---
 
