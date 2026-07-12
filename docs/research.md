@@ -1,17 +1,9 @@
-# Research — Repo Health and Sync Skill
+# Research — Repo Health Scan (v0.2.0)
 
-> **v0.2.0 note:** This file describes the evidence base that informed the
-> v0.1.0 design (B-phases, reference files, shipped scripts). The current
-> skill (v0.2.0) is a methodology-only single SKILL.md. The research evidence
-> here — ecosystem surveys, portability patterns, co-author guard analysis —
-> still informed the methodology's design principles. None of the reference
-> files cited below exist in the current repo. B-check labels in this file
-> refer to the old architecture; they are kept here as historical cross-references
-> to the original design decisions, not as active instructions.
-
-**Purpose:** Evidence base that informed the decisions in `docs/decisions.md`.
-Contains survey data, ecosystem tables, and research findings. This file is
-the reference for *what was found*, not *what was decided*.
+**Purpose:** Evidence base that informed the current methodology design.
+Contains ecosystem survey data, cross-platform consumption patterns, and
+research findings. This file is the reference for *what was found*,
+not *what was built* — decisions are in `docs/decisions.md`.
 
 ---
 
@@ -20,7 +12,8 @@ the reference for *what was found*, not *what was decided*.
 17 top-starred projects across 9 language ecosystems inspected for: directory
 structure, branch naming, tags, commit style, CI organization, scripts
 directory, agent config files, agent instruction files, CHANGELOG approach,
-and .gitattributes usage.
+and .gitattributes usage. This data shaped the methodology's design principles
+(runtime discovery, proportionate checking).
 
 ### Survey snapshot
 
@@ -39,7 +32,8 @@ and .gitattributes usage.
 **KF1 — No single commit convention dominates.** 10 distinct commit styles
 across 17 projects. Conventional Commits is the plurality (29%) but not the
 majority. Homebrew explicitly rejects conventional commits via CI workflow.
-B7 must discover the prevailing style before checking consistency.
+The methodology teaches agents to observe the repo's actual commit style
+before forming judgments — not to enforce one convention universally.
 
 **KF2 — 29% of top projects commit agent configs.** 5/17 commit `.claude/`,
 `.cursor/`, `.codex/`, `.agents/`, or `.vscode/` configs. JS/TS leads at
@@ -51,7 +45,7 @@ tags and no releases. The only actionable tag problem is *stale* tags, not
 
 **KF4 — .gitattributes is the most common cross-platform mechanism.** 13/17
 (76%) use `.gitattributes` for line-ending control. This is more common
-than any shell portability pattern. B8 initially missed this entirely.
+than any shell portability pattern.
 
 **KF5 — Pre-commit/husky/lefthook are NOT widely adopted.** Only 1/17
 (apache/spark) uses pre-commit. Projects rely on EditorConfig (53%) →
@@ -67,7 +61,7 @@ formatters (prettier, black, clang-format) need installation.
 
 ## 2. Agent instruction ecosystem
 
-Canonical instruction file per platform:
+Canonical instruction file per platform — relevant to portability:
 
 | Tool | Canonical file | Scoped extension |
 | :--- | :------------- | :--------------- |
@@ -84,10 +78,11 @@ place where guidance can become duplicated, stale, or contradictory.
 
 ## 3. Cross-platform portability — verified patterns
 
-All 8 B8 shell patterns validated against shellcheck rules:
+All patterns validated against shellcheck rules — relevant to the
+methodology's detection commands:
 
-| B8 pattern | Shellcheck rule | Priority |
-| :--------- | :-------------- | :------- |
+| Pattern | Shellcheck rule | Priority |
+| :------ | :-------------- | :------ |
 | `which` → `command -v` | SC2230 | High |
 | `grep -P` → `grep -E` | SC3028 | High |
 | `sed -i` (no backup) | SC2001 | High |
@@ -97,9 +92,12 @@ All 8 B8 shell patterns validated against shellcheck rules:
 | `find -exit` → `-exec` | SC2001 | Medium |
 | `flock` → `mkdir .lock \|\| exit 1` | SC2001 | Medium |
 
-**Patterns identified as missing** from the original B8: `[[ ]]` (SC3010),
-`source` vs `.` (SC2039), `pushd`/`popd` (SC2164), `readlink -f`, GNU
-`mktemp` flags, `${var/pattern/replacement}` (SC2001), `let` (SC2250).
+**Patterns identified as common but not actionable at methodology level:**
+`[[ ]]` (SC3010), `source` vs `.` (SC2039), `pushd`/`popd` (SC2164),
+`readlink -f`, GNU `mktemp` flags, `${var/pattern/replacement}` (SC2001),
+`let` (SC2250). The methodology teaches agents to check for these when
+cross-platform compatibility is declared; it does not enforce them
+universally.
 
 ---
 
@@ -107,15 +105,17 @@ All 8 B8 shell patterns validated against shellcheck rules:
 
 Two distinct enforcement families, same mechanism:
 
-- **Proactive trailer rejection** — hermes-skill-hq pattern: block unauthorized
-  `*-by:` attribution before it reaches the commit log. This is the rarer
-  direction.
-- **DCO enforcement** — Linux kernel, DCO App (337★), CNCF ecosystem: enforce
-  *presence* of `Signed-off-by`, not rejection of unauthorized trailers.
+- **Proactive trailer rejection** — block unauthorized `*-by:` attribution
+  before it reaches the commit log. Rare direction.
+- **DCO enforcement** — Linux kernel, DCO App (337★), CNCF ecosystem:
+  enforce *presence* of `Signed-off-by`, not rejection of unauthorized
+  trailers.
 
 Both use the same architecture: policy documentation → local commit-msg hook →
 shared checker script → CI gate. No surveyed project uses hook-only or CI-only
-for enforcement that matters.
+for enforcement that matters. The current methodology teaches agents to check
+for unauthorized `Co-authored-by:` trailers via `git log --format="%B"`,
+eliminating the need for a shipped Python checker script.
 
 ---
 
@@ -156,77 +156,55 @@ Consistent prefixes enable tab-completion grouping.
 
 ---
 
-## 7. Evidence quality distribution
+## 7. Ecosystem structural survey (v0.2.0 motivation)
 
-| Label | Meaning | Count | B-checks |
-| :---- | :------ | ----: | :------- |
-| research-backed | Grounded in systematic survey or documented study | 8 | B1, B3, B5, B7, B8, B9, B10, B11 |
-| observed | Grounded in specific user observation or single source | 2 | B0 tri-layer, B2 |
-| pragmatic | Common-sense design, no formal study | 4 | B0 (forge-awareness), B4, B6 |
+Survey of 6 major agent skill collection repos — the primary evidence that
+led to the single-SKILL.md methodology design:
 
-**Changes through research:** B3, B8, B10, B11 promoted from
-observed/pragmatic to research-backed during T1-T6 investigation. B4 and B6
-remained pragmatic — survey confirmed their approach but found no need for
-revision.
+| Repo | Stars | Skills | Root refs/ | Root scripts/ | Shipped scripts | Payload sync |
+|------|-------|--------|-----------|--------------|----------------|--------------|
+| addyosmani/agent-skills | 68K+ | 25 | 0 | 0 | 0 | No |
+| openai/skills | — | ~20 | 0 | 0 | 0 | No |
+| anthropics/claude-plugins-official | ~31K | 29+ | 0 | 0 | 0 | No |
+| wondelai/skills | 1.5K | 50 | 0 | ~2 | 0 | No |
+| cybersecurity-skills | 22.8K | 817 | 0 | 2 | 0 | No |
+| OpenMontage | 27.6K | 253 | 0 | ~50 | 0 | No |
 
----
+**Key finding: Zero ecosystem repos ship reference files or wrapper scripts
+in their skill payloads.** What you see in git is what the agent consumes.
+No build step, no sync script, no manifest.
 
-## 8. User suggestions — disposition
+### Consumption paths (no build step needed)
 
-All 16 user suggestions mapped to implementation or explicit design position:
+| Platform | Discovery path | Cross-agent path? |
+|----------|---------------|------------------|
+| Hermes | `external_dirs` → `skills/*/SKILL.md` | No — does not document `.agents/skills/` |
+| Claude Code | `.claude/skills/` directory walk | No |
+| Codex CLI | `.codex/skills/` directory walk | No |
+| Gemini CLI | `.agents/skills/` (user/workspace) | **Yes** — explicitly documented |
+| Cursor | `.cursor/rules/` glob match | No — uses rules format |
 
-| # | Suggestion | Status | Where landed |
-| :- | :--------- | :----- | :----------- |
-| 1 | Mature projects survey | Research | Survey table in this file; real-world table in SKILL.md |
-| 2 | Anthropic/OpenAI practices | Reference | Agent ecosystem table in this file |
-| 3 | Commit messages over CHANGELOG | Implemented | B0 commit-log-first + B7a-B7c |
-| 4 | Cross-platform portability | Implemented | B8 (8 patterns) + this file §3 |
-| 5 | Canonical script naming | Implemented | B2 verb-noun check + this file §6 |
-| 6 | Anti-stale/anti-drift | Implemented | B0 proportionate anti-drift + B7b-d |
-| 7 | CI efficiency | Implemented | B9 (6-signal table) |
-| 8 | Separate maintainer from user | Implemented | B0 repo-as-source + Phase C |
-| 9 | Quality skills before impl | Implemented | B0 tri-layer fallback |
-| 10 | Version tag anti-drift | Implemented | B5 tag vs release |
-| 11 | .gitignore + repo metadata | Implemented | B10 (6 categories) + this file §5 |
-| 12 | Co-author guard | Implemented | B11 (4-layer) + this file §4 |
-| 13 | Agent concepts study | Reference | `agent-concepts-study` study notes on proportionate anti-drift |
-| 14 | Cross-agent portability | Implemented | B0 forge-awareness + ecosystem reference |
-| 15 | Templates with caution | Principle | AP8 — no `templates/` directory exists |
-| 16 | Don't re-invent wheel | Principle | AP7/AP9 — 17-file discipline, scope bounded |
+**Confirmed:** `.agents/skills/` is the only cross-agent path explicitly
+endorsed by any platform vendor (Gemini CLI). The methodology works on any
+platform that can run `git`, `shellcheck`, `python3`, and `gh`.
 
 ---
 
-## 9. Specification changes register
-
-Changes that propagated from research findings into SKILL.md:
-
-| # | B-check | Change | Source |
-| :- | :------ | :----- | :----- |
-| 1 | B11 | Label promoted observed → research-backed | Three-layer enforcement pattern confirmed across Linux kernel DCO, DCO App |
-| 2 | B3 | Label promoted pragmatic → research-backed; detection order inverted | Pre-commit adoption is rare (1/17); EditorConfig is baseline (53%) |
-| 3 | B10 | Label promoted observed → research-backed; pattern list re-anchored | Official github/gitignore template is canonical; plan's ad-hoc list replaced |
-| 4 | B8 | Label promoted observed → research-backed; .gitattributes gap identified | 76% adoption across surveyed projects; shellcheck verified all patterns |
-| 5 | B4 | Confirmed pragmatic (no change) | 17-project survey validated single-source-of-truth approach |
-| 6 | B6 | Confirmed pragmatic (no change) | Survey confirmed formatter mapping; built-in vs external distinction added |
-
----
-
-## 10. Primary research sources
+## 8. Primary research sources
 
 - **agent-concepts-study** (`~/labs/agent-concepts-study/`): 6 study notes on
   instruction boundaries, proportionate anti-drift, duplicate guidance, and
-  research-practice loops
-- **hermes-skill-hq**: `dev/hq-review/references/durable-patterns.md` —
-  co-author guard pattern
-- **repo-consistency-enforcement skill** (30 reference files): consistency
-  tool detection patterns
+  research-practice loops; plus the 2026-07-12 structural diversity note
+  that directly motivated the v0.2.0 redesign
+- **skill-discovery/hub-marketplace-research.md**: ecosystem survey of 7
+  marketplaces, 42 client platforms, 3-layer discovery model
+- **skill-repo-architecture/repo-architecture-patterns.md**: structural
+  benchmarks from 6 major collections
+- **cross-ecosystem-skill-research skill**: platform vendor docs survey,
+  repo architecture patterns
 - **github/gitignore** (175k★): `Global/Agents.gitignore` — official agent
   artifact template
-- **Anthropic Claude Code docs**: platform.claude.com/docs
-- **OpenAI Codex / Agents SDK**: developers.openai.com
 - **shellcheck wiki**: SC2001, SC2230, SC2039, SC3010, SC3028, SC2164, SC2250
 - **DCO App**: github.com/dcoapp/app (337★) — Signed-off-by enforcement bot
 - **Linux kernel DCO v1.1**: docs.kernel.org — origin of Signed-off-by
   trailer convention
-- **config-doc-drift-prevention skill** (installed): drift detection patterns
-- **github-actions-workflows skill** (installed): CI workflow patterns

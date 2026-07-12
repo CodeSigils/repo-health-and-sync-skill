@@ -97,10 +97,10 @@
   ],
   "docs/decisions.md": [
     {
-      "id": "v020-note",
-      "description": "v0.2.0 evolution note",
+      "id": "describes-current-architecture",
+      "description": "Documents current (v0.2.0) architecture decisions",
       "type": "regex",
-      "pattern": "v0\\.2\\.0 note"
+      "pattern": "Decisions — Repo Health Scan \\(v0\\.2\\.0\\)"
     }
   ]
 }

@@ -1,194 +1,135 @@
-# Decisions — Repo Health and Sync Skill
+# Decisions — Repo Health Scan (v0.2.0)
 
-> **v0.2.0 note:** This file describes the v0.1.0 architecture (B-phases,
-> reference files, shipped scripts). The current skill is a methodology-only
-> single SKILL.md (v0.2.0). The design decisions documented here — like
-> file-swamp avoidance, proportionate anti-drift, and repo-as-source —
-> informed the evolution. See `skills/repo-health-and-sync-skill/SKILL.md` for the current implementation.
-
-**Purpose:** This file records the project's course — what was built, why, and
-what decisions shaped it. A maintainer reviewing this project should understand
-the architecture and rationale without reading the other docs files.
-
-**References:** Research evidence that informed these decisions is in
-`docs/research.md`. The skill itself is `SKILL.md`.
+**Purpose:** Records the design decisions that shaped the current methodology.
+The skill itself is `skills/repo-health-and-sync-skill/SKILL.md`. Research
+evidence that informed these decisions is in `docs/research.md`.
 
 ---
 
-## Project scope
+## Methodology over checklist
 
-Two-phase procedure for any git repository:
+**Decision:** Ship a three-step methodology (discover repo shape → infer what
+invariants matter → verify at runtime). Do not ship a hardcoded B-phase
+checklist.
 
-- **Phase B** — Project health baseline (B1-B12). Inspects the repo at runtime
-  for git hygiene, shell safety, version alignment, commit quality, CI
-  efficiency, and metadata integrity.
-- **Phase C** — Reverse sync (C1-C4). Deploys repo content to runtime targets
-  (skill directories, config mirrors, etc.) with repo-as-source discipline.
+**Why:** Every repo is different. A 200K-line monorepo with 5 package managers
+needs different checks than a 12-line shell script. The agent decides what to
+check based on what the repo profile reveals, not from a lookup table. This
+matches every major ecosystem repo (addyosmani/agent-skills, openai/skills,
+wondelai/skills) — none ship checklists.
 
-Phase B gates Phase C: never sync a broken repo.
-
----
-
-## Architecture decisions
-
-### Single-file skill + reference files
-
-**Decision:** SKILL.md is the canonical skill definition (kept under the
-verified 740-line ceiling). Detail lives in `references/`. No content
-duplicated between them.
-
-**Why:** Single-file index + pointed references is the ecosystem norm across
-Hermes, Claude Code, Codex, and Copilot. Inline detail in SKILL.md creates
-a drift surface when the same pattern appears in multiple phase sections
-(AP1 — duplicate guidance).
-
-### No `templates/` directory
-
-**Decision:** Rejected. SKILL.md contains example commands directly; reference
-files contain config schemas when needed.
-
-**Why:** Templates Before Need (AP8). A `.repo-health.json.example` would need
-maintenance independent of the schema reference file. The running text in
-SKILL.md and `references/repo-health-json-schema.md` serve the same purpose
-without an extra file.
-
-### Reference files stay capped
-
-**Decision:** Started from a smaller reference set and now keep the directory
-under a 15-file ceiling. Prioritise by observed failure modes.
-
-**Why:** Proportionate anti-drift (B0) — every reference file should trace to
-a specific observed failure or concrete user request. Deferred or new
-reference files must be grounded in enough evidence to justify their
-maintenance cost.
-
-### 15-file ceiling on references/
-
-**Decision:** Hard ceiling — when a new file would bring the count to 16, an
-existing one must be merged, archived, or deleted.
-
-**Why:** File-swamp avoidance (AP7). Each extra file increases scanning time
-and cross-reference surface. 15 is the empirically chosen limit from the
-ecosystem survey (no surveyed project exceeds this).
-
-### Not a general governance skill
-
-**Decision:** Scope is bounded to git-level health + reverse sync. Does not
-cover code quality (linting/formatting beyond detection), CI pipeline design,
-or project-specific governance policies.
-
-**Why:** Don't re-invent the wheel (AP9). Existing tools (shellcheck, EditorConfig,
-pre-commit, ecosystem formatters) already handle those concerns. The skill
-detects whether they're present but does not replace them.
-
-### Eliminated repo CHANGELOG.md
-
-**Decision:** Removed this repo's `CHANGELOG.md` (30bd423). Git tags and
-annotated release metadata are the release record.
-
-**Why:** The CHANGELOG was a duplicate drift surface — every commit needed
-a CHANGELOG entry AND a commit message, and the two could diverge. Git tags
-are single-source: `git tag -a` records the version, `git log` is the
-history. The verification checklist now says "every release gets an
-annotated tag" instead of "every change gets a CHANGELOG line."
-
-**Impact:**
-- `verify.sh` no longer checks for `## Unreleased`
-- AGENTS.md → docs/maintaining.md: maintainer instructions migrated to docs/
-- SKILL.md references to CHANGELOG remain — they instruct agents about
-  checking *other repos'* CHANGELOGs (conceptual, not self-referential)
+**Evidence:** Ecosystem survey of 6 top-starred skill collections; study note
+on 6 cross-project patterns (§ Methodology over Collection).
 
 ---
 
-## B0 design principles (read before any phase)
+## Runtime discovery over reference tables
 
-| Principle | Why it exists |
-| :-------- | :------------ |
-| **Commit log vs CHANGELOG** | `git log` is the authoritative record. CHANGELOG enforcement is proportionate to commit quality. |
-| **Detect, don't enforce** | No convention is universal. Discover the project's patterns before imposing rules. |
-| **Zero tags is valid** | ohmyzsh (188k stars) proves absence of tags is not a defect. Only stale tags matter. |
-| **Proportionate anti-drift** | Every check traces to an observed failure. Speculative checks accumulate debt before value. |
-| **Repo as source** | The repo is authoritative; deployed targets are derived. Never ship maintainer tooling to users. |
-| **Forge-awareness** | Detection logic is agent-agnostic. Activation mechanism (SKILL.md) is Hermes-specific. Portability tiers documented. |
-| **Quality-skill fallback** | Quad-layer probe before depending on external tools: `command -v` → config/project file → `skill_view` on Hermes → degraded mode/skip. |
+**Decision:** Do not ship reference files. The agent discovers everything it
+needs at runtime using tools on PATH.
 
----
+**Why:** The v0.1.0 design shipped 14 reference files as lookup tables for
+detection heuristics, portability patterns, and co-author guard procedures.
+These went stale as tools, paths, and conventions evolved. Runtime discovery
+uses the repo's actual filesystem state and the tools on PATH — it stays
+current between maintainer edits. Self-proving drift: the agentskills.io
+Showcase page cycled 404→200→404 within 4 hours. A reference file claiming
+it was 404 would have been wrong within hours.
 
-## Phase rationale
-
-| Phase | What it checks | Why it matters | Severity if absent |
-| :---- | :------------- | :------------- | :----------------- |
-| B1 | Git hygiene | Dirty trees, orphan tags, un-pushed commits accumulate misleading context | INFO — actionable |
-| B2 | Shellcheck | Shell scripts are the most common automation defect vector | WARNING — actionable |
-| B3 | Consistency check | Project-specific invariants cannot be generic; discover and run the project's own check | BLOCKING on drift, WARNING on missing |
-| B4 | Version alignment | Version skew between manifests is the leading cause of stale-release bugs | WARNING — multi-source skew |
-| B5 | Tag vs Release integrity | Tags and GitHub Releases are separate artifacts; tags can be orphaned | WARNING — actionable |
-| B6 | Format + lint | Consistent formatting reduces diff noise and prevents formatting-only commits | WARNING — advisory |
-| B7 | Commit audit (5 sub-steps) | Unchecked commits accumulate silently until a release fails | WARNING to BLOCKING per sub-step |
-| B8 | Cross-platform shell | Linux-only patterns break CI on macOS/BSD and block cross-platform contributors | WARNING — project-dependent |
-| B9 | CI efficiency | Docs-only changes should not trigger full builds; tag pushes should not re-run branch CI | WARNING — advisory, project-dependent |
-| B10 | .gitignore + metadata | Build artifacts, OS junk, and agent state leak into commits without .gitignore rules | WARNING — advisory |
-| B11 | Co-author guard | Accidental attribution trailers create permanent history artifacts | BLOCKING |
-
-Phase C (C1-C4) syncs repo content to runtime targets. Only runs when Phase B
-has no BLOCKING items.
+**Evidence:** Hub marketplace research (skill-discovery docs); skill-discovery
+durable findings § drift self-proof.
 
 ---
 
-## Implementation order
+## No shipped scripts
 
-1. **Phase 0:** Extract inline detail to reference files, establish B0 principles
-2. **Phase 1:** B7 (commit audit) + drift-pairs reference file
-3. **Phase 2:** B11 (co-author guard) + shared Python checker
-4. **Phase 3:** B8 (cross-platform shell audit) — parallel with P2
-5. **Phase 4:** B9 (CI efficiency audit) — parallel with P2/P3
-6. **Phase 5:** B10 (.gitignore + metadata audit)
-7. **Phase 6:** Value-added reference files (agent-ecosystem, gitignore-templates)
-8. **Phase 7:** End-to-end verification against self
-9. **Phase 8:** Move research docs to `docs/`, mark historical files
+**Decision:** The agent uses general-purpose tools directly (`git`, `shellcheck`,
+`python3`, `gh`). Do not ship wrapper scripts.
 
----
+**Why:** The v0.1.0 design shipped a Python checker for commit trailers and
+commit body format, plus a shared verification script. These duplicated
+functionality already available via `git log`, `shellcheck`, and `python3 -c`.
+Every ecosystem repo (addyosmani, openai/skills) ships zero scripts in their
+skill payloads. The methodology's detection commands call tools on PATH
+directly — no wrapper needed.
 
-## File structure at completion
-
-```
-├── docs/maintaining.md     # Maintainer workflow (docs/maintaining.md)
-├── SKILL.md                  # ≤740 lines — canonical skill definition
-├── README.md                 # User-facing install/quickstart
-├── LICENSE                   # MIT
-├── SECURITY.md               # Security policy and reporting
-├── .gitignore                # Agent-artifact patterns + OS/IDE junk
-├── .gitattributes            # Git/Linguist configuration
-├── docs/
-│   ├── README.md             # Maintainer audience note
-│   ├── decisions.md          # What and why
-│   ├── research.md           # Evidence base
-│   └── doc-standards.json    # Doc completeness manifest
-├── references/               # ≤15 files — selected core examples below
-│   ├── agent-instruction-ecosystem.md
-│   ├── anti-drift-proportionality.md
-│   ├── co-author-guard.md
-│   ├── drift-pairs.md
-│   ├── gitignore-templates.md
-│   ├── heuristic-discovery.md
-│   ├── repo-health-json-schema.md
-│   └── sync-targets.md
-└── scripts/
-    ├── verify.sh                 # Orchestration (self-consistency)
-    ├── check-commit-trailers.py  # Shared Python checker (12/12 self-test)
-    └── doc-audit.py              # Manifest-driven doc completeness audit
-```
+**Evidence:** Ecosystem structural survey (2026-07-12 study note). All 6
+surveyed repos ship zero runtime scripts.
 
 ---
 
-## Key anti-patterns avoided
+## Compatibility: all (agent-agnostic methodology)
 
-| AP | Name | What we did instead |
-| :- | :--- | :------------------ |
-| AP1 | Duplicate guidance | Single-file SKILL.md + pointed references. No content duplicated. |
-| AP3 | Speculative checks | Every B-check traces to an observed failure or concrete user request. |
-| AP7 | File swamp | 15-file ceiling on references/. Maintainer must merge or delete to add. |
-| AP8 | Templates before need | No `templates/` directory. Examples inline in SKILL.md. |
-| AP9 | Re-inventing wheels | Shellcheck, EditorConfig, ecosystem formatters — detect, don't replace. |
-| AP10 | Shipping maintainer tooling | CI scripts and release infra stay in repo, never sync to user runtime. |
-| AP11 | Stale CHANGELOG enforcement | Commit-log-aware: defer to `git log` when commit quality is high. |
+**Decision:** The skill declares `compatibility: all`. No Hermes-specific
+references (`skill_view`, `hermes skills`), no agent-specific config paths.
+
+**Why:** The methodology uses only `ls`, `git`, `shellcheck`, `python3`, `gh`,
+and standard POSIX commands. Every agent runtime that can run shell commands
+can consume it. This is the broadest possible audience for a git-repo
+methodology.
+
+**Evidence:** Platform vendor docs survey (2026-07-12). All major agents
+(Claude Code, Codex CLI, Gemini CLI, Hermes) discover skills from directory
+walks and can run the shell commands this skill uses.
+
+---
+
+## Single-file payload
+
+**Decision:** `skills/repo-health-and-sync-skill/SKILL.md` is the only shipped
+file. No references, no scripts, no config.
+
+**Why:** A methodology that fits in one file is consumed immediately — the
+agent reads it once and applies it. Multi-file payloads require the agent to
+load references on demand, which adds context overhead and risks skipped steps.
+The v0.1.0 payload had 15+ files; the current payload has 1. This matches
+openai/skills (payload: SKILL.md + per-skill refs), addyosmani (zero refs),
+and wondelai (flat SKILL.md per skill).
+
+**Evidence:** Structural survey of 6 CodeSigils repos vs 6 ecosystem repos
+(2026-07-12 study note). The ecosystem consistently ships minimal payloads.
+
+---
+
+## Proportionate checking
+
+**Decision:** The agent checks only dimensions that the repo profile reveals
+as relevant. No universal checklist, no mandatory PASS/FAIL for every step.
+
+**Why:** Running a version-alignment check on a repo with no version sources
+wastes agent context and produces false negatives. Running a CI-efficiency
+check on a repo with no CI config is noise. The methodology's Step 1
+(discover shape) gates Step 2 (infer invariants) — only dimensions that
+the repo profile shows as active are checked.
+
+**Evidence:** v0.1.0 B0 principle "detect, don't enforce." Observed during
+dogfooding: the old B-phase would emit WARNINGs for dimensions that didn't
+apply, consuming the agent's attention on noise.
+
+---
+
+## Judgment over labels
+
+**Decision:** The agent reports findings with context and harm assessment,
+not pre-defined PASS/WARNING/BLOCKING labels.
+
+**Why:** The old architecture used a fixed severity scale (PASS / WARNING /
+BLOCKING) that couldn't account for project context. A loose `.gitignore`
+in a solo personal project is less harmful than the same issue in a
+multi-contributor open-source repo. The methodology's Step 3 instructs
+the agent to use language that reflects actual harm ("This causes silent
+failure when...") rather than a severity class that repeats on every report.
+
+**Evidence:** Observed during dogfooding: B-phase reports would flag the
+same items as WARNING regardless of the repo's stage or audience, wasting
+the maintainer's attention on items that didn't need action.
+
+---
+
+## What this file does NOT document
+
+This file documents v0.2.0 decisions. The v0.1.0 design (B-phases, 14
+reference files, 10 shipped scripts, payload sync process) is archived in
+git history (commits 2691398, 78b31c7). See also the agent-concepts-study
+note `2026-07-12-skill-repo-structural-diversity-and-optimal-patterns.md`
+for the structural analysis that motivated the v0.2.0 design.
