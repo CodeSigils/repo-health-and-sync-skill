@@ -70,7 +70,6 @@ def check_script(script_path: Path) -> list[str]:
     # Check for encoding on open() calls (but not urllib.request.urlopen)
     open_calls = re.findall(r"open\([^)]+\)", content)
     for call in open_calls:
-        # Check if this is urllib.request.urlopen (not a plain open() call)
         for i, line in enumerate(lines, 1):
             if call in line:
                 # Skip if this is urllib.request.urlopen
