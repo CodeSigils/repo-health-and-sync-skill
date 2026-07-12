@@ -37,5 +37,5 @@ output/
 .venv/
 venv/
 
-# Skill payload generated scripts (build artifacts)
-skills/repo-health-and-sync-skill/scripts/
+# Skill payload generated files (build artifacts — source is root)
+skills/repo-health-and-sync-skill/
