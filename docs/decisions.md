@@ -1,5 +1,11 @@
 # Decisions — Repo Health and Sync Skill
 
+> **v0.2.0 note:** This file describes the v0.1.0 architecture (B-phases,
+> reference files, shipped scripts). The current skill is a methodology-only
+> single SKILL.md (v0.2.0). The design decisions documented here — like
+> file-swamp avoidance, proportionate anti-drift, and repo-as-source —
+> informed the evolution. See `SKILL.md` for the current implementation.
+
 **Purpose:** This file records the project's course — what was built, why, and
 what decisions shaped it. A maintainer reviewing this project should understand
 the architecture and rationale without reading the other docs files.

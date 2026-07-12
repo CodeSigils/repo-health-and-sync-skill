@@ -1,5 +1,12 @@
 # Research — Repo Health and Sync Skill
 
+> **v0.2.0 note:** This file describes the evidence base that informed the
+> v0.1.0 design (B-phases, reference files, shipped scripts). The current
+> skill (v0.2.0) is a methodology-only single SKILL.md. The research evidence
+> here — ecosystem surveys, portability patterns, co-author guard analysis —
+> still informed the methodology's design principles. None of the reference
+> files cited below exist in the current repo.
+
 **Purpose:** Evidence base that informed the decisions in `docs/decisions.md`.
 Contains survey data, ecosystem tables, and research findings. This file is
 the reference for *what was found*, not *what was decided*.

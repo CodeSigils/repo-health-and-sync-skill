@@ -37,6 +37,3 @@ output/
 .venv/
 venv/
 .ruff_cache/
-
-# Skill payload — tracked in repo but verified by CI to match payload-manifest.json
-# skills/repo-health-and-sync-skill/  (un-ignored so clones work out of the box)

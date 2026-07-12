@@ -5,13 +5,13 @@ audience: maintainers only — not shipped to skill users.
 supersedes: AGENTS.md
 ---
 
-# Maintaining the Repo Health Skill
+# Maintaining the Repo Health Scan Skill
 
 ## Commit convention
 
 Every commit must answer what and why. Use this body format:
 
-```
+```text
 what: <one-line description of the change>
 why:  <reason — design rationale, observed failure, user request, or finding>
 ```
@@ -20,75 +20,70 @@ Subject line: `type: scope — description`.
 
 | Type | When to use |
 | :--- | :---------- |
-| `feat:` | New check, reference file, or B-phase addition |
+| `feat:` | New methodology addition |
 | `docs:` | Documentation (README, docs/) |
 | `refactor:` | Restructuring, no behaviour change |
-| `fix:` | Bug fix in skill code or reference files |
+| `fix:` | Bug fix in SKILL.md |
 | `chore:` | Housekeeping (.gitignore, CI) |
-
-Cite evidence sources (survey finding, user request, observed failure).
 
 ## Verification checklist
 
 Before marking work done, run through in order:
 
 1. **Tree clean** — `git status --porcelain` shows nothing
-2. **Self-tests pass** — `python3 scripts/check-commit-trailers.py --self-test`,
-   `python3 scripts/doc-audit.py --self-test`, and
-   `bash scripts/verify.sh --self-test`
-3. **Payload is in sync** — `bash scripts/sync-payload.sh --ci` exits 0
-4. **Cross-refs resolve** — `bash scripts/verify.sh` checks every `references/*.md`
-   linked from SKILL.md and validates `docs/doc-standards.json` schema
-5. **No stale refs** — `grep -rn --include='*.md' 'PLAN\.md\|PROPOSALS\.md\|REPORT\.md\|USER-SUGGESTIONS\.md' . | grep -v '.git/'` returns nothing
-6. **SKILL.md under 740 lines** — `wc -l < SKILL.md` must be ≤ 740
-7. **Tagged releases** — every user-facing change gets an annotated tag (`git tag -a`)
-8. **Shellcheck clean** — on any modified `.sh` files
+2. **Doc audit passes** — `python3 scripts/doc-audit.py --self-test`
+3. **No stale refs** — `grep -rn --include='*.md' 'PLAN\\.md\\|PROPOSALS\\.md\\|REPORT\\.md\\|USER-SUGGESTIONS\\.md' . | grep -v '.git/'` returns nothing
+4. **Shellcheck clean** — on any modified `.sh` files
 
-## How to add or modify a B-check
+## How the skill works
 
-1. **Decide scope** — new B-check (B12), extend existing one, or add reference?
-2. **Ground it** — needs observed failure or user request, false-positive assessment, severity, and skip condition.
-3. **Update SKILL.md** — follow `### B<N>: Title` → Why → How → Severity → Remediation → Reference link.
-4. **Update or add reference file** — detail in `references/`, not inline. Every file needs YAML frontmatter.
-5. **Update docs/research.md** — add evidence with quality label (research-backed / observed / pragmatic).
-6. **Update docs/decisions.md** — record architectural shifts.
-7. **Verify** — see [Verification checklist](#verification-checklist) above.
-8. **Commit** — structured what:/why: body, evidence cited.
+The skill is a single SKILL.md with no shipped scripts, no reference files,
+and no build process. The agent discovers repo characteristics at runtime
+using tools already on PATH (`git`, `shellcheck`, `python3`, `gh`).
+
+Changes to the methodology go directly into `skills/repo-health-and-sync-skill/SKILL.md`.
+There is no sync step, no payload regeneration, and no duplicate reference
+copies to maintain.
 
 ## Project structure
 
-Top-level layout (canonical source: `git ls-files`):
-
+```text
+├── .github/workflows/ci.yml
+├── .gitignore
+├── .repo-health.json
+├── CITATION.cff
+├── LICENSE
+├── README.md
+├── SECURITY.md
+├── docs/                          # Maintainer docs (not shipped)
+│   ├── README.md
+│   ├── maintaining.md
+│   ├── decisions.md
+│   ├── research.md
+│   └── doc-standards.json
+├── scripts/                       # CI-only tooling (not shipped)
+│   ├── check-expiry.py
+│   ├── check-portability.py
+│   ├── doc-audit.py
+│   ├── extract-tests.py
+│   ├── validate-scripts.py
+│   ├── verify-urls.py
+│   └── verify.sh
+├── test-fixtures.json
+└── skills/
+    └── repo-health-and-sync-skill/
+        └── SKILL.md               # The entire skill
 ```
-├── SKILL.md              Canonical skill definition
-├── README.md             User-facing install/quickstart
-├── LICENSE               MIT
-├── .gitattributes        Git/Linguist configuration
-├── .gitignore            Agent state + OS/IDE junk
-├── .repo-health.json     Self-configuration for the skill's own repo
-├── docs/
-│   ├── README.md         Maintainer docs index
-│   ├── maintaining.md    THIS FILE — developer workflow
-│   ├── decisions.md      Architecture decisions
-│   ├── research.md       Evidence sources
-│   └── doc-standards.json Doc audit manifest
-├── references/           One concern per file
-└── scripts/
-    ├── check-commit-trailers.py
-    ├── doc-audit.py
-    └── verify.sh
-```
-
-Key constraint: maintainer-only paths (`scripts/`, `.github/` if present, `docs/`) are
-never included in Phase C sync targets. See [SKILL.md §C](SKILL.md#c1-detect-targets).
 
 ## Common pitfalls
 
-1. **Duplicating content between SKILL.md and references/.** Detail goes in
-   references/; SKILL.md holds the index and per-check Why/How/Severity.
-2. **Speculative checks.** "Seems useful" without an observed failure or
-   user request will accumulate maintenance debt before value.
-3. **Forgetting to update cross-refs on rename/delete.** A single stale
-   `references/` link breaks the skill. Verify with the checklist above.
-4. **Letting SKILL.md grow past 740 lines.** When it approaches this ceiling,
-   extract to a new reference file or consolidate existing ones.
+1. **Speculative checks.** A methodology addition needs an observed failure
+   or a documented ecosystem pattern, not "seems useful."
+2. **Over-instruction.** If the SKILL.md exceeds 100 lines, the methodology
+   may be drifting toward a checklist. Extract to a reference or trust the
+   agent's judgment.
+3. **Ecosystem drift.** The tools on PATH change over time. Verify that
+   detection commands in SKILL.md still work against current tool versions.
+4. **Platform-specific commands in an all-platform skill.** The skill claims
+   `compatibility: all`. Do not add Hermes-specific commands (`skill_view`,
+   `hermes skills`) or agent-specific config paths.
