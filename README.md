@@ -152,7 +152,6 @@ to use, or a custom consistency check.
 ---
 
 ## Project structure
-
 ```text
 ├── .github/
 │   └── workflows/

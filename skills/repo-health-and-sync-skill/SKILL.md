@@ -88,10 +88,10 @@ a PASS/FAIL for things the repo does not need.
 | **Tag/release integrity** | Do git tags and GitHub releases overlap? | Any tags exist |
 | **Commit quality** | Are messages structured? Are bodies informative? | Commits on this branch |
 | **CI efficiency** | Is CI scoped to what changed? | CI config exists |
-| **Cross-platform** | Do scripts use portable constructs? | .sh files + any macOS/BSD users |
-| **Attribution drift** | Are unauthorized `Co-authored-by:` trailers present? | Commits on this branch |
-| **File coverage** | Does .gitignore cover agent/OS/build artifacts? | .gitignore exists |
-| **External reference health** | Do all `https://` refs in docs/config resolve? | `REPO_HEALTH_VERIFY_REFS=1` env var (opt-in) |
+|| **Cross-platform** | Do scripts use portable constructs? | .sh files + any macOS/BSD users |
+|| **Attribution drift** | Are unauthorized `Co-authored-by:` trailers present? | Commits since last release tag (or all commits if no tags) |
+|| **File coverage** | Does .gitignore cover agent/OS/build artifacts? | .gitignore exists |
+|| **External reference health** | Do all `https://` refs in docs/config resolve? | `REPO_HEALTH_VERIFY_REFS=1` env var (opt-in) |
 
 For each relevant dimension, run exactly ONE command to check it:
 
@@ -102,12 +102,11 @@ git log origin/main..HEAD --oneline | wc -l
 
 # Shell correctness
 find . -name '*.sh' -not -path '*/node_modules/*' -not -path '*/.git/*' \
-  -exec shellcheck {} \; 2>&1 | grep -c 'SC[0-9]*:'
+  -exec shellcheck {} \; 2>&1 | grep -c 'SC[0-9]*:' || true
 
 # Version alignment
 python3 -c "
 import json, sys
-# Collect versions from all manifests found in Step 1
 versions = {}
 for path in ['package.json', 'pyproject.toml', 'Cargo.toml']:
     try:
@@ -138,7 +137,13 @@ grep -n 'which\|grep -P\|sed -i[^.]' scripts/*.sh 2>/dev/null \
   | head -10 || echo "no patterns found"
 
 # Attribution drift
-git log --format="%B" origin/main..HEAD 2>/dev/null \
+last_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+if [ -n "$last_tag" ]; then
+  range="$last_tag..HEAD"
+else
+  range="HEAD"
+fi
+git log --format="%B" "$range" 2>/dev/null \
   | grep -c 'Co-authored-by:' || echo "0"
 
 # .gitignore coverage
@@ -245,24 +250,14 @@ one the skill defines.**
 
 ---
 
-## Design principles (read before Step 1)
+## Attribution drift dimension clarification
 
-**The repo tells you what it needs.** Do not bring expectations. A
-10-year-old project with 10K commits and no tags is valid if that's
-how they work. Judge drift from local invariants, not from a universal
-standard.
+The **Attribution drift** check scans `origin/main..HEAD` — this covers
+commits on the current branch that are not yet in `origin/main`. On a
+fresh clone with no local commits, this range is empty and the check
+correctly reports 0 trailers found. 
 
-**Every invariant traces to a concrete failure.** If you cannot think
-of a specific problem that would occur when this invariant breaks, the
-check is speculative. Skip it.
-
-**Run once, observe broadly.** One `ls`, one `find`, one `git log`
-should give you the repo's shape. Do not chain five commands to
-confirm what the first two already showed.
-
-**Write the profile before the checks.** If you don't know the repo's
-languages, tools, commit culture, and CI system, you cannot meaningfully
-assess its health. Step 1 is not optional.
-
-**The right number of checks is the one the repo needs, not the
-one the skill defines.**
+If you need to scan all commits in the repo (including history), adjust
+the range to `HEAD` or use `git log --all`. The default range is
+designed for pre-push/pre-merge validation where only new commits
+matter.
