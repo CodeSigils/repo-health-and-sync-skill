@@ -88,10 +88,10 @@ a PASS/FAIL for things the repo does not need.
 | **Tag/release integrity** | Do git tags and GitHub releases overlap? | Any tags exist |
 | **Commit quality** | Are messages structured? Are bodies informative? | Commits on this branch |
 | **CI efficiency** | Is CI scoped to what changed? | CI config exists |
-|| **Cross-platform** | Do scripts use portable constructs? | .sh files + any macOS/BSD users |
-|| **Attribution drift** | Are unauthorized `Co-authored-by:` trailers present? | Commits since last release tag (or all commits if no tags) |
-|| **File coverage** | Does .gitignore cover agent/OS/build artifacts? | .gitignore exists |
-|| **External reference health** | Do all `https://` refs in docs/config resolve? | `REPO_HEALTH_VERIFY_REFS=1` env var (opt-in) |
+| **Cross-platform** | Do scripts use portable constructs? | .sh files + any macOS/BSD users |
+| **Attribution drift** | Are unauthorized `Co-authored-by:` trailers present? | Commits since last release tag (or all commits if no tags) |
+| **File coverage** | Does .gitignore cover agent/OS/build artifacts? | .gitignore exists |
+| **External reference health** | Do all `https://` refs in docs/config resolve? | `REPO_HEALTH_VERIFY_REFS=1` env var (opt-in) |
 
 For each relevant dimension, run exactly ONE command to check it:
 
@@ -189,6 +189,12 @@ cannot run, version drift that would break a publish), say so explicitly
 and stop. Do not continue checking other dimensions — fix the block first.
 
 | **Structured output** | Emit JSONL for automation | `REPO_HEALTH_OUTPUT=jsonl` env var (opt-in) |
+
+Example JSONL output:
+```jsonl
+{"dimension":"version_alignment","finding":"pyproject=1.2.0 Cargo=1.1.0","harm":"stale release","remediation":"sync to 1.2.0","confidence":0.95}
+{"dimension":"external_reference_health","finding":"https://example.com/docs 404","harm":"dead link in README","remediation":"update URL","confidence":1.0}
+```
 
 ---
 
