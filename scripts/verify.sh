@@ -124,16 +124,16 @@ check "Self-test: doc audit" \
 
 # Cross-refs: root vs skill scripts must be byte-identical for overlapping files
 script_drift=0
-for f in check-commit-body.py check-commit-trailers.py check-portability.py; do
-    if [ -f "scripts/$f" ] && [ -f "skills/repo-health-and-sync-skill/scripts/$f" ]; then
-        if diff -q "scripts/$f" "skills/repo-health-and-sync-skill/scripts/$f" >/dev/null 2>&1; then
-            :
-        else
-            echo "  DRIFT  scripts/$f != skills/repo-health-and-sync-skill/scripts/$f"
+while IFS= read -r f; do
+    [ -z "$f" ] && continue
+    base=$(basename "$f")
+    if [ -f "scripts/$base" ] && [ -f "skills/repo-health-and-sync-skill/scripts/$base" ]; then
+        if ! diff -q "scripts/$base" "skills/repo-health-and-sync-skill/scripts/$base" >/dev/null 2>&1; then
+            echo "  DRIFT  scripts/$base != skills/repo-health-and-sync-skill/scripts/$base"
             script_drift=$((script_drift + 1))
         fi
     fi
-done
+done < <(find scripts/ -maxdepth 1 -type f \( -name '*.py' -o -name '*.sh' \) -not -name 'payload-manifest.json' 2>/dev/null | sort)
 if [ "$script_drift" -eq 0 ]; then
     echo "  PASS  root vs skill scripts are in sync"
     PASS=$((PASS + 1))
@@ -144,16 +144,16 @@ fi
 
 # Cross-refs: root vs skill reference files must be byte-identical
 ref_drift=0
-for f in agent-instruction-ecosystem.md anti-drift-proportionality.md co-author-guard.md drift-pairs.md gitignore-templates.md heuristic-discovery.md repo-health-json-schema.md sync-targets.md; do
-    if [ -f "references/$f" ] && [ -f "skills/repo-health-and-sync-skill/references/$f" ]; then
-        if diff -q "references/$f" "skills/repo-health-and-sync-skill/references/$f" >/dev/null 2>&1; then
-            :
-        else
-            echo "  DRIFT  references/$f != skills/repo-health-and-sync-skill/references/$f"
+while IFS= read -r f; do
+    [ -z "$f" ] && continue
+    base=$(basename "$f")
+    if [ -f "references/$base" ] && [ -f "skills/repo-health-and-sync-skill/references/$base" ]; then
+        if ! diff -q "references/$base" "skills/repo-health-and-sync-skill/references/$base" >/dev/null 2>&1; then
+            echo "  DRIFT  references/$base != skills/repo-health-and-sync-skill/references/$base"
             ref_drift=$((ref_drift + 1))
         fi
     fi
-done
+done < <(find references/ -maxdepth 1 -type f -name '*.md' 2>/dev/null | sort)
 if [ "$ref_drift" -eq 0 ]; then
     echo "  PASS  root vs skill references are in sync"
     PASS=$((PASS + 1))

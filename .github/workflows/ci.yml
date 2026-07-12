@@ -8,7 +8,6 @@ on:
       - 'SKILL.md'
       - 'scripts/**'
       - 'references/**'
-      - 'skills/**'
       - 'docs/**'
       - 'README.md'
       - 'SECURITY.md'
@@ -22,7 +21,6 @@ on:
       - 'SKILL.md'
       - 'scripts/**'
       - 'references/**'
-      - 'skills/**'
       - 'docs/**'
       - 'README.md'
       - 'SECURITY.md'
@@ -98,6 +96,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: lint
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    env:
+      COMMIT_RANGE: ${{ github.event.before == '0000000000000000000000000000000000000000' && 'origin/main..HEAD' || format('{0}..{1}', github.event.before, github.event.after) }}
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
         with:
