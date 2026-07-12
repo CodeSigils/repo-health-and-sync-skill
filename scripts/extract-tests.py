@@ -34,7 +34,6 @@ def extract_test_cases(script_path: Path) -> list[dict]:
 
     # Find test assignments in the function
     tests = []
-    pattern = None
 
     for node in ast.walk(test_func):
         if isinstance(node, ast.Assign):
@@ -55,7 +54,7 @@ def extract_test_cases(script_path: Path) -> list[dict]:
                                         "expected": expected
                                     })
                     if target.id == "tests_pattern":
-                        pattern = "pattern"
+                        pass
 
     return tests
 

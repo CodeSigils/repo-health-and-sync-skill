@@ -15,7 +15,6 @@ from __future__ import annotations
 
 import json
 import re
-import sys
 from datetime import datetime, date
 from pathlib import Path
 from typing import Any
@@ -72,7 +71,7 @@ def check_file_expiry(file_path: Path, strict: bool = False) -> tuple[list[tuple
     missing = []
 
     try:
-        content = file_path.read_text(encoding="utf-8")
+        file_path.read_text(encoding="utf-8")
     except (OSError, UnicodeDecodeError):
         return [], []
 

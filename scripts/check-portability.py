@@ -90,11 +90,9 @@ def is_single_runtime_skill(path: Path) -> bool:
 
 
 def scan_file(path: Path) -> list[tuple[Path, int, str, str]]:
-    violations: list[tuple[Path, int, str, str]] = []
     if is_single_runtime_skill(path):
         return []
     text = path.read_text(encoding="utf-8")
-    lines = text.splitlines()
     # File-level exemption: if marker appears in first 3 lines (frontmatter), skip entire file
     file_exempt = any("# portability: allow-platform-ref" in line for line in text.splitlines()[:3])
     if file_exempt:
@@ -129,7 +127,6 @@ def run_self_tests() -> int:
     ]
 
     for text, should_match, label in test_cases:
-        matched = False
         for pattern_label, pattern in FORBIDDEN_PATTERNS:
             if pattern.search(text):
                 if not should_match:
