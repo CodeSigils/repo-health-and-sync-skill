@@ -89,10 +89,11 @@ a PASS/FAIL for things the repo does not need.
 | **Commit quality** | Are messages structured? Are bodies informative? | Commits on this branch |
 | **CI efficiency** | Is CI scoped to what changed? | CI config exists |
 | **Cross-platform** | Do scripts use portable constructs? | .sh files + any macOS/BSD users |
-| **Attribution drift** | Are unauthorized `Co-authored-by:` trailers present? | Any commits on this branch |
-| **File coverage** | Does .gitignore cover agent/OS/build artifacts? | .gitignore exists |
-
-For each relevant dimension, run exactly ONE command to check it:
+|| **Attribution drift** | Are unauthorized `Co-authored-by:` trailers present? | Any commits on this branch |
+|| **File coverage** | Does .gitignore cover agent/OS/build artifacts? | .gitignore exists |
+|| **External reference health** | Do all `https://` refs in docs/config resolve? | `REPO_HEALTH_VERIFY_REFS=1` env var (opt-in) |
+|
+|For each relevant dimension, run exactly ONE command to check it:
 
 ```bash
 # History hygiene
@@ -181,6 +182,8 @@ PASS — 4 dimensions checked, all healthy.
 If there is a blocking issue (dirty tree, shell script that literally
 cannot run, version drift that would break a publish), say so explicitly
 and stop. Do not continue checking other dimensions — fix the block first.
+
+| **Structured output** | Emit JSONL for automation | `REPO_HEALTH_OUTPUT=jsonl` env var (opt-in) |
 
 ---
 
