@@ -158,3 +158,7 @@ def do_self_test():
     
     print("PASS: extract-tests.py self-tests")
     return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
