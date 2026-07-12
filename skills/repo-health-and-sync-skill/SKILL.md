@@ -88,12 +88,12 @@ a PASS/FAIL for things the repo does not need.
 | **Tag/release integrity** | Do git tags and GitHub releases overlap? | Any tags exist |
 | **Commit quality** | Are messages structured? Are bodies informative? | Commits on this branch |
 | **CI efficiency** | Is CI scoped to what changed? | CI config exists |
-| **Cross-platform** | Do scripts use portable constructs? | .sh files + any macOS/BSD users |
+|| **Cross-platform** | Do scripts use portable constructs? | .sh files + any macOS/BSD users |
 || **Attribution drift** | Are unauthorized `Co-authored-by:` trailers present? | Any commits on this branch |
 || **File coverage** | Does .gitignore cover agent/OS/build artifacts? | .gitignore exists |
 || **External reference health** | Do all `https://` refs in docs/config resolve? | `REPO_HEALTH_VERIFY_REFS=1` env var (opt-in) |
-|
-|For each relevant dimension, run exactly ONE command to check it:
+
+| For each relevant dimension, run exactly ONE command to check it:
 
 ```bash
 # History hygiene
