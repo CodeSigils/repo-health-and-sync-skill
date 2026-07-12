@@ -192,7 +192,7 @@ platform that can run `git`, `shellcheck`, `python3`, and `gh`.
 
 ## 8. Primary research sources
 
-- **agent-concepts-study** (`~/labs/agent-concepts-study/`): 6 study notes on
+- **agent-concepts-study** (https://github.com/CodeSigils/agent-concepts-study): 6 study notes on
   instruction boundaries, proportionate anti-drift, duplicate guidance, and
   research-practice loops; plus the 2026-07-12 structural diversity note
   that directly motivated the v0.2.0 redesign
