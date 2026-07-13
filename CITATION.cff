@@ -3,8 +3,8 @@ message: "If you use this work in your research, please cite it as below."
 authors:
   - family-names: "CodeSigils"
 title: "Repo Health and Sync Skill"
-version: 0.2.0
-date-released: 2026-07-12
+version: 0.3.0
+date-released: 2026-07-13
 license: MIT
 type: software
 description: "A three-step methodology for evaluating any git repository's health at runtime. The agent discovers the repo's shape, infers what invariants matter, and checks them using tools on PATH. Ships as a single SKILL.md with no reference files or scripts."
