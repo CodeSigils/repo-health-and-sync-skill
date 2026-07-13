@@ -136,7 +136,7 @@ cp -r repo-health-and-sync-skill/skills/repo-health-and-sync-skill <your-skills-
 | Shipped runtime scripts | The agent uses `git`, `shellcheck`, `python3`, `gh`, and whatever else is on PATH. |
 | Install scripts | Every platform provides native skill consumption paths. A script would compete and drift. |
 | Platform adapter files | User-side setup only. The repo ships only `skills/repo-health-and-sync-skill/SKILL.md`. |
-| Plugin manifest | Not shipped yet. Codex plugin distribution requires `.codex-plugin/plugin.json`; see the roadmap before adding it. |
+| Runtime plugin code | The Codex plugin manifest points at the skill directory; it does not add runtime scripts, hooks, MCP servers, or connectors. |
 
 ---
 
@@ -167,6 +167,8 @@ to use, or a custom consistency check.
 ├── .github/
 │   └── workflows/
 │       └── ci.yml        # CI pipeline
+├── .codex-plugin/
+│   └── plugin.json       # Codex plugin manifest
 ├── .gitignore
 ├── CITATION.cff
 ├── LICENSE

@@ -1,0 +1,6 @@
+{
+  "name": "repo-health-and-sync-skill",
+  "version": "0.2.0",
+  "description": "Repo health scan methodology for AI coding agents.",
+  "skills": "./skills/"
+}

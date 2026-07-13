@@ -2,10 +2,13 @@
 name: repo-health-scan
 description: >-
   Methodology for evaluating any git repository's health at runtime.
-  The agent discovers the repo's shape, infers what invariants matter,
-  and checks them using general-purpose tools already on PATH.
-  No hardcoded checklists, no reference files, no shipped scripts.
-  The methodology is the only artifact.
+  Guides the agent through discover -> infer -> report: inspect the
+  filesystem and git history, decide which invariants matter for this
+  repository, then report findings with concrete harm and remediation.
+  Use when asked to audit, review, assess, or check the health of a repo.
+  Use before a release, archive, handoff, or onboarding session.
+  Use when CI is failing and the cause is unclear.
+  Not for single-file edits, narrow bug fixes, or feature implementation.
 license: MIT
 compatibility: all
 metadata:
@@ -29,6 +32,27 @@ Unlike a checklist, this methodology does not prescribe what to check.
 It teaches the agent how to decide. Every repo is different. The right
 checks for a 200K-line monorepo with 5 package managers are not the
 right checks for a 12-line shell script. The agent decides.
+
+---
+
+## When to Use
+
+- Before cutting a release tag or publishing a GitHub Release
+- When onboarding onto an unfamiliar repository
+- When CI is failing and the cause is not obvious
+- Before handing a project to a new maintainer
+- When reviving a dormant repository
+- After a large batch of AI-assisted commits
+
+## When Not to Use
+
+- For a task scoped to one file, one bug, or one feature
+- For ordinary implementation work where the repository's overall health is not
+  in question
+- For repositories without git history, unless the user only wants a filesystem
+  shape summary
+- As an automatic fixer; this skill reports health findings and remediations,
+  but does not mutate the repository
 
 ---
 
@@ -277,6 +301,42 @@ overrides the heuristic discovery in Step 2:
 Read it if it exists. Merge its settings into your dimension list.
 If it declares a custom consistency check (`"require": [...]`), that
 check replaces the default probe for that dimension.
+
+---
+
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "I know this repo well enough to skip Step 1." | Repository shape changes. Run the probes and write the profile before judging. |
+| "CI is green, so the repo is healthy." | CI only checks what it is configured to check. Version drift, stale docs, and attribution drift can be invisible. |
+| "This checklist does not mention it, so I should skip it." | There is no universal checklist. Step 2 asks what would break in this repo if it drifted. |
+| "I should run every probe to be thorough." | Irrelevant probes create noise. Only check dimensions activated by the repo profile. |
+| "This finding is minor, so I will omit it." | Report concrete harm and let the human decide whether to act. |
+
+## Red Flags
+
+- Reporting PASS for a dimension that was skipped
+- Running Step 2 without a written structured repo profile
+- Treating missing tags, missing CI, or missing package manifests as defects
+  without explaining concrete harm
+- Applying a universal severity scale instead of judging local impact
+- Producing findings for tooling that is maintainer-only, not shipped runtime
+  payload
+- Emitting JSONL when `REPO_HEALTH_OUTPUT=jsonl` was not requested
+
+## Verification
+
+After completing the scan:
+
+- [ ] A concise structured repo profile was written before dimension checks
+- [ ] The profile separates observed facts from inferred labels
+- [ ] Only dimensions relevant to that profile were checked
+- [ ] No skipped dimension was reported as PASS
+- [ ] Every finding describes concrete harm, not abstract nonconformance
+- [ ] Blocking findings are named explicitly and placed first
+- [ ] Maintainer-only scripts are not described as shipped runtime payload
+- [ ] JSONL output is emitted only when `REPO_HEALTH_OUTPUT=jsonl` is set
 
 ---
 

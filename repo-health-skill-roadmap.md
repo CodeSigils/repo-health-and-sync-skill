@@ -74,6 +74,7 @@ Sources:
 | Project philosophy | Avoids a fixed universal checklist. |
 | Automation surface | Repo has maintenance scripts and CI, but the skill itself is still methodology-first. |
 | Runtime implementation | No executable scanner is shipped. JSONL output and `.repo-health.json` are instruction-level contracts, not enforced code paths. |
+| Codex plugin manifest | `.codex-plugin/plugin.json` exists and points at `./skills/`. |
 | Local verification | Maintainer self-tests cover syntax, documentation audit, portability, and version consistency. |
 
 ### Gaps to Fix
@@ -83,9 +84,7 @@ Sources:
 | Some probe examples are factually wrong or ambiguous. | Agents may report false health signals while following the skill exactly. | High |
 | The repo profile is too compressed for repo-type-specific suggestions. | Agents must infer too much from three lines and can miss distinctions such as shipped payload vs maintainer tooling. | High |
 | README platform-install claims are stale relative to current Codex plugin docs. | Users may install into paths that are not the documented current path. | High |
-| Description lacks explicit `Use when` trigger phrases. | Agents may not auto-select the skill. | High |
-| Missing anatomy sections: `When to Use`, `Common Rationalizations`, `Red Flags`, `Verification`. | Agents can skip steps or over-apply the skill. | High |
-| No Codex plugin manifest at `.codex-plugin/plugin.json`. | Codex plugin support is not actually packaged. | High |
+| Codex plugin manifest has not been install-tested. | Packaged Codex distribution may still fail despite the manifest being present. | High |
 | No local compatibility smoke tests. | `compatibility: all` is a metadata claim, not verified evidence. | High |
 | No eval case file. | Hard to regression-test whether agents follow the method. | Medium |
 | No security/trust review of skill instructions. | Skill metadata and instructions can influence selection and behavior. | Medium |
@@ -197,8 +196,7 @@ agent path before broadening distribution language.
 
 ### 5.1 Update `SKILL.md` Frontmatter
 
-Current description is accurate but too passive. Replace it with trigger-aware
-language:
+Status: implemented. The description now uses trigger-aware language:
 
 ```yaml
 description: >-
@@ -214,7 +212,7 @@ description: >-
 
 ### 5.2 Add Skill Anatomy Sections
 
-Add these sections to `SKILL.md`:
+Status: implemented. `SKILL.md` now includes:
 
 - `When to Use`
 - `When Not to Use`
@@ -235,7 +233,9 @@ The highest-value verification checks:
 
 ### 5.3 Update README Install Claims
 
-Rewrite the README install section around verified paths:
+Status: partially implemented. README now distinguishes repository-local skill
+copying from plugin packaging and documents `.agents/skills/` for Codex. Still
+verify Hermes-specific instructions before treating them as current.
 
 - Document `.agents/skills/` as the generic repository-skill path when using
   OpenAI's current skills docs.
@@ -245,15 +245,15 @@ Rewrite the README install section around verified paths:
 - Keep Hermes-specific instructions only if they are still verified against the
   Hermes skill installer.
 
-### 5.4 Add Codex Plugin Manifest
+### 5.4 Validate Codex Plugin Manifest
 
-OpenAI's Codex plugin docs require:
+Status: manifest added. OpenAI's Codex plugin docs require:
 
 ```text
 .codex-plugin/plugin.json
 ```
 
-Recommended minimal manifest:
+Current manifest:
 
 ```json
 {
@@ -264,9 +264,9 @@ Recommended minimal manifest:
 }
 ```
 
-Before committing this exact shape, validate it against the current Codex CLI
-because plugin manifest schemas can move. The required location is evidence-backed;
-the exact optional fields should be tested locally.
+The required location and `skills` path shape are evidence-backed from OpenAI
+docs. The remaining work is to install-test the plugin with Codex CLI or the
+local plugin development flow.
 
 ### 5.5 Treat Root `plugin.json` as Generic Skills Metadata
 
@@ -521,10 +521,7 @@ still decides whether the checks matter.
 | Expand repo profile contract with observed/inferred fields | 1 hr | High | High |
 | Add optional profile modules with field budgets | 1 day | Medium | High |
 | Classify Python tooling as maintainer-only in docs and checks | 30 min | High | High |
-| Align README install claims with verified platform docs | 1 hr | High | High |
-| Update description with `Use when` triggers | 10 min | High | High |
-| Add anatomy sections to `SKILL.md` | 1 hr | High | High |
-| Add `.codex-plugin/plugin.json` and test local Codex install | 30-60 min | High | High |
+| Validate Codex plugin install locally | 30-60 min | High | High |
 | Add root `plugin.json` after `npx skills` validation | 30 min | Medium | Medium |
 | Add `AGENTS.md` intent mapping | 20 min | Medium | High |
 | Add Codex and Gemini setup docs | 1-2 hr | Medium | High |
