@@ -74,7 +74,7 @@ Sources:
 | Project philosophy | Avoids a fixed universal checklist. |
 | Automation surface | Repo has maintenance scripts and CI, but the skill itself is still methodology-first. |
 | Runtime implementation | No executable scanner is shipped. JSONL output and `.repo-health.json` are instruction-level contracts, not enforced code paths. |
-| Codex plugin manifest | `.codex-plugin/plugin.json` exists and points at `./skills/`. |
+| Codex plugin manifest | `.codex-plugin/plugin.json` exists, passes local plugin validation, and installs from a temporary local Codex marketplace. |
 | Local verification | Maintainer self-tests cover syntax, documentation audit, portability, and version consistency. |
 
 ### Gaps to Fix
@@ -84,8 +84,8 @@ Sources:
 | Some probe examples are factually wrong or ambiguous. | Agents may report false health signals while following the skill exactly. | High |
 | The repo profile is too compressed for repo-type-specific suggestions. | Agents must infer too much from three lines and can miss distinctions such as shipped payload vs maintainer tooling. | High |
 | README platform-install claims are stale relative to current Codex plugin docs. | Users may install into paths that are not the documented current path. | High |
-| Codex plugin manifest has not been install-tested. | Packaged Codex distribution may still fail despite the manifest being present. | High |
-| No local compatibility smoke tests. | `compatibility: all` is a metadata claim, not verified evidence. | High |
+| Codex workflow activation has not been transcript-tested. | Install works, but skill selection and Step 1 -> Step 2 -> Step 3 behavior are not yet verified in Codex. | High |
+| No non-Codex compatibility smoke tests. | `compatibility: all` is a metadata claim, not verified evidence. | High |
 | No eval case file. | Hard to regression-test whether agents follow the method. | Medium |
 | No security/trust review of skill instructions. | Skill metadata and instructions can influence selection and behavior. | Medium |
 | Setup docs are absent. | Users of Codex, Gemini, Cursor, and OpenCode have no clear install path. | Medium |
@@ -247,26 +247,17 @@ verify Hermes-specific instructions before treating them as current.
 
 ### 5.4 Validate Codex Plugin Manifest
 
-Status: manifest added. OpenAI's Codex plugin docs require:
+Status: manifest added and install-verified. OpenAI's Codex plugin docs require:
 
 ```text
 .codex-plugin/plugin.json
 ```
 
-Current manifest:
-
-```json
-{
-  "name": "repo-health-and-sync-skill",
-  "version": "0.2.0",
-  "description": "Repo health scan methodology for AI coding agents.",
-  "skills": "./skills/"
-}
-```
-
 The required location and `skills` path shape are evidence-backed from OpenAI
-docs. The remaining work is to install-test the plugin with Codex CLI or the
-local plugin development flow.
+docs. The local manifest also passes the Codex plugin validator and installs
+from a temporary local marketplace; see `docs/compatibility-reports/codex.md`.
+The remaining Codex work is workflow activation: run a trigger prompt and record
+whether Codex follows Step 1 -> Step 2 -> Step 3.
 
 ### 5.5 Treat Root `plugin.json` as Generic Skills Metadata
 
@@ -521,7 +512,7 @@ still decides whether the checks matter.
 | Expand repo profile contract with observed/inferred fields | 1 hr | High | High |
 | Add optional profile modules with field budgets | 1 day | Medium | High |
 | Classify Python tooling as maintainer-only in docs and checks | 30 min | High | High |
-| Validate Codex plugin install locally | 30-60 min | High | High |
+| Verify Codex workflow activation transcript | 30-60 min | High | High |
 | Add root `plugin.json` after `npx skills` validation | 30 min | Medium | Medium |
 | Add `AGENTS.md` intent mapping | 20 min | Medium | High |
 | Add Codex and Gemini setup docs | 1-2 hr | Medium | High |

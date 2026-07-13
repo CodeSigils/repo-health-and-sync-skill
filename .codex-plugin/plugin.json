@@ -2,5 +2,34 @@
   "name": "repo-health-and-sync-skill",
   "version": "0.2.0",
   "description": "Repo health scan methodology for AI coding agents.",
-  "skills": "./skills/"
+  "author": {
+    "name": "CodeSigils",
+    "url": "https://github.com/CodeSigils"
+  },
+  "homepage": "https://github.com/CodeSigils/repo-health-and-sync-skill",
+  "repository": "https://github.com/CodeSigils/repo-health-and-sync-skill",
+  "license": "MIT",
+  "keywords": [
+    "repo-health",
+    "git-hygiene",
+    "skill-pack"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Repo Health Scan",
+    "shortDescription": "Audit repository health with runtime discovery.",
+    "longDescription": "Guides Codex through discover, infer, and report steps for repository health audits without shipped runtime scripts.",
+    "developerName": "CodeSigils",
+    "category": "Productivity",
+    "capabilities": [
+      "Read"
+    ],
+    "websiteURL": "https://github.com/CodeSigils/repo-health-and-sync-skill",
+    "defaultPrompt": [
+      "Audit this repository before release.",
+      "Check whether this repo is healthy.",
+      "Onboard me onto this codebase."
+    ],
+    "brandColor": "#3B82F6"
+  }
 }
