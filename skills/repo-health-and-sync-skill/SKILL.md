@@ -60,11 +60,21 @@ find . -maxdepth 2 -name 'requirements*.txt' -o -name 'Cargo.toml' \
 cat .repo-health.json 2>/dev/null || echo "no .repo-health.json"
 ```
 
-From this output, form a concise repo profile — three lines max:
+From this output, form a concise structured repo profile before checking
+any dimension. Separate observed facts from inferred labels:
 
-```
-lang: Python + shell   deps: pip   CI: GitHub Actions
-commits: conventional  tags: 12   maturity: active
+```yaml
+observed:
+  languages: Python + shell
+  package_managers: pip
+  ci: GitHub Actions
+  script_surface: maintainer-only Python + shell
+  shipped_payload: single SKILL.md
+
+inferred:
+  repo_type: skill-pack
+  release_model: git tags
+  risk_context: pre-release
 ```
 
 This profile is the only thing between Step 1 and Step 2. If you cannot
@@ -89,37 +99,90 @@ a PASS/FAIL for things the repo does not need.
 | **Commit quality** | Are messages structured? Are bodies informative? | Commits on this branch |
 | **CI efficiency** | Is CI scoped to what changed? | CI config exists |
 | **Cross-platform** | Do scripts use portable constructs? | .sh files + any macOS/BSD users |
-| **Attribution drift** | Are unauthorized `Co-authored-by:` trailers present? | Commits since last release tag (or all commits if no tags) |
+| **Attribution drift** | Are unauthorized `Co-authored-by:` trailers present? | Commits on the current branch that are not yet in `origin/main` |
 | **File coverage** | Does .gitignore cover agent/OS/build artifacts? | .gitignore exists |
 | **External reference health** | Do all `https://` refs in docs/config resolve? | `REPO_HEALTH_VERIFY_REFS=1` env var (opt-in) |
 
-For each relevant dimension, run exactly ONE command to check it:
+For each relevant dimension, run the smallest command or command block
+that answers the question. Do not run probes for skipped dimensions:
 
 ```bash
 # History hygiene
-git status --porcelain && echo "clean" || echo "dirty"
-git log origin/main..HEAD --oneline | wc -l
+if [ -n "$(git status --porcelain)" ]; then
+  echo "DIRTY: working tree has uncommitted changes"
+else
+  echo "CLEAN: working tree has no uncommitted changes"
+fi
+if git rev-parse --verify origin/main >/dev/null 2>&1; then
+  git log origin/main..HEAD --oneline | wc -l
+else
+  echo "origin/main unavailable"
+fi
 
 # Shell correctness
 find . -name '*.sh' -not -path '*/node_modules/*' -not -path '*/.git/*' \
   -exec shellcheck {} \; 2>&1 | grep -c 'SC[0-9]*:' || true
 
 # Version alignment
-python3 -c "
-import json, sys
+python3 - <<'PY'
+import json
+import pathlib
+import re
+
 versions = {}
-for path in ['package.json', 'pyproject.toml', 'Cargo.toml']:
+
+package_json = pathlib.Path("package.json")
+if package_json.exists():
     try:
-        with open(path) as f:
-            data = json.load(f) if path.endswith('.json') else {}
-        v = data.get('version', data.get('package', {}).get('version'))
-        if v: versions[path] = v
-    except: pass
-if len(set(versions.values())) <= 1:
-    print('PASS: versions aligned')
+        data = json.loads(package_json.read_text())
+        if isinstance(data.get("version"), str):
+            versions["package.json"] = data["version"]
+    except Exception as exc:
+        versions["package.json"] = f"unreadable:{exc.__class__.__name__}"
+
+def load_toml(path):
+    try:
+        import tomllib
+    except ModuleNotFoundError:
+        return None
+    try:
+        return tomllib.loads(path.read_text())
+    except Exception:
+        return None
+
+pyproject = pathlib.Path("pyproject.toml")
+if pyproject.exists():
+    data = load_toml(pyproject)
+    version = None
+    if data:
+        version = data.get("project", {}).get("version")
+        version = version or data.get("tool", {}).get("poetry", {}).get("version")
+    if not version:
+        match = re.search(r'(?m)^version\s*=\s*["\']([^"\']+)["\']', pyproject.read_text())
+        version = match.group(1) if match else None
+    if version:
+        versions["pyproject.toml"] = version
+
+cargo = pathlib.Path("Cargo.toml")
+if cargo.exists():
+    data = load_toml(cargo)
+    version = data.get("package", {}).get("version") if data else None
+    if not version:
+        text = cargo.read_text()
+        package_block = re.search(r'(?ms)^\[package\](.*?)(?:^\[|\Z)', text)
+        if package_block:
+            match = re.search(r'(?m)^version\s*=\s*["\']([^"\']+)["\']', package_block.group(1))
+            version = match.group(1) if match else None
+    if version:
+        versions["Cargo.toml"] = version
+
+if len(versions) < 2:
+    print(f"SKIP: fewer than two version sources found: {versions}")
+elif len(set(versions.values())) == 1:
+    print(f"PASS: versions aligned: {versions}")
 else:
-    print(f'DRIFT: {versions}')
-"
+    print(f"DRIFT: {versions}")
+PY
 
 # Tag/release integrity
 git tag --list 'v*' --sort=-version:refname | head -5
@@ -137,9 +200,8 @@ grep -n 'which\|grep -P\|sed -i[^.]' scripts/*.sh 2>/dev/null \
   | head -10 || echo "no patterns found"
 
 # Attribution drift
-last_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-if [ -n "$last_tag" ]; then
-  range="$last_tag..HEAD"
+if git rev-parse --verify origin/main >/dev/null 2>&1; then
+  range="origin/main..HEAD"
 else
   range="HEAD"
 fi
@@ -248,8 +310,9 @@ should give you the repo's shape. Do not chain five commands to
 confirm what the first two already showed.
 
 **Write the profile before the checks.** If you don't know the repo's
-languages, tools, commit culture, and CI system, you cannot meaningfully
-assess its health. Step 1 is not optional.
+observed languages, tools, CI system, shipped payload, script surface, and
+inferred repo type, you cannot meaningfully assess its health. Step 1 is
+not optional.
 
 **The right number of checks is the one the repo needs, not the
 one the skill defines.**

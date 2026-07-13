@@ -61,8 +61,6 @@ jobs:
         run: python3 scripts/extract-tests.py --self-test
       - name: Self-test — script validator
         run: python3 scripts/validate-scripts.py --self-test
-      - name: Staged-install smoke test
-        run: python3 skills/repo-health-and-sync-skill/scripts/check-portability.py || true
       - name: Shell script lint
         run: shellcheck scripts/*.sh 2>/dev/null || true
       - name: Python script lint
@@ -94,7 +92,11 @@ jobs:
         run: |
           echo "=== Phase B: Pre-release health check ==="
           echo "Checking commit range: ${COMMIT_RANGE}"
-          git status --porcelain | read && echo "BLOCKING: dirty tree" && exit 1 || echo "PASS: clean tree"
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "BLOCKING: dirty tree"
+            exit 1
+          fi
+          echo "PASS: clean tree"
 
   check-expiry:
     runs-on: ubuntu-latest

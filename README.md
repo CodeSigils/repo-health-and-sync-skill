@@ -7,8 +7,8 @@ A methodology skill that teaches agents how to evaluate any git repository's
 health at runtime. The agent discovers the repo's shape, infers what
 invariants matter, and checks them using tools already on PATH.
 
-No hardcoded checklists. No reference files. No shipped scripts. The
-methodology is the only artifact.
+No hardcoded checklists. No reference files. No shipped runtime scripts.
+The methodology is the only shipped skill artifact.
 
 ---
 
@@ -66,11 +66,16 @@ Claude Code discovers skills by scanning `.claude/skills/` for SKILL.md files.
 <details>
 <summary><b>Codex CLI (OpenAI)</b></summary>
 
+For repository-local skill authoring, place the skill under `.agents/skills/`:
+
 ```bash
-cp -r repo-health-and-sync-skill/skills/repo-health-and-sync-skill .codex/skills/
+mkdir -p .agents/skills
+cp -r repo-health-and-sync-skill/skills/repo-health-and-sync-skill .agents/skills/
 ```
 
-Codex CLI discovers skills in `.codex/skills/` via filesystem walk.
+Codex discovers repository skills from `.agents/skills/`. For reusable
+distribution through Codex plugins, package the repository with a
+`.codex-plugin/plugin.json` manifest instead of copying skill folders by hand.
 </details>
 
 <details>
@@ -128,18 +133,23 @@ cp -r repo-health-and-sync-skill/skills/repo-health-and-sync-skill <your-skills-
 |----------|--------|
 | Hardcoded checklists | The agent discovers what to check from the repo itself, not from a pre-written table. |
 | Reference files | Every fact the skill needs is discovered at runtime (tools on PATH, repo state, filesystem). |
-| Shipped scripts | The agent uses `git`, `shellcheck`, `python3`, `gh`, and whatever else is on PATH. |
+| Shipped runtime scripts | The agent uses `git`, `shellcheck`, `python3`, `gh`, and whatever else is on PATH. |
 | Install scripts | Every platform provides native skill consumption paths. A script would compete and drift. |
 | Platform adapter files | User-side setup only. The repo ships only `skills/repo-health-and-sync-skill/SKILL.md`. |
-| Plugin manifest | Filesystem discovery is sufficient at 1 skill. |
+| Plugin manifest | Not shipped yet. Codex plugin distribution requires `.codex-plugin/plugin.json`; see the roadmap before adding it. |
 
 ---
 
 ## Dependencies
 
-None shipped. The skill expects the agent to have access to general-purpose
-tools: `git`, `shellcheck`, `python3`. If a tool is absent, the agent
-skips that dimension and reports the gap.
+None shipped with the skill payload. The skill expects the agent to have
+access to general-purpose tools already on PATH: `git`, `shellcheck`,
+`python3`, and optionally `gh`. If a tool is absent, the agent skips that
+dimension and reports the gap.
+
+The Python and shell files under `scripts/` are maintainer-only checks for
+this repository's CI and documentation. They are not installed as skill
+runtime helpers and should not be copied into `skills/repo-health-and-sync-skill/`.
 
 ---
 

@@ -4,7 +4,7 @@
 
 Generated July 2026 from local inspection of this repository plus public evidence
 from the `addyosmani/agent-skills` repository, OpenAI Codex plugin docs, and
-recent agent-skill research.
+recent agent-skill research. External sources were accessed on 2026-07-12.
 
 ---
 
@@ -69,7 +69,7 @@ Sources:
 | Area | Status |
 |---|---|
 | Skill path | `skills/repo-health-and-sync-skill/SKILL.md` exists. |
-| Frontmatter | Has `name`, `description`, `license`, `compatibility`, and metadata. |
+| Frontmatter | Has `name`, `description`, `license`, `compatibility`, and metadata. `compatibility: all` is a claim in metadata; verification should be tracked per agent. |
 | Core workflow | Clear discover → infer → report loop. |
 | Project philosophy | Avoids a fixed universal checklist. |
 | Automation surface | Repo has maintenance scripts and CI, but the skill itself is still methodology-first. |
@@ -86,7 +86,7 @@ Sources:
 | Description lacks explicit `Use when` trigger phrases. | Agents may not auto-select the skill. | High |
 | Missing anatomy sections: `When to Use`, `Common Rationalizations`, `Red Flags`, `Verification`. | Agents can skip steps or over-apply the skill. | High |
 | No Codex plugin manifest at `.codex-plugin/plugin.json`. | Codex plugin support is not actually packaged. | High |
-| No local compatibility smoke tests. | `compatibility: all` is an assertion, not evidence. | High |
+| No local compatibility smoke tests. | `compatibility: all` is a metadata claim, not verified evidence. | High |
 | No eval case file. | Hard to regression-test whether agents follow the method. | Medium |
 | No security/trust review of skill instructions. | Skill metadata and instructions can influence selection and behavior. | Medium |
 | Setup docs are absent. | Users of Codex, Gemini, Cursor, and OpenCode have no clear install path. | Medium |
@@ -116,6 +116,10 @@ Fix these concrete issues in `SKILL.md`:
 - Fix CI's non-gating smoke test path. It currently references
   `skills/repo-health-and-sync-skill/scripts/check-portability.py`, but this
   repo does not ship scripts inside the skill directory.
+- Classify all existing Python scripts as maintainer-only tooling. They may
+  validate this repository, but README, `SKILL.md`, install docs, compatibility
+  reports, and plugin packaging must not imply they ship as runtime skill
+  payload.
 
 Expand the Step 1 profile from a three-line sketch into a short structured
 inventory. Keep it concise, but make the dimensions explicit enough to drive
@@ -166,12 +170,30 @@ Exit criteria:
 - The profile separates observed facts from inferred labels before any
   repo-type-specific checks are selected.
 
+Phase 0 is the implementation gate for the rest of the roadmap. Do not start
+packaging, compatibility reports, or companion skills until these conditions are
+met:
+
+- `SKILL.md` probe examples are copy-pasteable and status-correct.
+- The structured profile contract is documented in `SKILL.md`.
+- README capability and install claims match the skill's actual runtime model.
+- CI no longer references nonexistent staged-install paths.
+- Python scripts under `scripts/` remain maintainer-only, and no file under
+  `skills/repo-health-and-sync-skill/` depends on them.
+- A manual transcript or local fixture demonstrates the corrected Step 1 → Step 2
+  → Step 3 flow.
+- External-facing implementation decisions are grounded in current evidence.
+  Web research is not required for purely local command corrections, but is
+  required before changing install guidance, plugin manifests, compatibility
+  claims, registry claims, or agent-platform behavior. Record the source URL and
+  access date in the relevant doc, fixture, or compatibility report.
+
 ---
 
 ## 5. Phase 1 — Make Activation and Packaging Correct
 
 **Goal:** make the skill discoverable and installable in at least one verified
-agent path before expanding claims.
+agent path before broadening distribution language.
 
 ### 5.1 Update `SKILL.md` Frontmatter
 
@@ -238,9 +260,7 @@ Recommended minimal manifest:
   "name": "repo-health-and-sync-skill",
   "version": "0.2.0",
   "description": "Repo health scan methodology for AI coding agents.",
-  "skills": {
-    "path": "skills"
-  }
+  "skills": "./skills/"
 }
 ```
 
@@ -299,6 +319,10 @@ Each compatibility report should include:
 Prefer text transcripts over screenshots. They diff cleanly, survive in git, and
 can be reviewed in pull requests.
 
+Treat `compatibility: all` as unverified until these reports exist. Report status
+as `claimed`, `verified:<agent>`, or `blocked:<agent>` rather than as a blanket
+project property.
+
 ---
 
 ## 7. Phase 3 — Add Local Evals
@@ -342,6 +366,15 @@ Initial case:
 
 Keep registry claims out of the roadmap until a public registry contract is
 confirmed. The eval is still valuable as a local regression fixture.
+
+Acceptance criteria:
+
+- Positive trigger prompts select `repo-health-scan` before general code review
+  or implementation workflows.
+- Negative prompts do not select `repo-health-scan`.
+- At least one fixture covers this repository as a `skill-pack`.
+- At least one fixture covers a non-skill repository so profile-specific behavior
+  is not overfit to this project.
 
 ---
 
@@ -486,6 +519,8 @@ still decides whether the checks matter.
 |---|---:|---|---|
 | Fix factual probe examples in `SKILL.md` | 1-2 hr | High | High |
 | Expand repo profile contract with observed/inferred fields | 1 hr | High | High |
+| Add optional profile modules with field budgets | 1 day | Medium | High |
+| Classify Python tooling as maintainer-only in docs and checks | 30 min | High | High |
 | Align README install claims with verified platform docs | 1 hr | High | High |
 | Update description with `Use when` triggers | 10 min | High | High |
 | Add anatomy sections to `SKILL.md` | 1 hr | High | High |
@@ -500,7 +535,6 @@ still decides whether the checks matter.
 | Build `repo-sync` companion skill | 2-3 days | High | Medium |
 | Build org scan variant | 3-5 days | High | Medium |
 | CI integration doc | 1 day | Medium | Medium |
-| Add optional profile modules with field budgets | 1 day | Medium | High |
 
 ---
 
@@ -512,16 +546,23 @@ still decides whether the checks matter.
    checks from the current repository.
 3. **No required runtime helper scripts.** Repository maintenance scripts are
    fine, but running `repo-health-scan` should not depend on bundled code.
-4. **Human approval between scan and sync.** The companion fixer skill starts
+4. **Python is maintainer tooling unless explicitly repackaged.** Existing
+   Python scripts support this repository's CI and documentation checks; they
+   are not part of the `repo-health-scan` skill payload.
+5. **Human approval between scan and sync.** The companion fixer skill starts
    only after findings are reviewed.
-5. **Claims need fixtures.** Any compatibility or installability claim should
+6. **Claims need fixtures.** Any compatibility or installability claim should
    point to a setup doc, report, or reproducible command.
-6. **Instruction-level features are labelled as contracts.** Do not imply JSONL,
+7. **Instruction-level features are labelled as contracts.** Do not imply JSONL,
    `.repo-health.json`, or compatibility behavior is enforced by bundled code.
-7. **Profile growth follows progressive disclosure.** Keep the core profile
+8. **Profile growth follows progressive disclosure.** Keep the core profile
    small; load optional modules only when repo evidence activates them.
-8. **Profile fields need evidence and confidence.** Unknown is better than a
+9. **Profile fields need evidence and confidence.** Unknown is better than a
    guessed field that steers the scan toward irrelevant checks.
+10. **External-facing changes need current evidence.** Verify platform behavior,
+   install paths, manifest schemas, registry rules, security guidance, and
+   compatibility claims against primary sources before editing. Local command
+   fixes can be grounded in local tests instead.
 
 ---
 
