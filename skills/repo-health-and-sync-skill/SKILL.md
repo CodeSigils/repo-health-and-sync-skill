@@ -2,7 +2,7 @@
 name: repo-health-scan
 description: >-
   Methodology for evaluating any git repository's health at runtime.
-  Guides the agent through discover -> infer -> report: inspect the
+  Guides the agent through discover, infer, and report: inspect the
   filesystem and git history, decide which invariants matter for this
   repository, then report findings with concrete harm and remediation.
   Use when asked to audit, review, assess, or check the health of a repo.
@@ -10,7 +10,6 @@ description: >-
   Use when CI is failing and the cause is unclear.
   Not for single-file edits, narrow bug fixes, or feature implementation.
 license: MIT
-compatibility: all
 metadata:
   author: CodeSigils
   version: "0.2.0"

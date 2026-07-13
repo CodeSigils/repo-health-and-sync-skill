@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "skill_name": "repo-health-scan",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Audit the health of this repo before I cut a release",
+        "top_k": 1
+      },
+      {
+        "prompt": "Check if this repository is in good shape",
+        "top_k": 3
+      },
+      {
+        "prompt": "CI is failing for no obvious reason. Check the repo.",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Review the changes in this PR",
+        "owner": "code-review-and-quality"
+      },
+      {
+        "prompt": "Fix the parser bug in src/parser.ts",
+        "owner": "implementation"
+      }
+    ]
+  },
+  "workflow_contract": {
+    "ordered_events": [
+      "profile",
+      "dimension_checks",
+      "report"
+    ],
+    "profile_before_dimension_checks": true,
+    "require_activation_evidence": true,
+    "report_requirements": [
+      "concrete_harm",
+      "remediation",
+      "blocking_findings_first",
+      "no_pass_for_skipped_dimensions"
+    ]
+  },
+  "fixtures": [
+    {
+      "name": "codex-skill-pack",
+      "profile": {
+        "observed": {
+          "vcs": "git",
+          "languages": [
+            "Markdown",
+            "Python",
+            "shell"
+          ],
+          "ci": "GitHub Actions",
+          "shell_files": true,
+          "version_sources": [
+            "skills/repo-health-and-sync-skill/SKILL.md",
+            ".codex-plugin/plugin.json",
+            "CITATION.cff",
+            "git tag"
+          ],
+          "script_surface": "maintainer-only",
+          "shipped_payload": "single SKILL.md"
+        },
+        "inferred": {
+          "repo_type": "skill-pack",
+          "release_model": "git tag plus Codex plugin",
+          "risk_context": "pre-release"
+        }
+      },
+      "expected": {
+        "active_dimensions": [
+          {
+            "name": "history_hygiene",
+            "activated_by": [
+              "observed.vcs"
+            ]
+          },
+          {
+            "name": "shell_correctness",
+            "activated_by": [
+              "observed.shell_files"
+            ]
+          },
+          {
+            "name": "version_alignment",
+            "activated_by": [
+              "observed.version_sources"
+            ]
+          },
+          {
+            "name": "tag_release_integrity",
+            "activated_by": [
+              "inferred.release_model",
+              "inferred.risk_context"
+            ]
+          },
+          {
+            "name": "ci_efficiency",
+            "activated_by": [
+              "observed.ci"
+            ]
+          }
+        ],
+        "skipped_dimensions": [
+          {
+            "name": "cross_platform",
+            "reason": "No macOS or BSD user evidence appears in the profile."
+          },
+          {
+            "name": "attribution_drift",
+            "reason": "No unreleased branch commits or attribution policy appears in the profile."
+          },
+          {
+            "name": "external_reference_health",
+            "reason": "The opt-in environment flag was not set."
+          }
+        ]
+      }
+    },
+    {
+      "name": "python-library-without-shell",
+      "profile": {
+        "observed": {
+          "vcs": "git",
+          "languages": [
+            "Python"
+          ],
+          "package_managers": [
+            "uv"
+          ],
+          "ci": "GitHub Actions",
+          "shell_files": false,
+          "version_sources": [
+            "pyproject.toml",
+            "src/example/__init__.py"
+          ]
+        },
+        "inferred": {
+          "repo_type": "library",
+          "release_model": "PyPI package",
+          "risk_context": "routine review"
+        }
+      },
+      "expected": {
+        "active_dimensions": [
+          {
+            "name": "history_hygiene",
+            "activated_by": [
+              "observed.vcs"
+            ]
+          },
+          {
+            "name": "version_alignment",
+            "activated_by": [
+              "observed.version_sources"
+            ]
+          },
+          {
+            "name": "ci_efficiency",
+            "activated_by": [
+              "observed.ci"
+            ]
+          }
+        ],
+        "skipped_dimensions": [
+          {
+            "name": "shell_correctness",
+            "reason": "The profile records no shell files."
+          },
+          {
+            "name": "cross_platform",
+            "reason": "The profile records no shell surface or platform-specific user requirement."
+          },
+          {
+            "name": "external_reference_health",
+            "reason": "The opt-in environment flag was not set."
+          }
+        ]
+      }
+    }
+  ]
+}

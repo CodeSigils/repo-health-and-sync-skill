@@ -58,19 +58,44 @@ surveyed repos ship zero runtime scripts.
 
 ---
 
-## Compatibility: all (agent-agnostic methodology)
+## Portability Is Verified Per Agent
 
-**Decision:** The skill declares `compatibility: all`. No Hermes-specific
-references (`skill_view`, `hermes skills`), no agent-specific config paths.
+**Decision:** Keep the skill methodology free of agent-specific commands and
+config paths, but do not declare blanket compatibility in `SKILL.md`
+frontmatter. Record installation and workflow evidence in per-agent
+compatibility reports.
 
 **Why:** The methodology uses only `ls`, `git`, `shellcheck`, `python3`, `gh`,
-and standard POSIX commands. Every agent runtime that can run shell commands
-can consume it. This is the broadest possible audience for a git-repo
-methodology.
+and standard shell commands, so terminal-capable coding agents are plausible
+targets. Discovery, packaging, tool availability, and
+instruction-following behavior vary by agent. Portability of the text does not
+prove end-to-end support.
 
-**Evidence:** Platform vendor docs survey (2026-07-12). All major agents
-(Claude Code, Codex CLI, Gemini CLI, Hermes) discover skills from directory
-walks and can run the shell commands this skill uses.
+**Evidence:** The current Codex skill validator rejects `compatibility` as an
+unsupported frontmatter key. Codex installation, implicit discovery, and
+workflow behavior are tracked in `docs/compatibility-reports/codex.md`; other
+agents remain unverified.
+
+---
+
+## CI API Authentication Is Separate From Commit Signing
+
+**Decision:** Pass the job-scoped `${{ github.token }}` to GitHub CLI as
+`GH_TOKEN` for release queries. Keep SSH commit and tag signing as a separate
+provenance policy.
+
+**Why:** `gh release list` calls the GitHub API and needs API authorization.
+An SSH signature proves who signed a git object; it does not authorize API
+requests. The workflow grants only `contents: read`, which is sufficient for
+the read-only release query and keeps the token scoped to the job.
+
+**Evidence:** GitHub's `GITHUB_TOKEN` authentication guide explicitly configures
+GitHub CLI through `GH_TOKEN`. GitHub's signing documentation describes SSH as
+a mechanism for cryptographically signing commits and tags. Sources accessed
+2026-07-13:
+
+- https://docs.github.com/en/actions/tutorials/authenticate-with-github_token
+- https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits
 
 ---
 

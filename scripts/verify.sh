@@ -26,6 +26,21 @@ check() {
     fi
 }
 
+status_is_clean() {
+    [ -z "$1" ]
+}
+
+# Called indirectly by check(), so ShellCheck cannot resolve the call site.
+# shellcheck disable=SC2329
+tree_is_clean() {
+    local status
+    status=$(git status --porcelain) || return
+    if ! status_is_clean "$status"; then
+        printf '%s\n' "$status"
+        return 1
+    fi
+}
+
 # --- Self-test mode ---
 if [ "${1:-}" = "--self-test" ]; then
     echo "=== verify.sh --self-test ==="
@@ -39,8 +54,16 @@ if [ "${1:-}" = "--self-test" ]; then
         errors=$((errors + 1))
     fi
 
+    if status_is_clean "" && ! status_is_clean " M README.md"; then
+        echo "  PASS  dirty-tree predicate"
+    else
+        echo "  FAIL  dirty-tree predicate"
+        errors=$((errors + 1))
+    fi
+
     # Required files (new architecture)
     for f in docs/doc-standards.json README.md docs/maintaining.md \
+             evals/cases/repo-health-scan.json \
              skills/repo-health-and-sync-skill/SKILL.md; do
         if [ -f "$f" ]; then
             echo "  PASS  $f exists"
@@ -72,9 +95,11 @@ fi
 echo "=== verify.sh: self-consistency check ==="
 echo ""
 
-check "Tree is clean" git status --porcelain
+check "Tree is clean" tree_is_clean
 
 check "Self-test: doc audit" python3 scripts/doc-audit.py --self-test
+check "Eval contract" python3 scripts/validate-evals.py
+check "Version consistency" python3 scripts/check-version-consistency.py
 
 # Shellcheck on all .sh files
 sh_count=$(find . -name '*.sh' -not -path './.git/*' | wc -l)

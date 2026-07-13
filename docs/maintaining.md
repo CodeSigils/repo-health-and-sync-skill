@@ -34,6 +34,8 @@ Before marking work done, run through in order:
 2. **Doc audit passes** — `python3 scripts/doc-audit.py --self-test`
 3. **No stale refs** — `grep -rn --include='*.md' 'PLAN\\.md\\|PROPOSALS\\.md\\|REPORT\\.md\\|USER-SUGGESTIONS\\.md' . | grep -v '.git/'` returns nothing
 4. **Shellcheck clean** — on any modified `.sh` files
+5. **Eval contract valid** — `python3 scripts/validate-evals.py`
+6. **Versions aligned** — `python3 scripts/check-version-consistency.py`
 
 ## How the skill works
 
@@ -61,11 +63,15 @@ copies to maintain.
 │   ├── decisions.md
 │   ├── research.md
 │   └── doc-standards.json
+├── evals/
+│   └── cases/
+│       └── repo-health-scan.json  # Local behavioral contract
 ├── scripts/                       # CI-only tooling (not shipped)
 │   ├── check-expiry.py
 │   ├── check-portability.py
 │   ├── doc-audit.py
 │   ├── extract-tests.py
+│   ├── validate-evals.py
 │   ├── validate-scripts.py
 │   ├── verify-urls.py
 │   └── verify.sh
@@ -85,6 +91,7 @@ copies to maintain.
    not *what to check*.
 3. **Ecosystem drift.** The tools on PATH change over time. Verify that
    detection commands in SKILL.md still work against current tool versions.
-4. **Platform-specific commands in an all-platform skill.** The skill claims
-   `compatibility: all`. Do not add Hermes-specific commands (`skill_view`,
-   `hermes skills`) or agent-specific config paths.
+4. **Platform-specific commands in a portable methodology.** Do not add
+   Hermes-specific commands (`skill_view`, `hermes skills`) or agent-specific
+   config paths to the skill payload. Track platform packaging and behavior in
+   compatibility reports instead.

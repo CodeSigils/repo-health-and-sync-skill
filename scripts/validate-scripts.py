@@ -16,7 +16,9 @@ PY_SCRIPTS_WITH_SELF_TEST = [
     "verify-urls.py",
     "doc-audit.py",
     "check-expiry.py",
+    "check-version-consistency.py",
     "extract-tests.py",
+    "validate-evals.py",
 ]
 
 # All scripts to check for quality
@@ -25,7 +27,9 @@ ALL_SCRIPTS = [
     "verify-urls.py",
     "doc-audit.py",
     "check-expiry.py",
+    "check-version-consistency.py",
     "extract-tests.py",
+    "validate-evals.py",
     "verify.sh",
 ]
 

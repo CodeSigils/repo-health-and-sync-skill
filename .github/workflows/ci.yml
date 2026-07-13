@@ -8,6 +8,7 @@ on:
       - 'skills/**'
       - 'scripts/**'
       - 'docs/**'
+      - 'evals/**'
       - 'README.md'
       - 'SECURITY.md'
       - 'LICENSE'
@@ -21,6 +22,7 @@ on:
       - 'skills/**'
       - 'scripts/**'
       - 'docs/**'
+      - 'evals/**'
       - 'README.md'
       - 'SECURITY.md'
       - 'LICENSE'
@@ -63,12 +65,20 @@ jobs:
         run: python3 scripts/extract-tests.py --self-test
       - name: Self-test — script validator
         run: python3 scripts/validate-scripts.py --self-test
+      - name: Self-test — eval validator
+        run: python3 scripts/validate-evals.py --self-test
+      - name: Self-test — version consistency
+        run: python3 scripts/check-version-consistency.py --self-test
+      - name: Validate behavioral eval contract
+        run: python3 scripts/validate-evals.py
       - name: Shell script lint
         run: shellcheck scripts/*.sh 2>/dev/null || true
       - name: Python script lint
         run: python3 -m ruff check scripts/ skills/
       - name: Version consistency check
-        run: python3 scripts/check-version-consistency.py
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/check-version-consistency.py --require-github-release-query
 
   full-verify:
     runs-on: ubuntu-latest

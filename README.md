@@ -180,12 +180,16 @@ to use, or a custom consistency check.
 │   ├── decisions.md
 │   ├── research.md
 │   └── doc-standards.json
+├── evals/
+│   └── cases/
+│       └── repo-health-scan.json  # Local behavioral contract
 ├── scripts/              # CI-only tooling (not shipped)
 │   ├── check-expiry.py
 │   ├── check-portability.py
 │   ├── check-version-consistency.py
 │   ├── doc-audit.py
 │   ├── extract-tests.py
+│   ├── validate-evals.py
 │   ├── validate-scripts.py
 │   ├── verify.sh
 │   └── verify-urls.py
