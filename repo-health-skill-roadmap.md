@@ -82,7 +82,6 @@ Primary sources and research, accessed 2026-07-12 or 2026-07-13:
 | Gap | Consequence | Priority |
 |---|---|---|
 | The eval is a deterministic contract validator, not a model grader. | CI cannot prove future Codex output conforms to the contract. | Medium |
-| `v0.2.0` predates the current Codex packaging, eval, and validation work. | The latest release does not contain the current implementation. | High before release |
 
 ---
 
@@ -122,24 +121,22 @@ Acceptance evidence:
 
 ---
 
-## 5. Ordered Follow-ups
+## 5. Release Milestone and Ordered Follow-up
 
-### 5.1 Release Current Codex Work
+### 5.1 Completed: Release Current Codex Work
 
-After workflow conformance and security review:
+**Result:** `v0.3.0` published on 2026-07-13.
 
-- Choose the next semantic version based on the accumulated behavior and
-  packaging changes; `0.3.0` is the current recommendation.
-- Update `SKILL.md`, `.codex-plugin/plugin.json`, and `CITATION.cff` together.
-- Confirm README describes the released behavior, compatibility status, opt-in
-  interfaces, and repository shape.
-- Run strict release consistency with authenticated GitHub access.
-- Commit using the documented what/why convention.
-- Create a new signed tag; do not move `v0.2.0`.
-- Publish the matching GitHub release and rerun strict consistency.
+- Updated `SKILL.md`, `.codex-plugin/plugin.json`, and `CITATION.cff` together.
+- Confirmed README describes the released behavior, Codex compatibility status,
+  opt-in interfaces, and repository shape.
+- Created a signed release commit and a new signed `v0.3.0` tag without moving
+  `v0.2.0`.
+- Published the matching GitHub release.
+- Reran strict consistency and the full repository verifier successfully.
 
-Acceptance: local metadata, tag, GitHub release, and released plugin payload all
-identify the same artifact.
+Acceptance met: local metadata, tag, GitHub release, and released plugin payload
+all identify version `0.3.0`.
 
 ### 5.2 Model-Driven Regression Harness
 
@@ -217,9 +214,9 @@ Profile rules:
 - Unknown is valid; never invent a value to activate a check.
 - Modules add questions, not mandatory PASS/FAIL dimensions.
 
-Implement profile modules only after the security review, setup guide, and
-current release; otherwise they expand the behavior surface before the verified
-core contract is shipped.
+Implement profile modules only after the model-driven regression harness is
+designed; otherwise they expand the behavior surface before the verified core
+contract has a scalable evaluation path.
 
 ---
 
@@ -227,9 +224,8 @@ core contract is shipped.
 
 | Order | Action | Effort | Impact |
 |---:|---|---:|---|
-| 1 | Prepare and publish the next coherent release without moving `v0.2.0`. | 1-2 hr | High |
-| 2 | Design a non-blocking model-driven regression harness. | 1 day | Medium |
-| 3 | Add evidence-activated profile modules with field budgets. | 1 day | Medium |
+| 1 | Design a non-blocking model-driven regression harness. | 1 day | Medium |
+| 2 | Add evidence-activated profile modules with field budgets. | 1 day | Medium |
 
 Completed foundation:
 
@@ -245,6 +241,8 @@ Completed foundation:
 - Fixed dirty-tree verification.
 - Enforced local/tag/release version consistency with strict CI API behavior.
 - Removed unsupported blanket compatibility metadata.
+- Published signed release `v0.3.0` with aligned skill, plugin, citation, tag,
+  and GitHub Release versions.
 
 ---
 
