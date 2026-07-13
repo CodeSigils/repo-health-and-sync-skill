@@ -31,7 +31,7 @@ status_is_clean() {
 }
 
 # Called indirectly by check(), so ShellCheck cannot resolve the call site.
-# shellcheck disable=SC2329
+# shellcheck disable=SC2317,SC2329
 tree_is_clean() {
     local status
     status=$(git status --porcelain) || return
