@@ -17,6 +17,7 @@ PY_SCRIPTS_WITH_SELF_TEST = [
     "doc-audit.py",
     "check-expiry.py",
     "check-version-consistency.py",
+    "check-trust.py",
     "extract-tests.py",
     "validate-evals.py",
 ]
@@ -28,6 +29,7 @@ ALL_SCRIPTS = [
     "doc-audit.py",
     "check-expiry.py",
     "check-version-consistency.py",
+    "check-trust.py",
     "extract-tests.py",
     "validate-evals.py",
     "verify.sh",

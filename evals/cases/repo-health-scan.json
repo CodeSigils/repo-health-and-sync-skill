@@ -35,6 +35,7 @@
     ],
     "profile_before_dimension_checks": true,
     "require_activation_evidence": true,
+    "account_for_all_dimensions": true,
     "report_requirements": [
       "concrete_harm",
       "remediation",
@@ -55,6 +56,8 @@
           ],
           "ci": "GitHub Actions",
           "shell_files": true,
+          "recent_commits": true,
+          "gitignore": true,
           "version_sources": [
             "skills/repo-health-and-sync-skill/SKILL.md",
             ".codex-plugin/plugin.json",
@@ -102,20 +105,32 @@
             "activated_by": [
               "observed.ci"
             ]
+          },
+          {
+            "name": "commit_quality",
+            "activated_by": [
+              "observed.recent_commits"
+            ]
+          },
+          {
+            "name": "file_coverage",
+            "activated_by": [
+              "observed.gitignore"
+            ]
           }
         ],
         "skipped_dimensions": [
           {
             "name": "cross_platform",
-            "reason": "No macOS or BSD user evidence appears in the profile."
+            "skip_reason": "No macOS or BSD user evidence appears in the profile."
           },
           {
             "name": "attribution_drift",
-            "reason": "No unreleased branch commits or attribution policy appears in the profile."
+            "skip_reason": "No unreleased branch commits or attribution policy appears in the profile."
           },
           {
             "name": "external_reference_health",
-            "reason": "The opt-in environment flag was not set."
+            "skip_reason": "The opt-in environment flag was not set."
           }
         ]
       }
@@ -133,6 +148,8 @@
           ],
           "ci": "GitHub Actions",
           "shell_files": false,
+          "recent_commits": true,
+          "gitignore": true,
           "version_sources": [
             "pyproject.toml",
             "src/example/__init__.py"
@@ -163,20 +180,40 @@
             "activated_by": [
               "observed.ci"
             ]
+          },
+          {
+            "name": "commit_quality",
+            "activated_by": [
+              "observed.recent_commits"
+            ]
+          },
+          {
+            "name": "file_coverage",
+            "activated_by": [
+              "observed.gitignore"
+            ]
           }
         ],
         "skipped_dimensions": [
           {
             "name": "shell_correctness",
-            "reason": "The profile records no shell files."
+            "skip_reason": "The profile records no shell files."
           },
           {
             "name": "cross_platform",
-            "reason": "The profile records no shell surface or platform-specific user requirement."
+            "skip_reason": "The profile records no shell surface or platform-specific user requirement."
+          },
+          {
+            "name": "tag_release_integrity",
+            "skip_reason": "The profile contains no tag or release evidence."
+          },
+          {
+            "name": "attribution_drift",
+            "skip_reason": "No unreleased branch commits or attribution policy appears in the profile."
           },
           {
             "name": "external_reference_health",
-            "reason": "The opt-in environment flag was not set."
+            "skip_reason": "The opt-in environment flag was not set."
           }
         ]
       }

@@ -10,6 +10,18 @@ from pathlib import Path
 from typing import Any
 
 DEFAULT_CASE = Path("evals/cases/repo-health-scan.json")
+DIMENSIONS = {
+    "history_hygiene",
+    "shell_correctness",
+    "version_alignment",
+    "tag_release_integrity",
+    "commit_quality",
+    "ci_efficiency",
+    "cross_platform",
+    "attribution_drift",
+    "file_coverage",
+    "external_reference_health",
+}
 
 
 def resolve_path(data: dict[str, Any], dotted_path: str) -> Any:
@@ -72,6 +84,10 @@ def validate_case(data: Any) -> list[str]:
         if contract.get("require_activation_evidence") is not True:
             errors.append(
                 "workflow_contract must require dimension activation evidence"
+            )
+        if contract.get("account_for_all_dimensions") is not True:
+            errors.append(
+                "workflow_contract must account for every candidate dimension"
             )
         required_report_fields = {
             "concrete_harm",
@@ -162,8 +178,8 @@ def validate_case(data: Any) -> list[str]:
                 errors.append(f"{prefix} repeats skipped dimension {name}")
             skipped_names.add(name)
             if (
-                not isinstance(dimension.get("reason"), str)
-                or not dimension["reason"].strip()
+                not isinstance(dimension.get("skip_reason"), str)
+                or not dimension["skip_reason"].strip()
             ):
                 errors.append(
                     f"{prefix} skipped dimension {dimension['name']} lacks a reason"
@@ -174,6 +190,14 @@ def validate_case(data: Any) -> list[str]:
             errors.append(
                 f"{prefix} dimensions cannot be both active and skipped: {sorted(overlap)}"
             )
+        accounted_for = active_names | skipped_names
+        if accounted_for != DIMENSIONS:
+            missing = sorted(DIMENSIONS - accounted_for)
+            unknown = sorted(accounted_for - DIMENSIONS)
+            if missing:
+                errors.append(f"{prefix} omits dimensions: {missing}")
+            if unknown:
+                errors.append(f"{prefix} contains unknown dimensions: {unknown}")
 
     if "skill-pack" not in repo_types:
         errors.append("fixtures must include a skill-pack profile")
@@ -195,6 +219,7 @@ def run_self_tests() -> int:
             "ordered_events": ["profile", "dimension_checks", "report"],
             "profile_before_dimension_checks": True,
             "require_activation_evidence": True,
+            "account_for_all_dimensions": True,
             "report_requirements": [
                 "concrete_harm",
                 "remediation",
@@ -213,7 +238,8 @@ def run_self_tests() -> int:
                         {"name": "history_hygiene", "activated_by": ["observed.vcs"]}
                     ],
                     "skipped_dimensions": [
-                        {"name": "shell_correctness", "reason": "no shell files"}
+                        {"name": name, "skip_reason": "not activated"}
+                        for name in sorted(DIMENSIONS - {"history_hygiene"})
                     ],
                 },
             },
@@ -227,7 +253,8 @@ def run_self_tests() -> int:
                         {"name": "history_hygiene", "activated_by": ["observed.vcs"]}
                     ],
                     "skipped_dimensions": [
-                        {"name": "shell_correctness", "reason": "no shell files"}
+                        {"name": name, "skip_reason": "not activated"}
+                        for name in sorted(DIMENSIONS - {"history_hygiene"})
                     ],
                 },
             },

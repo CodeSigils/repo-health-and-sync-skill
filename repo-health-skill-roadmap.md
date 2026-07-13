@@ -6,7 +6,7 @@
 
 This roadmap is based on the current repository, recorded compatibility tests,
 official platform documentation, and the research sources listed below. It
-separates completed foundation work, the active Codex milestone, and deferred
+separates completed foundation work, ordered Codex follow-ups, and deferred
 cross-agent expansion so completed tasks do not remain disguised as open work.
 
 ---
@@ -17,8 +17,7 @@ cross-agent expansion so completed tasks do not remain disguised as open work.
 agents. It discovers repository shape, infers relevant invariants, and reports
 concrete harm and remediation without applying a universal checklist.
 
-The current priority is not adding more health dimensions. It is making the
-existing three-step contract reliably observable in Codex:
+The three-step contract is now observable in Codex:
 
 1. Discover and emit a structured repository profile.
 2. Select dimensions using explicit evidence from that profile.
@@ -36,11 +35,11 @@ targets, not verified support claims.
 | OpenAI plugin documentation requires `.codex-plugin/plugin.json` and supports a plugin-root-relative `skills` path. | Keep Codex packaging separate from the portable `SKILL.md` payload. |
 | OpenAI skill documentation describes metadata-first discovery and progressive disclosure. | Keep trigger language precise and the loaded skill concise. |
 | The 2026-07-13 isolated Codex transcript selected the unnamed skill prompt and loaded the installed payload. | Treat implicit Codex discovery as verified for CLI 0.133.0. |
-| The full Codex audit emitted a correct final profile and actionable findings but probed weakly justified dimensions before emitting the profile. | Tighten profile ordering and dimension activation before declaring full workflow conformance. |
+| The 2026-07-13 conformance retest emitted the profile and evidence-linked dimension plan before health checks. | Treat the core Codex workflow as verified and preserve it with deterministic evals. |
 | Current Codex skill validation rejects the blanket `compatibility` frontmatter field. | Record compatibility per agent instead of declaring `compatibility: all`. |
 | GitHub documents `GH_TOKEN` for GitHub CLI API access in Actions and SSH/GPG/S/MIME for commit or tag signing. | Keep CI API authorization separate from git provenance policy. |
 | Repository-context research warns that excess context can increase cost or reduce task performance. | Add profile fields through evidence-activated modules with strict budgets. |
-| Comparative skill repositories use platform-specific packaging alongside portable skill content. | Consider broader packaging only after each target is verified directly. |
+| Addy Osmani's `agent-skills` keeps shared `SKILL.md` workflows alongside focused per-agent setup guides, verification, and limitations. | Keep README concise, maintain a dedicated Codex guide, and add other agent guides only with direct evidence. |
 
 Primary sources and research, accessed 2026-07-12 or 2026-07-13:
 
@@ -67,11 +66,14 @@ Primary sources and research, accessed 2026-07-12 or 2026-07-13:
 | Skill schema | Current Codex skill validator passes. Frontmatter contains supported fields only. |
 | Codex packaging | Plugin validator passes; local marketplace installation is verified. |
 | Codex discovery | An unnamed release-audit prompt selected `repo-health-scan` and loaded the installed skill. |
+| Codex workflow | The isolated retest emitted the profile and complete dimension plan before probes; all active checks cited profile evidence. |
+| Codex setup | The focused guide was reproduced from a clean isolated `CODEX_HOME`; plugin installation and implicit discovery passed. |
 | Final reporting | The full audit produced a structured final profile, concrete harm, remediation, and correct payload/tooling classification. |
 | Probe correctness | Dirty-tree, TOML/JSON version parsing, attribution range, and command-block examples were corrected and smoke-tested. |
 | Runtime boundary | The shipped payload is one `SKILL.md`; Python and shell scripts are maintainer-only. |
 | Eval contract | `evals/cases/repo-health-scan.json` covers positive/negative triggers, this skill pack, and a Python library using `uv`. |
 | Eval validation | `scripts/validate-evals.py` enforces profile-first ordering, activation evidence, skip reasons, and fixture diversity. |
+| Security and trust | `scripts/check-trust.py` enforces bounded triggers, read-only instructions, opt-in network/output behavior, credential hygiene, versioned compatibility evidence, and payload separation. |
 | Release consistency | The checker validates `SKILL.md`, plugin metadata, `CITATION.cff`, tags, and GitHub releases. Strict CI queries use a read-only job token. |
 | Repository verification | Script self-tests, Ruff, ShellCheck, documentation audit, plugin validation, skill validation, and diff checks pass independently. |
 
@@ -79,28 +81,23 @@ Primary sources and research, accessed 2026-07-12 or 2026-07-13:
 
 | Gap | Consequence | Priority |
 |---|---|---|
-| The full Codex transcript did not emit the structured profile before dimension probes. | The required Discover -> Infer boundary is not externally auditable. | High |
-| Codex selected cross-platform and attribution checks without strong profile evidence. | The skill can drift back toward a broad checklist and waste context. | High |
 | The eval is a deterministic contract validator, not a model grader. | CI cannot prove future Codex output conforms to the contract. | Medium |
-| No focused security/trust review exists. | Operational skill text could acquire unsafe or over-broad instructions unnoticed. | Medium |
-| Codex setup is embedded in README rather than a focused setup document. | Installation evidence is harder to reproduce and maintain. | Medium |
 | `v0.2.0` predates the current Codex packaging, eval, and validation work. | The latest release does not contain the current implementation. | High before release |
 
 ---
 
-## 4. Active Milestone: Codex Workflow Conformance
+## 4. Completed Milestone: Codex Workflow Conformance
 
-**Goal:** move the Codex report from `workflow_partially_verified` to
-`workflow_verified` without expanding the methodology.
+**Result:** `workflow_verified` on Codex CLI 0.133.0.
 
-Update `SKILL.md` so Step 1 and Step 2 have an observable handoff:
+`SKILL.md` now gives Step 1 and Step 2 an observable handoff:
 
 - Require the agent to emit the structured `observed`/`inferred` profile before
   running any dimension-specific command.
 - Require every active dimension to name at least one profile signal that
   activated it.
-- Require an explicit skip reason when a nearby dimension lacks activation
-  evidence.
+- Require an explicit skip reason for every candidate dimension that lacks
+  activation evidence.
 - Keep cross-platform checks inactive unless the profile contains a platform or
   user requirement.
 - Keep attribution checks inactive when there are no commits outside the base
@@ -108,12 +105,11 @@ Update `SKILL.md` so Step 1 and Step 2 have an observable handoff:
 - Preserve read-only behavior and the distinction between shipped payload and
   maintainer-only tooling.
 
-Rerun the isolated implicit Codex audit after the instruction change. Record the
-CLI version, prompt, selected skill, profile event, activated dimensions,
-skipped dimensions, findings, and deviations in
+The isolated implicit Codex audit and its environment, prompt, selected skill,
+profile event, dimension plan, findings, and deviations are recorded in
 `docs/compatibility-reports/codex.md`.
 
-Acceptance criteria:
+Acceptance evidence:
 
 - Implicit discovery still selects `repo-health-scan`.
 - A structured profile appears in the transcript before the first dimension
@@ -122,45 +118,21 @@ Acceptance criteria:
 - Dimensions without evidence are skipped before probing.
 - Findings retain concrete harm and remediation.
 - No repository files are modified by the audit.
-- The compatibility report status becomes `workflow_verified`, or remains
-  partial with the exact failed criterion recorded.
+- The compatibility report status is `workflow_verified`.
 
 ---
 
 ## 5. Ordered Follow-ups
 
-### 5.1 Security and Trust Review
-
-Add a concise checklist to `SECURITY.md` or `docs/maintaining.md` covering:
-
-- Accurate, bounded trigger language.
-- No hidden actions, approval bypasses, or destructive commands.
-- Read-only runtime probes by default.
-- Opt-in network and JSONL behavior.
-- No secrets or personal credentials in fixtures and transcripts.
-- Per-agent compatibility evidence with exact tested versions.
-- Clear separation between skill payload and maintainer tooling.
-
-Acceptance: the checklist is part of maintainer verification and the current
-skill passes it.
-
-### 5.2 Codex Setup Document
-
-Create `docs/codex-setup.md` from the verified local marketplace procedure.
-Document repository-local skill placement separately from plugin installation,
-include the tested CLI version, and link to the compatibility report. Do not
-copy the full transcript into the setup guide.
-
-Acceptance: a clean isolated Codex home can install and discover the skill by
-following only the setup document.
-
-### 5.3 Release Current Codex Work
+### 5.1 Release Current Codex Work
 
 After workflow conformance and security review:
 
 - Choose the next semantic version based on the accumulated behavior and
   packaging changes; `0.3.0` is the current recommendation.
 - Update `SKILL.md`, `.codex-plugin/plugin.json`, and `CITATION.cff` together.
+- Confirm README describes the released behavior, compatibility status, opt-in
+  interfaces, and repository shape.
 - Run strict release consistency with authenticated GitHub access.
 - Commit using the documented what/why convention.
 - Create a new signed tag; do not move `v0.2.0`.
@@ -169,7 +141,7 @@ After workflow conformance and security review:
 Acceptance: local metadata, tag, GitHub release, and released plugin payload all
 identify the same artifact.
 
-### 5.4 Model-Driven Regression Harness
+### 5.2 Model-Driven Regression Harness
 
 Investigate a repeatable Codex transcript runner only after the instruction
 contract is stable. Keep the deterministic JSON eval as the fast CI layer.
@@ -245,9 +217,9 @@ Profile rules:
 - Unknown is valid; never invent a value to activate a check.
 - Modules add questions, not mandatory PASS/FAIL dimensions.
 
-Implement profile modules only after the active Codex conformance milestone;
-otherwise they increase the behavior surface before the core ordering contract
-is reliable.
+Implement profile modules only after the security review, setup guide, and
+current release; otherwise they expand the behavior surface before the verified
+core contract is shipped.
 
 ---
 
@@ -255,12 +227,9 @@ is reliable.
 
 | Order | Action | Effort | Impact |
 |---:|---|---:|---|
-| 1 | Tighten profile emission and dimension activation; rerun Codex transcript. | 1-2 hr | High |
-| 2 | Add and execute the security/trust checklist. | 45-60 min | High |
-| 3 | Add the focused Codex setup document and reproduce it from a clean home. | 1 hr | Medium |
-| 4 | Prepare and publish the next coherent release without moving `v0.2.0`. | 1-2 hr | High |
-| 5 | Design a non-blocking model-driven regression harness. | 1 day | Medium |
-| 6 | Add evidence-activated profile modules with field budgets. | 1 day | Medium |
+| 1 | Prepare and publish the next coherent release without moving `v0.2.0`. | 1-2 hr | High |
+| 2 | Design a non-blocking model-driven regression harness. | 1 day | Medium |
+| 3 | Add evidence-activated profile modules with field budgets. | 1 day | Medium |
 
 Completed foundation:
 
@@ -268,6 +237,10 @@ Completed foundation:
 - Added trigger-aware skill anatomy and valid Codex plugin packaging.
 - Verified local plugin installation and implicit Codex discovery.
 - Captured the first full workflow transcript and deviations.
+- Verified profile-first Codex workflow conformance in an isolated read-only run.
+- Added and executed the security/trust checklist as a local and CI gate.
+- Reconciled README with Codex-only evidence and documented opt-in behavior.
+- Added the focused Codex setup guide and reproduced it from an isolated home.
 - Added deterministic eval fixtures and validation.
 - Fixed dirty-tree verification.
 - Enforced local/tag/release version consistency with strict CI API behavior.
@@ -310,10 +283,11 @@ repo-health-and-sync-skill/
 │   └── cases/
 │       └── repo-health-scan.json
 ├── docs/
-│   ├── codex-setup.md                  # next focused setup artifact
+│   ├── codex-setup.md                  # verified Codex setup
 │   ├── maintaining.md
 │   ├── decisions.md
 │   └── compatibility-reports/
 │       └── codex.md
 └── scripts/                            # maintainer-only validation
+    └── check-trust.py                  # security and trust contract
 ```

@@ -11,5 +11,6 @@ tools on PATH.
 **Start here:**
 
 - [decisions.md](decisions.md) — what was built, why, phase rationale, anti-patterns avoided
+- [codex-setup.md](codex-setup.md) — verified repository-local and plugin setup
 - [maintaining.md](maintaining.md) — developer workflow and verification
 - [research.md](research.md) — survey data, ecosystem tables, evidence that informed decisions

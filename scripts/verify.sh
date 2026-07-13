@@ -64,6 +64,7 @@ if [ "${1:-}" = "--self-test" ]; then
     # Required files (new architecture)
     for f in docs/doc-standards.json README.md docs/maintaining.md \
              evals/cases/repo-health-scan.json \
+             scripts/check-trust.py \
              skills/repo-health-and-sync-skill/SKILL.md; do
         if [ -f "$f" ]; then
             echo "  PASS  $f exists"
@@ -99,6 +100,7 @@ check "Tree is clean" tree_is_clean
 
 check "Self-test: doc audit" python3 scripts/doc-audit.py --self-test
 check "Eval contract" python3 scripts/validate-evals.py
+check "Security and trust contract" python3 scripts/check-trust.py
 check "Version consistency" python3 scripts/check-version-consistency.py
 
 # Shellcheck on all .sh files

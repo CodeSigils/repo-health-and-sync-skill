@@ -1,17 +1,16 @@
 # Codex Compatibility Report
 
-Status: `workflow_partially_verified`
+Status: `workflow_verified`
 
 Date: 2026-07-13
 
 ## Scope
 
 This report verifies Codex plugin packaging, local marketplace installation,
-implicit skill discovery, and a model-driven repository audit for
-`repo-health-and-sync-skill`. Skill selection and final reporting passed. The
-full workflow remains partial because the transcript did not emit the structured
-profile as a distinct artifact before dimension commands and selected more
-dimensions than the observed profile clearly justified.
+implicit skill discovery, and the full model-driven workflow for
+`repo-health-and-sync-skill`. A 2026-07-13 conformance retest selected the skill
+without naming it, emitted the profile and evidence-linked dimension plan before
+health checks, reported concrete harm and remediation, and remained read-only.
 
 ## Sources
 
@@ -38,11 +37,26 @@ plugin version: 0.2.0
 isolated CODEX_HOME: .codex-test-home
 temporary marketplace root: /tmp/repo-health-marketplace
 activation CODEX_HOME: /tmp/repo-health-codex-eval-20260713
+audit fixture: clean local clone at /tmp/repo-health-audit-fixture
 execution mode: ephemeral, read-only sandbox
 ```
 
 The install test used an isolated `CODEX_HOME` under the workspace so the user's
 real Codex configuration was not modified.
+
+## Setup Guide Reproduction
+
+The `docs/codex-setup.md` procedure was reproduced on 2026-07-13 with a new
+isolated `CODEX_HOME`, a new local marketplace, and an empty git repository.
+Marketplace registration, plugin installation, and listing reported
+`repo-health-and-sync-skill@repo-health-local` as installed, enabled, and
+version `0.2.0`.
+
+An unnamed release-audit prompt then selected `repo-health-scan`, read
+`SKILL.md` from the isolated plugin cache, summarized Discover -> Infer ->
+Report, and stopped without repository probes or file changes. A diagnostic run
+with `--ignore-user-config` did not see the installed plugin, so the setup guide
+warns against that option during plugin verification.
 
 ## Commands
 
@@ -134,72 +148,64 @@ Codex then read `SKILL.md` from the installed plugin cache and summarized the
 Discover -> Infer -> Report workflow without running repository probes. This
 verifies description-driven discovery for this prompt on Codex CLI 0.133.0.
 
-### Full Workflow
+### Full Workflow Retest
 
-The second prompt explicitly named the skill to isolate workflow conformance
-from discovery:
+The conformance prompt omitted the skill name, combining implicit discovery and
+workflow validation in one isolated run:
 
 ```text
-Audit this repository before release using repo-health-scan. Do not modify
-files. Produce the structured observed/inferred repository profile before
-selecting health dimensions, then report findings with concrete harm and
-remediation.
+Audit this repository before release. Before running repository probes,
+identify and read any installed skill relevant to this request. Do not modify
+files. Emit the structured observed/inferred repository profile before
+selecting health dimensions. For every candidate dimension, cite the profile
+evidence that activates it or give a skip reason, then report findings with
+concrete harm and remediation.
 ```
 
 ## Workflow Result
 
 | Requirement | Result | Evidence |
 |---|---|---|
-| Select and load the installed skill | Pass | Codex announced `repo-health-scan` and read `SKILL.md` from the plugin cache before repository inspection. |
-| Produce an observed/inferred profile | Pass in final output | The final response began with structured `observed` and `inferred` YAML. |
-| Write the profile before dimension checks | Partial | Codex stated that a profile was required and summarized the repo shape, but did not emit the structured YAML profile as a distinct transcript event before running dimension commands. |
-| Check only profile-relevant dimensions | Partial | Codex skipped opt-in external reference health, but selected nine dimensions, including cross-platform and attribution checks without strong activation evidence. |
-| Explain concrete harm and remediation | Pass | Four findings included impact and a specific remediation. |
+| Select and load the installed skill | Pass | Codex selected `repo-health-scan` from the unnamed prompt and read its installed `SKILL.md` before repository inspection. |
+| Produce an observed/inferred profile | Pass | A distinct `REPO PROFILE` transcript event separated observed facts from inferred labels. |
+| Write the profile before dimension checks | Pass | The profile and `DIMENSION PLAN` appeared before the first health-check command. |
+| Cite activation evidence | Pass | All seven active dimensions named one or more exact profile paths in `activated_by`. |
+| Skip unsupported dimensions before probing | Pass | Cross-platform, attribution drift, and external-reference checks had explicit reasons and were not probed. |
+| Explain concrete harm and remediation | Pass | The release-verification limitation included its concrete consequence and a specific rerun procedure. |
 | Distinguish payload from maintainer tooling | Pass | The profile identified `SKILL.md` as shipped payload and `scripts/` as maintainer-only. |
 | Preserve read-only behavior | Pass | No repository files changed; the run used Codex's read-only sandbox. |
 
-The final profile correctly identified the repository as a Codex plugin and
-skill pack with a single shipped `SKILL.md`, maintainer-only Python and shell
-scripts, GitHub Actions, no package manager, and a pre-release risk context.
-
-The audit reported four evidence-backed findings:
-
-1. `v0.2.0` points seven commits behind `HEAD`, so it does not identify the
-   current artifact.
-2. `scripts/check-version-consistency.py` does not enforce the versions in
-   `.codex-plugin/plugin.json` or `CITATION.cff`.
-3. GitHub release query failures degrade to "No GitHub releases found" and an
-   exit-zero consistency result.
-4. Recent commit messages do not follow the convention in
-   `docs/maintaining.md`.
-
-The first three findings described concrete release or CI harm and actionable
-remediation. The fourth was proportionately reported as low impact.
-
-Findings 2 and 3 were subsequently addressed: the checker now validates
-`SKILL.md`, `.codex-plugin/plugin.json`, `CITATION.cff`, tags, and available
-GitHub releases. CI supplies its read-only job token and treats API query
-failure as an error; local runs report an explicit skip when the API is
-unavailable.
+The active dimensions were history hygiene, shell correctness, version
+alignment, tag/release integrity, commit quality, CI efficiency, and file
+coverage. The audit found the local dimensions healthy. It could not verify the
+GitHub release because the clean local clone intentionally had a filesystem
+remote; the report described the resulting evidence gap and the strict command
+to rerun from a GitHub-backed clone. CI already executes that strict check with
+its read-only job token.
 
 ## Deviations and Follow-up
 
-Codex activation is verified. Full workflow conformance is now represented by
-the local contract at `evals/cases/repo-health-scan.json`, which asserts:
+No workflow acceptance criterion failed. The model additionally recorded
+structured output as skipped because JSONL was not requested; this was
+conservative and did not trigger an extra probe or finding.
+
+The subsequent security review changed the release probe so `gh release list`
+now requires `REPO_HEALTH_VERIFY_RELEASES=1`. The recorded transcript remains
+the ordering and activation-evidence test; current network opt-in behavior is
+enforced deterministically by `scripts/check-trust.py`.
+
+Full workflow conformance is also represented by the local contract at
+`evals/cases/repo-health-scan.json`, which asserts:
 
 - A structured observed/inferred profile appears before any dimension probe.
 - Every selected dimension cites the profile signal that activated it.
-- Dimensions without activation evidence are explicitly skipped, not probed.
+- Every candidate dimension is active or explicitly skipped before probing.
 
 `python3 scripts/validate-evals.py` checks the contract structure, ordering
-requirements, profile evidence references, active/skipped separation, and both
-skill-pack and non-skill fixtures. It does not run Codex or grade free-form model
-output; repeat the transcript test when `SKILL.md` behavior changes materially.
-
-One shellcheck probe initially attempted to write under `/tmp` despite the
-read-only run. Codex recognized the sandbox failure and reran the probe without
-writing. This did not modify the repository, but the eval should prefer probes
-that are read-only on their first attempt.
+requirements, profile evidence references, complete dimension accounting, and
+both skill-pack and non-skill fixtures. It does not run Codex or grade free-form
+model output; repeat the transcript test when `SKILL.md` behavior changes
+materially.
 
 ## Notes
 

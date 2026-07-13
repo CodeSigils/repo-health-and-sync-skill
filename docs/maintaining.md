@@ -35,7 +35,8 @@ Before marking work done, run through in order:
 3. **No stale refs** — `grep -rn --include='*.md' 'PLAN\\.md\\|PROPOSALS\\.md\\|REPORT\\.md\\|USER-SUGGESTIONS\\.md' . | grep -v '.git/'` returns nothing
 4. **Shellcheck clean** — on any modified `.sh` files
 5. **Eval contract valid** — `python3 scripts/validate-evals.py`
-6. **Versions aligned** — `python3 scripts/check-version-consistency.py`
+6. **Trust contract valid** — `python3 scripts/check-trust.py`
+7. **Versions aligned** — `python3 scripts/check-version-consistency.py`
 
 ## How the skill works
 
@@ -59,6 +60,7 @@ copies to maintain.
 ├── SECURITY.md
 ├── docs/                          # Maintainer docs (not shipped)
 │   ├── README.md
+│   ├── codex-setup.md
 │   ├── maintaining.md
 │   ├── decisions.md
 │   ├── research.md
@@ -69,6 +71,7 @@ copies to maintain.
 ├── scripts/                       # CI-only tooling (not shipped)
 │   ├── check-expiry.py
 │   ├── check-portability.py
+│   ├── check-trust.py
 │   ├── doc-audit.py
 │   ├── extract-tests.py
 │   ├── validate-evals.py

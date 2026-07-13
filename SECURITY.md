@@ -3,8 +3,27 @@
 ## Supported Versions
 
 This repo is a single-SKILL.md methodology skill with CI-only tooling in
-`scripts/`. There are no versioned releases — always use the latest commit
-from `main`.
+`scripts/`. Security fixes are supported on the latest release and `main`;
+older tags do not receive backports.
+
+## Skill Trust Checklist
+
+Maintainers must review this checklist whenever the skill instructions,
+fixtures, compatibility evidence, or packaging changes. The enforceable parts
+run through `python3 scripts/check-trust.py` in local verification and CI.
+
+- [x] Trigger metadata states both when the skill applies and when it does not.
+- [x] Runtime probes are read-only; the skill contains no destructive commands,
+  privilege escalation, approval bypasses, or automatic fixes.
+- [x] Network access is explicit: release and external-reference queries require
+  opt-in environment flags.
+- [x] JSONL output is emitted only when `REPO_HEALTH_OUTPUT=jsonl` is set.
+- [x] Eval fixtures and recorded compatibility evidence contain no credentials.
+- [x] Compatibility claims name the tested agent and exact version.
+- [x] The shipped `SKILL.md` payload remains separate from maintainer-only
+  scripts, evals, CI, and documentation.
+
+Last reviewed: 2026-07-13 against Codex CLI 0.133.0.
 
 ## Reporting a Vulnerability
 

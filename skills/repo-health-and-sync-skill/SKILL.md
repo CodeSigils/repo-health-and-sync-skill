@@ -69,6 +69,11 @@ ls Dockerfile Containerfile 2>/dev/null
 # What's the commit culture like?
 git log --oneline -20
 git log --format="%B" -5 | head -30
+git status --short --branch
+git tag --list 'v*' --sort=-version:refname | head -5
+if git rev-parse --verify origin/main >/dev/null 2>&1; then
+  git log origin/main..HEAD --oneline | head -20
+fi
 
 # What automation exists?
 find .github/workflows -name '*.yml' 2>/dev/null | head -5
@@ -81,17 +86,31 @@ find . -maxdepth 2 -name 'requirements*.txt' -o -name 'Cargo.toml' \
 
 # Is there a pre-existing health convention?
 cat .repo-health.json 2>/dev/null || echo "no .repo-health.json"
+
+# Did the user or environment opt into a conditional check?
+printf 'verify_refs=%s\n' "${REPO_HEALTH_VERIFY_REFS:-0}"
+printf 'verify_releases=%s\n' "${REPO_HEALTH_VERIFY_RELEASES:-0}"
 ```
 
-From this output, form a concise structured repo profile before checking
-any dimension. Separate observed facts from inferred labels:
+From this output, form and **emit** a concise structured repo profile before
+checking any dimension. Separate observed facts from inferred labels. The
+profile must be visible in the transcript as a `REPO PROFILE` block; do not keep
+it only in internal reasoning or defer it to the final report:
 
 ```yaml
+# REPO PROFILE
 observed:
+  vcs: git
   languages: Python + shell
   package_managers: pip
   ci: GitHub Actions
   script_surface: maintainer-only Python + shell
+  version_sources: [SKILL.md, plugin.json, CITATION.cff, git tags]
+  tags: present
+  branch_commits_outside_base: none
+  platform_requirements: none found
+  verify_refs: false
+  verify_releases: false
   shipped_payload: single SKILL.md
 
 inferred:
@@ -100,25 +119,48 @@ inferred:
   risk_context: pre-release
 ```
 
-This profile is the only thing between Step 1 and Step 2. If you cannot
-write it, you did not run enough probes.
+Do not run a dimension-specific command before emitting this block. If you
+cannot write it, run more discovery probes.
 
 ---
 
 ## Step 2: Infer what invariants matter
 
-Given the repo profile, ask: what invariants would break if they drifted?
+Given the emitted repo profile, ask: what invariants would break if they
+drifted?
 
-For each dimension below, check whether the repo profile makes the
-invariant relevant. Skip dimensions that don't apply — do not produce
-a PASS/FAIL for things the repo does not need.
+For each dimension below, check whether the repo profile makes the invariant
+relevant. Before running any dimension command, emit a `DIMENSION PLAN` that:
+
+- lists each active dimension with one or more exact profile paths in
+  `activated_by`;
+- lists each inactive dimension with a concrete `skip_reason`; and
+- accounts for every candidate dimension in the table as active or skipped.
+
+Use paths such as `observed.ci` or `inferred.release_model`. A request or
+environment flag may also activate a dimension when recorded in the observed
+profile. Do not activate a dimension from an assumption that is absent from the
+profile.
+
+```yaml
+# DIMENSION PLAN
+active:
+  - name: shell_correctness
+    activated_by: [observed.script_surface]
+skipped:
+  - name: cross_platform
+    skip_reason: no platform or user requirement appears in the profile
+```
+
+Skip dimensions that do not apply; do not probe them or produce a PASS/FAIL for
+them.
 
 | Dimension | Ask | Relevant when |
 |-----------|-----|---------------|
 | **History hygiene** | Is the working tree clean? Are there unpushed commits? | Always — cheap, universal |
 | **Shell correctness** | Do .sh files pass shellcheck with no SC-level issues? | Any .sh files exist |
 | **Version alignment** | Do version fields across manifests agree? | 2+ version sources |
-| **Tag/release integrity** | Do git tags and GitHub releases overlap? | Any tags exist |
+| **Tag/release integrity** | Do local version tags align, and, when opted in, do GitHub releases overlap? | Any tags exist |
 | **Commit quality** | Are messages structured? Are bodies informative? | Commits on this branch |
 | **CI efficiency** | Is CI scoped to what changed? | CI config exists |
 | **Cross-platform** | Do scripts use portable constructs? | .sh files + any macOS/BSD users |
@@ -126,8 +168,9 @@ a PASS/FAIL for things the repo does not need.
 | **File coverage** | Does .gitignore cover agent/OS/build artifacts? | .gitignore exists |
 | **External reference health** | Do all `https://` refs in docs/config resolve? | `REPO_HEALTH_VERIFY_REFS=1` env var (opt-in) |
 
-For each relevant dimension, run the smallest command or command block
-that answers the question. Do not run probes for skipped dimensions:
+Only after emitting the dimension plan, run the smallest command or command
+block that answers each active dimension. Do not run probes for skipped
+dimensions:
 
 ```bash
 # History hygiene
@@ -209,7 +252,11 @@ PY
 
 # Tag/release integrity
 git tag --list 'v*' --sort=-version:refname | head -5
-gh release list --limit 5 2>/dev/null || echo "gh not available"
+if [ "${REPO_HEALTH_VERIFY_RELEASES:-0}" = "1" ]; then
+  gh release list --limit 5 2>/dev/null || echo "GitHub release query failed"
+else
+  echo "SKIP: GitHub release query requires REPO_HEALTH_VERIFY_RELEASES=1"
+fi
 
 # Commit quality (same as Step 1 — already observed)
 # Just reach a judgment from what you already read
@@ -316,7 +363,9 @@ check replaces the default probe for that dimension.
 ## Red Flags
 
 - Reporting PASS for a dimension that was skipped
-- Running Step 2 without a written structured repo profile
+- Running a dimension probe before emitting the structured repo profile and
+  dimension plan
+- Activating a dimension without naming its profile evidence
 - Treating missing tags, missing CI, or missing package manifests as defects
   without explaining concrete harm
 - Applying a universal severity scale instead of judging local impact
@@ -330,6 +379,8 @@ After completing the scan:
 
 - [ ] A concise structured repo profile was written before dimension checks
 - [ ] The profile separates observed facts from inferred labels
+- [ ] A dimension plan accounts for every candidate before probes run
+- [ ] Every active dimension cites profile evidence
 - [ ] Only dimensions relevant to that profile were checked
 - [ ] No skipped dimension was reported as PASS
 - [ ] Every finding describes concrete harm, not abstract nonconformance

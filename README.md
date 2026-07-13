@@ -10,13 +10,17 @@ invariants matter, and checks them using tools already on PATH.
 No hardcoded checklists. No reference files. No shipped runtime scripts.
 The methodology is the only shipped skill artifact.
 
+**Compatibility status:** Codex CLI 0.133.0 is the only verified agent target.
+The `SKILL.md` payload is designed to be portable, but other agents are not
+supported claims until they have their own recorded compatibility tests.
+
 ---
 
 ## How it works
 
 1. **Load the skill** via your agent's skill system.
 2. **Point the agent at a repo** (any git repo, any language, any ecosystem).
-3. The agent runs three steps — discover → infer → verify — and reports
+3. The agent runs three steps — discover → infer → report — and reports
    what it finds with judgment proportional to actual harm.
 
 See [SKILL.md](skills/repo-health-and-sync-skill/SKILL.md) for the full three-step procedure.
@@ -31,42 +35,7 @@ Clone this repo and make the skill discoverable:
 git clone --filter=blob:none https://github.com/CodeSigils/repo-health-and-sync-skill
 ```
 
-Then choose your platform:
-
-<details>
-<summary><b>Hermes Agent</b></summary>
-
-**Recommended for development — clone the repo and add to `external_dirs`:**
-```yaml
-skills:
-  external_dirs:
-    - /path/to/repo-health-and-sync-skill/skills
-```
-This loads the skill directly from the repo — every commit is immediately
-reflected without reinstalling. The skill appears as a `local` skill.
-
-**For end users — install from hub:**
-```bash
-hermes skills install CodeSigils/repo-health-and-sync-skill
-```
-
-*Other agents: see sections below for their native setup commands.*
-</details>
-
-<details>
-<summary><b>Claude Code (Anthropic)</b></summary>
-
-```bash
-cp -r repo-health-and-sync-skill/skills/repo-health-and-sync-skill .claude/skills/
-```
-
-Claude Code discovers skills by scanning `.claude/skills/` for SKILL.md files.
-</details>
-
-<details>
-<summary><b>Codex CLI (OpenAI)</b></summary>
-
-For repository-local skill authoring, place the skill under `.agents/skills/`:
+For repository-local Codex use, place the skill under `.agents/skills/`:
 
 ```bash
 mkdir -p .agents/skills
@@ -74,56 +43,14 @@ cp -r repo-health-and-sync-skill/skills/repo-health-and-sync-skill .agents/skill
 ```
 
 Codex discovers repository skills from `.agents/skills/`. For reusable
-distribution through Codex plugins, package the repository with a
-`.codex-plugin/plugin.json` manifest instead of copying skill folders by hand.
-</details>
+distribution, this repository includes `.codex-plugin/plugin.json`. The tested
+repository-local and marketplace procedures are in the
+[Codex setup guide](docs/codex-setup.md); exact test evidence is recorded in the
+[Codex compatibility report](docs/compatibility-reports/codex.md).
 
-<details>
-<summary><b>OpenCode CLI</b></summary>
-
-```bash
-cp -r repo-health-and-sync-skill/skills/repo-health-and-sync-skill .opencode/skills/
-```
-
-Or create a symlink (zero-maintenance pointer):
-
-```bash
-ln -s /path/to/repo-health-and-sync-skill/skills/repo-health-and-sync-skill .opencode/skills/
-```
-</details>
-
-<details>
-<summary><b>Gemini CLI (Google)</b></summary>
-
-```bash
-cp -r repo-health-and-sync-skill/skills/repo-health-and-sync-skill .agents/skills/
-```
-
-Gemini CLI explicitly supports `.agents/skills/` as a cross-tool path.
-</details>
-
-<details>
-<summary><b>Cursor</b></summary>
-
-```bash
-cp -r repo-health-and-sync-skill/skills/repo-health-and-sync-skill .cursor/rules/
-```
-
-Note: Cursor applies rules as chat context, not via invocation-based
-discovery like CLI-focused agents.
-</details>
-
-<details>
-<summary><b>Generic agentskills.io client</b></summary>
-
-Copy the skill to your agent's configured skills directory. Most clients
-that support the agentskills.io standard scan a `skills/` or
-`.agents/skills/` directory.
-
-```bash
-cp -r repo-health-and-sync-skill/skills/repo-health-and-sync-skill <your-skills-dir>/
-```
-</details>
+Other agents may be able to consume the portable `SKILL.md`, but installation,
+discovery, and workflow behavior remain unverified. Platform-specific setup
+instructions will be added only with a matching compatibility report.
 
 ---
 
@@ -159,6 +86,14 @@ Add a `.repo-health.json` at the repo root to override the agent's
 heuristic discovery — declare which checks to skip, which version sources
 to use, or a custom consistency check.
 
+Optional behavior is explicit:
+
+| Variable | Effect |
+|---|---|
+| `REPO_HEALTH_VERIFY_RELEASES=1` | Allow the GitHub release query for tag/release integrity. |
+| `REPO_HEALTH_VERIFY_REFS=1` | Allow network checks for external references. |
+| `REPO_HEALTH_OUTPUT=jsonl` | Emit automation-oriented JSONL instead of the normal report. |
+
 ---
 
 ## Project structure
@@ -173,11 +108,16 @@ to use, or a custom consistency check.
 ├── CITATION.cff
 ├── LICENSE
 ├── README.md
+├── repo-health-skill-roadmap.md
 ├── SECURITY.md
 ├── docs/                 # Maintainer documentation
 │   ├── README.md
+│   ├── codex-setup.md
+│   ├── compatibility-reports/
+│   │   └── codex.md
 │   ├── maintaining.md
 │   ├── decisions.md
+│   ├── evidence-urls.json
 │   ├── research.md
 │   └── doc-standards.json
 ├── evals/
@@ -186,6 +126,7 @@ to use, or a custom consistency check.
 ├── scripts/              # CI-only tooling (not shipped)
 │   ├── check-expiry.py
 │   ├── check-portability.py
+│   ├── check-trust.py
 │   ├── check-version-consistency.py
 │   ├── doc-audit.py
 │   ├── extract-tests.py
@@ -193,7 +134,6 @@ to use, or a custom consistency check.
 │   ├── validate-scripts.py
 │   ├── verify.sh
 │   └── verify-urls.py
-├── SECURITY.md
 ├── skills/
 │   └── repo-health-and-sync-skill/
 │       └── SKILL.md      # The entire skill — one file, nothing else
@@ -225,8 +165,13 @@ one the skill defines.**
 
 ## See also
 
-- [Hermes Agent docs](https://hermes-agent.nousresearch.com/docs) — skills,
-  install, configuration
+- [Codex compatibility report](docs/compatibility-reports/codex.md) — tested
+  version, installation evidence, and workflow results
+- [Codex setup guide](docs/codex-setup.md) — repository-local and plugin setup
+- [Growth roadmap](repo-health-skill-roadmap.md) — verified scope and ordered
+  follow-ups
+- [Maintainer guide](docs/maintaining.md) — repository verification and release
+  workflow
 - [CodeSigils/agents-markdown-formatter](https://github.com/CodeSigils/agents-markdown-formatter) — GFM/MDX formatter with structural guards
 
 ---

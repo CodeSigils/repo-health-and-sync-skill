@@ -1,10 +1,10 @@
 {
   "README.md": [
     {
-      "id": "audience",
-      "description": "Audience declared",
+      "id": "compatibility-scope",
+      "description": "Verified compatibility scope declared",
       "type": "regex",
-      "pattern": "agentskills\\.io-compatible|agentskills\\.io client"
+      "pattern": "Codex CLI 0\\.133\\.0 is the only verified agent target"
     },
     {
       "id": "quickstart-bash",
@@ -93,6 +93,38 @@
       "description": "Verification checklist section",
       "type": "regex",
       "pattern": "## Verification checklist"
+    }
+  ],
+  "docs/codex-setup.md": [
+    {
+      "id": "tested-version",
+      "description": "Names the tested Codex CLI version",
+      "type": "regex",
+      "pattern": "Codex CLI 0\\.133\\.0"
+    },
+    {
+      "id": "repo-local",
+      "description": "Documents repository-local skill setup",
+      "type": "regex",
+      "pattern": "\\.agents/skills"
+    },
+    {
+      "id": "plugin-marketplace",
+      "description": "Documents plugin marketplace setup",
+      "type": "regex",
+      "pattern": "codex plugin marketplace add"
+    },
+    {
+      "id": "implicit-discovery",
+      "description": "Includes an implicit discovery test",
+      "type": "regex",
+      "pattern": "does\\s+not name the skill"
+    },
+    {
+      "id": "compatibility-report",
+      "description": "Links compatibility evidence",
+      "type": "regex",
+      "pattern": "compatibility-reports/codex\\.md"
     }
   ],
   "docs/decisions.md": [

@@ -67,12 +67,16 @@ jobs:
         run: python3 scripts/validate-scripts.py --self-test
       - name: Self-test — eval validator
         run: python3 scripts/validate-evals.py --self-test
+      - name: Self-test — security and trust validator
+        run: python3 scripts/check-trust.py --self-test
       - name: Self-test — version consistency
         run: python3 scripts/check-version-consistency.py --self-test
       - name: Validate behavioral eval contract
         run: python3 scripts/validate-evals.py
+      - name: Validate security and trust contract
+        run: python3 scripts/check-trust.py
       - name: Shell script lint
-        run: shellcheck scripts/*.sh 2>/dev/null || true
+        run: shellcheck scripts/*.sh
       - name: Python script lint
         run: python3 -m ruff check scripts/ skills/
       - name: Version consistency check
