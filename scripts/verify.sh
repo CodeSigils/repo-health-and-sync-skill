@@ -62,7 +62,7 @@ if [ "${1:-}" = "--self-test" ]; then
     fi
 
     # Required files (new architecture)
-    for f in docs/doc-standards.json README.md docs/maintaining.md \
+    for f in AGENTS.md docs/doc-standards.json README.md docs/maintaining.md \
              evals/cases/repo-health-scan.json \
              scripts/check-trust.py \
              skills/repo-health-and-sync-skill/SKILL.md; do

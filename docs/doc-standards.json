@@ -1,4 +1,30 @@
 {
+  "AGENTS.md": [
+    {
+      "id": "repository-scope",
+      "description": "Scopes instructions to maintaining this repository",
+      "type": "regex",
+      "pattern": "agents maintaining this repository"
+    },
+    {
+      "id": "canonical-skill-route",
+      "description": "Routes health-audit intent to the canonical skill",
+      "type": "regex",
+      "pattern": "skills/repo-health-and-sync-skill/SKILL\\.md"
+    },
+    {
+      "id": "negative-trigger",
+      "description": "Excludes narrow implementation work",
+      "type": "regex",
+      "pattern": "Do not invoke the skill for ordinary feature implementation"
+    },
+    {
+      "id": "maintainer-route",
+      "description": "Routes repository changes to the maintainer guide",
+      "type": "regex",
+      "pattern": "docs/maintaining\\.md"
+    }
+  ],
   "README.md": [
     {
       "id": "compatibility-scope",

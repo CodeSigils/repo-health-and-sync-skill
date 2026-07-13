@@ -110,6 +110,7 @@ Optional behavior is explicit:
 ├── .codex-plugin/
 │   └── plugin.json       # Codex plugin manifest
 ├── .gitignore
+├── AGENTS.md             # Repository-level agent routing
 ├── CITATION.cff
 ├── LICENSE
 ├── README.md

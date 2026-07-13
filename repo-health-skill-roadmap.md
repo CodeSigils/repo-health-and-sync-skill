@@ -39,7 +39,10 @@ targets, not verified support claims.
 | Current Codex skill validation rejects the blanket `compatibility` frontmatter field. | Record compatibility per agent instead of declaring `compatibility: all`. |
 | GitHub documents `GH_TOKEN` for GitHub CLI API access in Actions and SSH/GPG/S/MIME for commit or tag signing. | Keep CI API authorization separate from git provenance policy. |
 | Repository-context research warns that excess context can increase cost or reduce task performance. | Add profile fields through evidence-activated modules with strict budgets. |
-| Addy Osmani's `agent-skills` keeps shared `SKILL.md` workflows alongside focused per-agent setup guides, verification, and limitations. | Keep README concise, maintain a dedicated Codex guide, and add other agent guides only with direct evidence. |
+| Addy Osmani's `agent-skills` keeps shared `SKILL.md` workflows alongside substantial repository-level `AGENTS.md` and `CLAUDE.md` instructions, per-agent setup guides, and separate platform manifests. Its root `plugin.json` is identified as an Antigravity manifest. | Reuse the source-ownership principle, not a presumed universal three-file contract. Add only adapters required by a selected platform and keep their scope explicit. |
+| The AGENTS.md specification describes one repository instruction file consumed by Codex, Cursor, OpenCode, GitHub Copilot, and other agents. | Use a concise root `AGENTS.md` for repository routing without treating its presence as runtime compatibility evidence. |
+| Skills CLI 1.5.16 discovers `skills/<name>/SKILL.md` directly and lists Codex, Cursor, OpenCode, GitHub Copilot, and Hermes installation targets. An isolated local `--list` check found exactly `repo-health-scan` without root `plugin.json`. | Treat skills CLI discovery as verified independently of agent execution; do not add duplicate root metadata for this path. |
+| Claude Code reads `CLAUDE.md`, not `AGENTS.md`, and officially supports importing `AGENTS.md` with `@AGENTS.md`. | If Claude Code becomes active, use an import adapter instead of duplicating repository instructions. |
 | Official Codex non-interactive guidance documents `codex exec --json`, ephemeral sessions, explicit sandboxes, and machine-readable output schemas. | Use raw JSONL locally and a schema-constrained final result for deterministic grading. |
 | Official Codex GitHub Action guidance keeps the API key behind a proxy and supports read-only execution on trusted triggers. | Use the official action for manual and scheduled hosted runs; never expose the key to repository shell steps. |
 
@@ -52,6 +55,9 @@ Primary sources and research, accessed 2026-07-12 or 2026-07-13:
 - https://docs.github.com/en/actions/tutorials/authenticate-with-github_token
 - https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits
 - https://github.com/addyosmani/agent-skills
+- https://agents.md/
+- https://github.com/vercel-labs/skills
+- https://code.claude.com/docs/en/memory
 - https://arxiv.org/abs/2607.01456
 - https://arxiv.org/abs/2605.11418
 - https://arxiv.org/abs/2607.00911
@@ -75,6 +81,8 @@ Primary sources and research, accessed 2026-07-12 or 2026-07-13:
 | Final reporting | The full audit produced a structured final profile, concrete harm, remediation, and correct payload/tooling classification. |
 | Probe correctness | Dirty-tree, TOML/JSON version parsing, attribution range, and command-block examples were corrected and smoke-tested. |
 | Runtime boundary | The shipped payload is one `SKILL.md`; Python and shell scripts are maintainer-only. |
+| Repository routing | Root `AGENTS.md` routes health-audit intent to `SKILL.md`, routine maintenance to `docs/maintaining.md`, and explicitly excludes narrow implementation work. |
+| Skills CLI discovery | Skills CLI 1.5.16 found exactly `repo-health-scan` from the local `skills/` tree with `npx --yes skills add <repo> --list`; no root manifest was required. |
 | Eval contract | `evals/cases/repo-health-scan.json` covers positive/negative triggers, this skill pack, and a Python library using `uv`. |
 | Eval validation | `scripts/validate-evals.py` enforces profile-first ordering, activation evidence, skip reasons, and fixture diversity. |
 | Security and trust | `scripts/check-trust.py` enforces bounded triggers, read-only instructions, opt-in network/output behavior, credential hygiene, versioned compatibility evidence, and payload separation. |
@@ -173,6 +181,22 @@ eval as the fast CI layer and do not make ordinary pull requests depend on the
 model run until repeated executions demonstrate reliability, runtime, and
 acceptable usage.
 
+### 5.3 Implemented: Minimal Repository Routing
+
+Root `AGENTS.md` now acts only as a repository adapter:
+
+- It scopes itself to agents maintaining this source repository.
+- It routes repository-health and release-readiness intent to the canonical
+  `SKILL.md`.
+- It preserves negative triggers for narrow fixes, feature work, single-file
+  edits, and routine code review.
+- It routes contributor workflow to `docs/maintaining.md` rather than copying
+  commands or conventions.
+
+An isolated skills CLI 1.5.16 check found exactly `repo-health-scan` directly
+from `skills/`. This verifies repository discovery by that CLI, not execution,
+automatic selection, or instruction adherence in any additional agent.
+
 ---
 
 ## 6. Deferred Work
@@ -182,12 +206,12 @@ These items are intentionally outside the current Codex-first milestone:
 | Item | Resume When |
 |---|---|
 | Gemini, Claude Code, OpenCode, Cursor, or Hermes verification | Codex workflow conformance and setup are stable. |
-| Root `plugin.json` and `npx skills add` claim | The current CLI contract is verified against this repository. |
+| Root `plugin.json` for Antigravity | Antigravity becomes an active target and its native manifest contract is tested. |
+| `CLAUDE.md` import adapter | Claude Code becomes an active target; use `@AGENTS.md` unless verified Claude-specific instructions are necessary. |
 | Additional per-agent setup guides and compatibility reports | The relevant agent is selected as an active target and tested directly. |
 | `repo-sync` companion skill | Scan findings and the human approval boundary are stable. |
 | Organization-wide scanner and dashboard | Single-repository JSONL behavior is executable and evaluated, not only instructional. |
 | Generic CI integration guide | A real agent runtime and failure policy are selected. |
-| `AGENTS.md` | A durable repository instruction need appears that is not already owned by `docs/maintaining.md`. |
 | `CHANGELOG.md` | Release cadence makes a changelog more useful than GitHub release notes alone. |
 
 No deferred item should appear in README as verified support before its own
@@ -244,7 +268,8 @@ before the evaluation path is proven stable.
 |---:|---|---:|---|
 | 1 | Configure the API-key secret, pass one manual hosted run, then enable the schedule and collect at least five runs with pass rate, duration, and token usage. | 1-2 hr plus observation | High |
 | 2 | Tune the harness only for observed reliability or usage problems. | 0.5-1 day | Medium |
-| 3 | Add evidence-activated profile modules with field budgets. | 1 day | Medium |
+| 3 | Select one non-Codex agent and verify installation, discovery, positive selection, negative non-selection, and read-only behavior in an isolated fixture. | 0.5-1 day | Medium |
+| 4 | Add evidence-activated profile modules with field budgets. | 1 day | Medium |
 
 Completed foundation:
 
@@ -264,6 +289,10 @@ Completed foundation:
   and GitHub Release versions.
 - Added and locally verified the non-blocking Codex model regression runner,
   deterministic grader, isolated fixture, and trusted-trigger hosted workflow.
+- Added a minimal root `AGENTS.md` that routes to canonical sources without
+  duplicating methodology or maintainer instructions.
+- Verified skills CLI 1.5.16 discovers the single skill directly from
+  `skills/` without a root `plugin.json`.
 
 ---
 
@@ -282,6 +311,8 @@ Completed foundation:
 8. Profile growth follows progressive disclosure and strict field budgets.
 9. Human approval separates scan findings from any future synchronization or
    repair workflow.
+10. Repository instruction adapters improve source-checkout routing but do not
+    establish installation, selection, or behavioral compatibility.
 
 ---
 
@@ -292,6 +323,7 @@ repo-health-and-sync-skill/
 ├── .codex-plugin/
 │   └── plugin.json
 ├── .github/workflows/ci.yml
+├── AGENTS.md                         # repository routing only
 ├── README.md
 ├── SECURITY.md
 ├── repo-health-skill-roadmap.md

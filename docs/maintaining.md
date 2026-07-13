@@ -2,7 +2,7 @@
 status: maintainer-reference
 purpose: Developer workflow guide for maintainers of this skill.
 audience: maintainers only — not shipped to skill users.
-supersedes: AGENTS.md
+related: AGENTS.md routes agents to this maintainer reference.
 ---
 
 # Maintaining the Repo Health Scan Skill
@@ -54,12 +54,16 @@ Changes to the methodology go directly into `skills/repo-health-and-sync-skill/S
 There is no sync step, no payload regeneration, and no duplicate reference
 copies to maintain.
 
+Root `AGENTS.md` is a routing adapter, not a second maintainer guide. It points
+repository-health work to `SKILL.md` and repository changes to this file.
+
 ## Project structure
 
 ```text
 ├── .github/workflows/ci.yml
 ├── .gitignore
 ├── .gitattributes
+├── AGENTS.md                      # Repository-level agent routing
 ├── CITATION.cff
 ├── LICENSE
 ├── README.md
