@@ -64,6 +64,20 @@
       "expected_statuses": [200],
       "source_section": "docs/decisions.md",
       "notes": "Primary source for SSH, GPG, and S/MIME commit signing"
+    },
+    {
+      "name": "Codex non-interactive mode",
+      "url": "https://developers.openai.com/codex/noninteractive",
+      "expected_statuses": [200],
+      "source_section": "docs/codex-regression.md",
+      "notes": "Official source for codex exec JSONL, ephemeral sessions, sandboxing, and automation authentication"
+    },
+    {
+      "name": "Codex GitHub Action",
+      "url": "https://developers.openai.com/codex/github-action",
+      "expected_statuses": [200],
+      "source_section": "docs/codex-regression.md",
+      "notes": "Official source for API-key proxying, read-only safety, output schemas, and trusted workflow triggers"
     }
   ]
 }

@@ -40,11 +40,15 @@ targets, not verified support claims.
 | GitHub documents `GH_TOKEN` for GitHub CLI API access in Actions and SSH/GPG/S/MIME for commit or tag signing. | Keep CI API authorization separate from git provenance policy. |
 | Repository-context research warns that excess context can increase cost or reduce task performance. | Add profile fields through evidence-activated modules with strict budgets. |
 | Addy Osmani's `agent-skills` keeps shared `SKILL.md` workflows alongside focused per-agent setup guides, verification, and limitations. | Keep README concise, maintain a dedicated Codex guide, and add other agent guides only with direct evidence. |
+| Official Codex non-interactive guidance documents `codex exec --json`, ephemeral sessions, explicit sandboxes, and machine-readable output schemas. | Use raw JSONL locally and a schema-constrained final result for deterministic grading. |
+| Official Codex GitHub Action guidance keeps the API key behind a proxy and supports read-only execution on trusted triggers. | Use the official action for manual and scheduled hosted runs; never expose the key to repository shell steps. |
 
 Primary sources and research, accessed 2026-07-12 or 2026-07-13:
 
 - https://learn.chatgpt.com/docs/build-plugins
 - https://learn.chatgpt.com/docs/build-skills
+- https://developers.openai.com/codex/noninteractive
+- https://developers.openai.com/codex/github-action
 - https://docs.github.com/en/actions/tutorials/authenticate-with-github_token
 - https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits
 - https://github.com/addyosmani/agent-skills
@@ -76,12 +80,14 @@ Primary sources and research, accessed 2026-07-12 or 2026-07-13:
 | Security and trust | `scripts/check-trust.py` enforces bounded triggers, read-only instructions, opt-in network/output behavior, credential hygiene, versioned compatibility evidence, and payload separation. |
 | Release consistency | The checker validates `SKILL.md`, plugin metadata, `CITATION.cff`, tags, and GitHub releases. Strict CI queries use a read-only job token. |
 | Repository verification | Script self-tests, Ruff, ShellCheck, documentation audit, plugin validation, skill validation, and diff checks pass independently. |
+| Local model regression | The first Codex CLI 0.133.0 run passed positive selection, profile/plan ordering, evidence-backed dimension accounting, seeded finding quality, and negative non-selection. |
 
 ### Remaining Gaps
 
 | Gap | Consequence | Priority |
 |---|---|---|
-| The eval is a deterministic contract validator, not a model grader. | CI cannot prove future Codex output conforms to the contract. | Medium |
+| The hosted Codex Action workflow has not completed its first run. | Local auth and execution do not prove the GitHub secret, action, and artifact path work together. | High |
+| The model harness has one passing run and no reliability baseline. | A single pass cannot justify making the workflow blocking or estimate stable runtime and usage. | Medium |
 
 ---
 
@@ -138,22 +144,34 @@ Acceptance evidence:
 Acceptance met: local metadata, tag, GitHub release, and released plugin payload
 all identify version `0.3.0`.
 
-### 5.2 Model-Driven Regression Harness
+### 5.2 Implemented: Model-Driven Regression Harness
 
-Investigate a repeatable Codex transcript runner only after the instruction
-contract is stable. Keep the deterministic JSON eval as the fast CI layer.
+**Local result:** `verified_once` on Codex CLI 0.133.0 on 2026-07-13.
 
-Minimum grader assertions:
+The harness now includes:
 
-- Skill selected for positive prompts and not selected for negative prompts.
-- Profile event precedes dimension events.
-- Every dimension event includes valid `activated_by` profile paths.
-- Skipped dimensions are never reported as PASS.
-- Findings include harm and remediation.
+- An isolated Python/`uv` fixture with positive and negative prompts.
+- A local `codex exec --json` runner that captures raw event streams and final
+  responses while enforcing read-only, ephemeral execution.
+- A deterministic grader for selection, raw profile/plan ordering,
+  `activated_by` evidence, complete dimension accounting, skip behavior,
+  seeded finding quality, severity ordering, and negative non-selection.
+- A separate manual/weekly GitHub workflow using the official Codex Action and
+  read-only safety strategy.
+- Artifact and reliability documentation in `docs/codex-regression.md`.
 
-Do not make ordinary pull requests depend on a flaky or account-dependent model
-run. Use scheduled, manual, or release-gate execution unless reliability and
-cost are demonstrated.
+First-run assertions:
+
+- Positive skill selection and negative non-selection passed.
+- The populated profile preceded the populated dimension plan.
+- Every active dimension cited a valid profile path.
+- All ten candidate dimensions were active or explicitly skipped.
+- The seeded dirty-tree finding named the defect, harm, and remediation.
+
+The hosted workflow remains `pending_first_run`. Keep the deterministic JSON
+eval as the fast CI layer and do not make ordinary pull requests depend on the
+model run until repeated executions demonstrate reliability, runtime, and
+acceptable usage.
 
 ---
 
@@ -214,9 +232,9 @@ Profile rules:
 - Unknown is valid; never invent a value to activate a check.
 - Modules add questions, not mandatory PASS/FAIL dimensions.
 
-Implement profile modules only after the model-driven regression harness is
-designed; otherwise they expand the behavior surface before the verified core
-contract has a scalable evaluation path.
+Implement profile modules only after repeated model-regression runs establish a
+reliability and usage baseline; otherwise they expand the behavior surface
+before the evaluation path is proven stable.
 
 ---
 
@@ -224,8 +242,9 @@ contract has a scalable evaluation path.
 
 | Order | Action | Effort | Impact |
 |---:|---|---:|---|
-| 1 | Design a non-blocking model-driven regression harness. | 1 day | Medium |
-| 2 | Add evidence-activated profile modules with field budgets. | 1 day | Medium |
+| 1 | Configure the API-key secret, pass one manual hosted run, then enable the schedule and collect at least five runs with pass rate, duration, and token usage. | 1-2 hr plus observation | High |
+| 2 | Tune the harness only for observed reliability or usage problems. | 0.5-1 day | Medium |
+| 3 | Add evidence-activated profile modules with field budgets. | 1 day | Medium |
 
 Completed foundation:
 
@@ -243,6 +262,8 @@ Completed foundation:
 - Removed unsupported blanket compatibility metadata.
 - Published signed release `v0.3.0` with aligned skill, plugin, citation, tag,
   and GitHub Release versions.
+- Added and locally verified the non-blocking Codex model regression runner,
+  deterministic grader, isolated fixture, and trusted-trigger hosted workflow.
 
 ---
 

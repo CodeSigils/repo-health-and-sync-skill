@@ -127,6 +127,32 @@
       "pattern": "compatibility-reports/codex\\.md"
     }
   ],
+  "docs/codex-regression.md": [
+    {
+      "id": "model-regression-status",
+      "description": "Records local and hosted model regression status",
+      "type": "regex",
+      "pattern": "Local status: `verified_once`\\. Hosted workflow status: `pending_first_run`"
+    },
+    {
+      "id": "model-regression-local-command",
+      "description": "Documents the local model regression command",
+      "type": "regex",
+      "pattern": "python3 scripts/run-codex-regression\\.py"
+    },
+    {
+      "id": "model-regression-non-blocking",
+      "description": "Keeps the model workflow non-blocking",
+      "type": "regex",
+      "pattern": "absent from push and pull-request"
+    },
+    {
+      "id": "model-regression-official-sources",
+      "description": "Links official Codex automation sources",
+      "type": "regex",
+      "pattern": "developers\\.openai\\.com/codex/noninteractive"
+    }
+  ],
   "docs/decisions.md": [
     {
       "id": "describes-current-architecture",

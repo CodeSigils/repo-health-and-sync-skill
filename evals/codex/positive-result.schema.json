@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "skill": {
+      "type": "object",
+      "properties": {
+        "selected": { "type": "boolean" },
+        "name": { "type": "string" },
+        "source_path": { "type": "string" }
+      },
+      "required": ["selected", "name", "source_path"],
+      "additionalProperties": false
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["profile", "dimension_checks", "report"]
+          },
+          "profile": {
+            "anyOf": [
+              { "type": "null" },
+              {
+                "type": "object",
+                "properties": {
+                  "observed": {
+                    "type": "object",
+                    "properties": {
+                      "vcs": { "type": "string" },
+                      "languages": {
+                        "type": "array",
+                        "items": { "type": "string" }
+                      },
+                      "package_managers": {
+                        "type": "array",
+                        "items": { "type": "string" }
+                      },
+                      "ci": { "type": "string" },
+                      "shell_files": { "type": "boolean" },
+                      "recent_commits": { "type": "boolean" },
+                      "gitignore": { "type": "boolean" },
+                      "version_sources": {
+                        "type": "array",
+                        "items": { "type": "string" }
+                      },
+                      "script_surface": { "type": "string" },
+                      "shipped_payload": { "type": "string" }
+                    },
+                    "required": [
+                      "vcs",
+                      "languages",
+                      "package_managers",
+                      "ci",
+                      "shell_files",
+                      "recent_commits",
+                      "gitignore",
+                      "version_sources",
+                      "script_surface",
+                      "shipped_payload"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "inferred": {
+                    "type": "object",
+                    "properties": {
+                      "repo_type": { "type": "string" },
+                      "release_model": { "type": "string" },
+                      "risk_context": { "type": "string" }
+                    },
+                    "required": ["repo_type", "release_model", "risk_context"],
+                    "additionalProperties": false
+                  }
+                },
+                "required": ["observed", "inferred"],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "active_dimensions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "activated_by": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "minItems": 1
+                }
+              },
+              "required": ["name", "activated_by"],
+              "additionalProperties": false
+            }
+          },
+          "skipped_dimensions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "status": { "type": "string", "enum": ["SKIP"] },
+                "skip_reason": { "type": "string" }
+              },
+              "required": ["name", "status", "skip_reason"],
+              "additionalProperties": false
+            }
+          },
+          "findings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "severity": {
+                  "type": "string",
+                  "enum": ["blocking", "warning", "info"]
+                },
+                "finding": { "type": "string" },
+                "harm": { "type": "string" },
+                "remediation": { "type": "string" }
+              },
+              "required": ["severity", "finding", "harm", "remediation"],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "type",
+          "profile",
+          "active_dimensions",
+          "skipped_dimensions",
+          "findings"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 3,
+      "maxItems": 3
+    }
+  },
+  "required": ["skill", "events"],
+  "additionalProperties": false
+}

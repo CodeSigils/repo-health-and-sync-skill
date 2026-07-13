@@ -19,6 +19,8 @@ PY_SCRIPTS_WITH_SELF_TEST = [
     "check-version-consistency.py",
     "check-trust.py",
     "extract-tests.py",
+    "grade-codex-transcript.py",
+    "run-codex-regression.py",
     "validate-evals.py",
 ]
 
@@ -31,6 +33,8 @@ ALL_SCRIPTS = [
     "check-version-consistency.py",
     "check-trust.py",
     "extract-tests.py",
+    "grade-codex-transcript.py",
+    "run-codex-regression.py",
     "validate-evals.py",
     "verify.sh",
 ]

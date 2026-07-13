@@ -38,6 +38,12 @@ Before marking work done, run through in order:
 6. **Trust contract valid** — `python3 scripts/check-trust.py`
 7. **Versions aligned** — `python3 scripts/check-version-consistency.py`
 
+The model regression is deliberately outside this required fast checklist.
+After a material `SKILL.md` workflow or trigger change, run
+`python3 scripts/run-codex-regression.py` locally or dispatch the dedicated
+`Codex regression` workflow. Do not make ordinary changes depend on model
+availability.
+
 ## How the skill works
 
 The skill is a single SKILL.md with no shipped scripts, no reference files,
@@ -74,6 +80,8 @@ copies to maintain.
 │   ├── check-trust.py
 │   ├── doc-audit.py
 │   ├── extract-tests.py
+│   ├── grade-codex-transcript.py
+│   ├── run-codex-regression.py
 │   ├── validate-evals.py
 │   ├── validate-scripts.py
 │   ├── verify-urls.py

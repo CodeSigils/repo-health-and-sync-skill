@@ -37,3 +37,7 @@ output/
 .venv/
 venv/
 .ruff_cache/
+
+# Model regression workspaces and captured transcripts
+.codex-regression/
+artifacts/

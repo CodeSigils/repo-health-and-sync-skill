@@ -78,6 +78,10 @@ The Python and shell files under `scripts/` are maintainer-only checks for
 this repository's CI and documentation. They are not installed as skill
 runtime helpers and should not be copied into `skills/repo-health-and-sync-skill/`.
 
+The optional [Codex model regression](docs/codex-regression.md) runs positive
+and negative prompts against an isolated fixture. It is manual or scheduled,
+uses a read-only sandbox, and does not block ordinary pull requests.
+
 ---
 
 ## Per-project configuration
@@ -101,7 +105,8 @@ Optional behavior is explicit:
 ```text
 ├── .github/
 │   └── workflows/
-│       └── ci.yml        # CI pipeline
+│       ├── ci.yml                    # Deterministic CI pipeline
+│       └── codex-regression.yml      # Non-blocking model evaluation
 ├── .codex-plugin/
 │   └── plugin.json       # Codex plugin manifest
 ├── .gitignore
@@ -113,6 +118,7 @@ Optional behavior is explicit:
 ├── docs/                 # Maintainer documentation
 │   ├── README.md
 │   ├── codex-setup.md
+│   ├── codex-regression.md
 │   ├── compatibility-reports/
 │   │   └── codex.md
 │   ├── maintaining.md
@@ -121,8 +127,9 @@ Optional behavior is explicit:
 │   ├── research.md
 │   └── doc-standards.json
 ├── evals/
-│   └── cases/
-│       └── repo-health-scan.json  # Local behavioral contract
+│   ├── cases/
+│   │   └── repo-health-scan.json  # Local behavioral contract
+│   └── codex/                     # Model prompts and output schema
 ├── scripts/              # CI-only tooling (not shipped)
 │   ├── check-expiry.py
 │   ├── check-portability.py
@@ -130,6 +137,8 @@ Optional behavior is explicit:
 │   ├── check-version-consistency.py
 │   ├── doc-audit.py
 │   ├── extract-tests.py
+│   ├── grade-codex-transcript.py
+│   ├── run-codex-regression.py
 │   ├── validate-evals.py
 │   ├── validate-scripts.py
 │   ├── verify.sh
@@ -168,6 +177,8 @@ one the skill defines.**
 - [Codex compatibility report](docs/compatibility-reports/codex.md) — tested
   version, installation evidence, and workflow results
 - [Codex setup guide](docs/codex-setup.md) — repository-local and plugin setup
+- [Codex model regression](docs/codex-regression.md) — isolated runner, grader,
+  and non-blocking workflow
 - [Growth roadmap](repo-health-skill-roadmap.md) — verified scope and ordered
   follow-ups
 - [Maintainer guide](docs/maintaining.md) — repository verification and release

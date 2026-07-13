@@ -1,0 +1,69 @@
+name: Codex regression
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 8 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: codex-regression
+  cancel-in-progress: false
+
+jobs:
+  model-regression:
+    if: github.event_name == 'workflow_dispatch' || vars.CODEX_REGRESSION_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          persist-credentials: false
+
+      - name: Prepare isolated fixture
+        run: |
+          python3 scripts/run-codex-regression.py \
+            --prepare-only \
+            --fixture-dir .codex-regression/fixture
+          mkdir -p artifacts/codex-regression
+
+      - name: Run positive audit scenario
+        id: positive
+        uses: openai/codex-action@52fe01ec70a42f454c9d2ebd47598f9fd6893d56 # v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          safety-strategy: read-only
+          working-directory: .codex-regression/fixture
+          prompt-file: evals/codex/positive-prompt.md
+          output-schema-file: evals/codex/positive-result.schema.json
+          output-file: artifacts/codex-regression/positive-result.json
+          codex-args: '["--ephemeral", "--ignore-rules"]'
+
+      - name: Run negative implementation scenario
+        id: negative
+        uses: openai/codex-action@52fe01ec70a42f454c9d2ebd47598f9fd6893d56 # v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          safety-strategy: read-only
+          working-directory: .codex-regression/fixture
+          prompt-file: evals/codex/negative-prompt.md
+          output-file: artifacts/codex-regression/negative-result.txt
+          codex-args: '["--ephemeral", "--ignore-rules"]'
+
+      - name: Grade model output
+        run: |
+          python3 scripts/grade-codex-transcript.py \
+            --positive-result artifacts/codex-regression/positive-result.json \
+            --negative-result artifacts/codex-regression/negative-result.txt \
+            --output artifacts/codex-regression/grade.json
+
+      - name: Upload regression artifacts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: codex-regression-${{ github.run_id }}
+          path: artifacts/codex-regression/
+          if-no-files-found: warn
+          retention-days: 14
