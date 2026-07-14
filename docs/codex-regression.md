@@ -104,6 +104,11 @@ Use `not recorded` for historical data that cannot be recovered.
 | 2 | 2026-07-14 | Local | 0.133.0 | not emitted | Pass | 2m 05s | 136,050 input (106,880 cached); 5,535 output; 1,233 reasoning | Positive and negative scenarios passed; non-fatal stale model-cache warning. |
 | 3 | 2026-07-14 | Local | 0.133.0 | not emitted | Timeout | 15m 00s | unavailable; no `turn.completed` event | Positive scenario selected the skill and began discovery, then stopped emitting events; negative scenario did not run. Same-session evidence. |
 
+Runs 1-3 predate the `run-summary.json` observability added in `f21214c`.
+Their committed log entries remain the authoritative historical evidence; do
+not manufacture or backfill generated summaries. Structured summaries begin
+with the first subsequent run, including when that run fails or times out.
+
 The reliability baseline is complete after five recorded runs include the
 CLI version, pass or failure, duration, and token usage. Record the model when
 the CLI emits it or the run selects one explicitly; do not infer a default model
