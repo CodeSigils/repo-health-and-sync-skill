@@ -91,12 +91,16 @@ Use `not recorded` for historical data that cannot be recovered.
 |---:|---|---|---|---|---|---|---|---|
 | 1 | 2026-07-13 | Local | 0.133.0 | not recorded | Pass | not recorded | 153,545 input (112,384 cached); 5,141 output; 774 reasoning | Negative-run pytest could not use a temporary directory; non-fatal stale model-cache warning. |
 | 2 | 2026-07-14 | Local | 0.133.0 | not emitted | Pass | 2m 05s | 136,050 input (106,880 cached); 5,535 output; 1,233 reasoning | Positive and negative scenarios passed; non-fatal stale model-cache warning. |
+| 3 | 2026-07-14 | Local | 0.133.0 | not emitted | Timeout | 15m 00s | unavailable; no `turn.completed` event | Positive scenario selected the skill and began discovery, then stopped emitting events; negative scenario did not run. Same-session evidence. |
 
 The reliability baseline is complete after five recorded runs include the
 CLI version, pass or failure, duration, and token usage. Record the model when
 the CLI emits it or the run selects one explicitly; do not infer a default model
 from the CLI version. Review the pass rate and deviations before changing the
 harness or expanding `SKILL.md`.
+
+Current baseline: three of five runs recorded, with two passes and one timeout
+(66.7% pass rate). Two more runs are required before the baseline review.
 
 Excluded infrastructure attempt: on 2026-07-14, a run inside the restricted
 network sandbox timed out after 900 seconds immediately after `turn.started`,

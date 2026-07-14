@@ -94,7 +94,7 @@ Primary sources and research, accessed 2026-07-12 or 2026-07-13:
 
 | Gap | Consequence | Priority |
 |---|---|---|
-| The model harness has two passing local runs and no five-run reliability baseline. | Two passes cannot yet justify expanding the profile contract or estimate stable runtime and usage. | High |
+| The model harness has three recorded local runs (two passes and one timeout) and no five-run reliability baseline. | A 66.7% observed pass rate requires more evidence and failure review before expanding the profile contract. | High |
 
 The hosted Codex Action is not a product gap. It requires API-key billing, which
 is separate from the ChatGPT subscription used by the current maintainer's
@@ -280,7 +280,7 @@ the expanded profile contract as verified.
 
 | Order | Action | Effort | Impact |
 |---:|---|---:|---|
-| 1 | Collect at least three more local model-regression runs and record pass rate, CLI version, model identifier when available, duration, and token usage for a five-run baseline. | Observation over multiple runs | High |
+| 1 | Collect at least two more local model-regression runs and record pass rate, CLI version, model identifier when available, duration, and token usage for a five-run baseline. Prefer time-separated runs because run 3 was collected in the same session as run 2. | Observation over multiple runs | High |
 | 2 | Review the baseline and tune the harness only for observed reliability or usage problems. | 0.5-1 day if needed | Medium |
 | 3 | Add evidence-activated profile modules and their field budgets to `SKILL.md`, eval fixtures, validators, and the model grader; then rerun regression. | 1-2 days | Medium |
 
