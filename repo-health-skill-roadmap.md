@@ -133,6 +133,28 @@ authenticated local Codex CLI. Keep the workflow available as an optional path,
 but do not use its unverified status to block local development, cloning, skill
 discovery, or profile scaling.
 
+### Current Decision Gate
+
+The repository is under a model-facing change freeze until the five-run v0.3.0
+baseline is complete and reviewed. Do not change `SKILL.md`, the regression
+prompt, the graded workflow contract, or the model output schema during the two
+remaining time-separated runs. Maintainer documentation and fixes that preserve
+the model-facing inputs may continue.
+
+The required sequence is:
+
+1. Collect runs four and five without changing the released payload.
+2. Review the five-run pass rate, failure phases, runtime, and token use.
+3. Consolidate the core methodology and contextual blocking behavior only if
+   the baseline review supports proceeding.
+4. Establish a fresh repeated baseline for the consolidated payload.
+5. Formalize optional output contracts, broaden deterministic fixtures, and
+   only then hold the profile-module go/no-go review.
+
+Completing a baseline is an evidence gate, not an automatic instruction to
+implement the next item. Any failed or stalled run must remain in the record and
+inform the review.
+
 ---
 
 ## 4. Completed Milestone: Codex Workflow Conformance
@@ -266,11 +288,9 @@ Completing the current five-run v0.3.0 baseline does not automatically unlock
 profile modules. It only characterizes the released payload. Before adding any
 module, complete these gates in order:
 
-1. Improve regression observability for evidence already seen: record CLI and
-   model identity when available, elapsed time, usage, last-event time, and
-   whether a failure occurred before selection, during tools, during model
-   inference, or in grading. Preserve first-attempt failures even if a retry is
-   offered for diagnosis.
+1. **Completed:** regression observability records CLI and model identity when
+   available, elapsed time, usage, last-event time, failure phase, and preserved
+   first-attempt outcomes. This shipped in commit `f21214c`.
 2. Finish the two remaining time-separated v0.3.0 regression runs with that
    observability and review pass rate, runtime, token use, and failure phases.
 3. Consolidate the core methodology while preserving the verified three-step
@@ -343,11 +363,11 @@ surface expansion.
 
 | Order | Action | Effort | Impact |
 |---:|---|---:|---|
-| 1 | Improve runner metadata and failure-phase reporting only for observability gaps demonstrated by the three existing runs. Do not change model-facing inputs. | 0.5-1 day | High |
-| 2 | Collect two more time-separated local v0.3.0 model-regression runs with the instrumented runner and review the five-run baseline. | Observation over multiple runs | High |
-| 3 | Consolidate `SKILL.md`, clarify the candidate-catalog and contextual-blocking contracts, and preserve the verified three-step behavior. | 1-2 days | High |
-| 4 | Formalize the optional interfaces and broaden deterministic fixture coverage. | 1-2 days | High |
-| 5 | Establish a fresh repeated model baseline for the consolidated payload. | Observation over multiple runs | High |
+| 1 | Collect two more time-separated local v0.3.0 model-regression runs with the instrumented runner. Preserve model-facing inputs and all first-attempt outcomes. | Observation over multiple runs | High |
+| 2 | Review the five-run baseline before authorizing payload changes: pass rate, failure phases, runtime, token use, and evidence quality. | 0.5 day | High |
+| 3 | If the review supports proceeding, consolidate `SKILL.md`, clarify the candidate-catalog and contextual-blocking contracts, and preserve the verified three-step behavior. | 1-2 days | High |
+| 4 | Establish a fresh repeated model baseline for the consolidated payload; do not reuse the v0.3.0 rate as proof. | Observation over multiple runs | High |
+| 5 | Formalize the optional interfaces and broaden deterministic fixture coverage against the stable consolidated contract. | 1-2 days | High |
 | 6 | Decide whether profile modules are justified. Keep them deferred by default; if approved, implement and evaluate one module at a time. | Review, then 0.5-1 day per approved module | Medium |
 
 Optional, unordered infrastructure: activate the hosted Codex Action only if a
@@ -357,6 +377,8 @@ deferred under Section 6 rather than competing with the Codex reliability path.
 
 Completed foundation:
 
+- Added regression run metadata, failure-phase reporting, and preserved-attempt
+  summaries without changing the model-facing regression inputs (`f21214c`).
 - Corrected methodology probes and structured profile.
 - Added trigger-aware skill anatomy and valid Codex plugin packaging.
 - Verified local plugin installation and implicit Codex discovery.
