@@ -17,6 +17,14 @@ cross-agent expansion so completed tasks do not remain disguised as open work.
 agents. It discovers repository shape, infers relevant invariants, and reports
 concrete harm and remediation without applying a universal checklist.
 
+Its primary value is as an **agent reasoning protocol**: it makes discovery,
+dimension selection, skip decisions, and reporting observable. It is not a
+general-purpose scanner and does not replace tests, linters, dependency or
+security scanners, package-manager checks, or an experienced maintainer's
+repository knowledge. Its highest-value contexts are unfamiliar repositories,
+release and handoff audits, and AI-assisted maintenance that benefits from a
+repeatable review structure.
+
 The three-step contract is now observable in Codex:
 
 1. Discover and emit a structured repository profile.
@@ -25,6 +33,23 @@ The three-step contract is now observable in Codex:
 
 Codex is the only active compatibility target. Other agents remain potential
 targets, not verified support claims.
+
+Current product assessment:
+
+- The profile-first and evidence-linked planning contract is useful and
+  differentiates the skill from a generic health checklist.
+- The current payload is too instruction-heavy for its intended role. At 442
+  lines, overlapping examples, rationalizations, red flags, and repeated design
+  principles increase context cost and create more opportunities for partial
+  adherence.
+- The ten dimensions behave as an evidence-activated candidate catalog. Calling
+  the method "not a checklist" without that qualification overstates the
+  distinction.
+- The skill is useful guidance, not an executable guarantee. Agent-interpreted
+  `.repo-health.json` and JSONL interfaces need tighter contracts before they
+  should be treated as stable automation surfaces.
+- Profile growth is not the next milestone. Core clarity, fixture diversity,
+  regression observability, and reliability take precedence.
 
 ---
 
@@ -38,13 +63,14 @@ targets, not verified support claims.
 | The 2026-07-13 conformance retest emitted the profile and evidence-linked dimension plan before health checks. | Treat the core Codex workflow as verified and preserve it with deterministic evals. |
 | Current Codex skill validation rejects the blanket `compatibility` frontmatter field. | Record compatibility per agent instead of declaring `compatibility: all`. |
 | GitHub documents `GH_TOKEN` for GitHub CLI API access in Actions and SSH/GPG/S/MIME for commit or tag signing. | Keep CI API authorization separate from git provenance policy. |
-| Repository-context research warns that excess context can increase cost or reduce task performance. | Add profile fields through evidence-activated modules with strict budgets. |
+| Repository-context research warns that excess context can increase cost or reduce task performance. | Consolidate the existing payload before adding fields or modules; any later profile growth requires strict evidence and budgets. |
 | Addy Osmani's `agent-skills` keeps shared `SKILL.md` workflows alongside substantial repository-level `AGENTS.md` and `CLAUDE.md` instructions, per-agent setup guides, and separate platform manifests. Its root `plugin.json` is identified as an Antigravity manifest. | Reuse the source-ownership principle, not a presumed universal three-file contract. Add only adapters required by a selected platform and keep their scope explicit. |
 | The AGENTS.md specification describes one repository instruction file consumed by Codex, Cursor, OpenCode, GitHub Copilot, and other agents. | Use a concise root `AGENTS.md` for repository routing without treating its presence as runtime compatibility evidence. |
 | Skills CLI 1.5.16 discovers `skills/<name>/SKILL.md` directly and lists Codex, Cursor, OpenCode, GitHub Copilot, and Hermes installation targets. An isolated local `--list` check found exactly `repo-health-scan` without root `plugin.json`. | Treat skills CLI discovery as verified independently of agent execution; do not add duplicate root metadata for this path. |
 | Claude Code reads `CLAUDE.md`, not `AGENTS.md`, and officially supports importing `AGENTS.md` with `@AGENTS.md`. | If Claude Code becomes active, use an import adapter instead of duplicating repository instructions. |
 | Official Codex non-interactive guidance documents `codex exec --json`, ephemeral sessions, explicit sandboxes, and machine-readable output schemas. | Use raw JSONL locally and a schema-constrained final result for deterministic grading. |
 | Official Codex GitHub Action guidance keeps the API key behind a proxy and supports read-only execution on trusted triggers. | Retain the official Action as optional infrastructure for maintainers with API-key billing; never make it a prerequisite for local evaluation or repository exploration. |
+| Two local regressions passed with 153,545 and 136,050 input tokens; a third produced partial model output and timed out after 15 minutes. | Treat model cost and stalls as product evidence, improve run observability, and do not expand the instruction surface yet. |
 
 Primary sources and research, accessed 2026-07-12 or 2026-07-13:
 
@@ -74,10 +100,10 @@ Primary sources and research, accessed 2026-07-12 or 2026-07-13:
 | Area | Evidence |
 |---|---|
 | Skill schema | Current Codex skill validator passes. Frontmatter contains supported fields only. |
-| Codex packaging | Plugin validator passes; local marketplace installation is verified. |
+| Codex packaging | The v0.3.0 plugin manifest validates. The recorded isolated marketplace installation is historical v0.2.0 evidence and should not be described as a reproduced v0.3.0 install. |
 | Codex discovery | An unnamed release-audit prompt selected `repo-health-scan` and loaded the installed skill. |
 | Codex workflow | The isolated retest emitted the profile and complete dimension plan before probes; all active checks cited profile evidence. |
-| Codex setup | The focused guide was reproduced from a clean isolated `CODEX_HOME`; plugin installation and implicit discovery passed. |
+| Codex setup | The focused guide was reproduced from a clean isolated `CODEX_HOME`; the historical v0.2.0 plugin installation and implicit discovery passed. |
 | Final reporting | The full audit produced a structured final profile, concrete harm, remediation, and correct payload/tooling classification. |
 | Probe correctness | Dirty-tree, TOML/JSON version parsing, attribution range, and command-block examples were corrected and smoke-tested. |
 | Runtime boundary | The shipped payload is one `SKILL.md`; Python and shell scripts are maintainer-only. |
@@ -95,6 +121,11 @@ Primary sources and research, accessed 2026-07-12 or 2026-07-13:
 | Gap | Consequence | Priority |
 |---|---|---|
 | The model harness has three recorded local runs (two passes and one timeout) and no five-run reliability baseline. | A 66.7% observed pass rate requires more evidence and failure review before expanding the profile contract. | High |
+| `SKILL.md` is 442 lines and repeats examples, cautions, and design principles around a compact three-step contract. | Excess instruction surface increases token use and makes partial or inconsistent adherence more likely. | High |
+| The fixed dimension table is presented alongside a "not a checklist" claim, and blocking behavior is more rigid than the contextual-severity principle. | Agents may anchor on the catalog as exhaustive or stop an audit before reporting other useful evidence. | High |
+| `.repo-health.json` and JSONL are agent-interpreted examples without versioned deterministic schemas. | Different agents may produce incompatible behavior while appearing to support the same interface. | Medium |
+| Deterministic fixtures cover this skill pack and one Python library shape. | The contract has limited evidence for missing tools, monorepos, docs products, repositories without `origin/main`, and intentionally dirty development trees. | Medium |
+| Current-version marketplace installation has not been reproduced in the compatibility report. | The v0.3.0 manifest is valid, but its installation evidence should remain distinct from the recorded v0.2.0 setup reproduction. | Low |
 
 The hosted Codex Action is not a product gap. It requires API-key billing, which
 is separate from the ChatGPT subscription used by the current maintainer's
@@ -227,7 +258,43 @@ fixture or compatibility report exists.
 
 ---
 
-## 7. Future Profile Scaling
+## 7. Core Consolidation Gate and Deferred Profile Scaling
+
+**Status:** profile modules are explicitly deferred.
+
+Completing the current five-run v0.3.0 baseline does not automatically unlock
+profile modules. It only characterizes the released payload. Before adding any
+module, complete these gates in order:
+
+1. Finish the two remaining time-separated v0.3.0 regression runs and review
+   pass rate, runtime, token use, and failure phases.
+2. Improve regression observability for evidence already seen: record CLI and
+   model identity when available, elapsed time, usage, last-event time, and
+   whether a failure occurred before selection, during tools, during model
+   inference, or in grading. Preserve first-attempt failures even if a retry is
+   offered for diagnosis.
+3. Consolidate the core methodology while preserving the verified three-step
+   contract. Target a 30-50% payload reduction where it can be achieved without
+   weakening trigger boundaries, read-only behavior, profile-first ordering,
+   activation evidence, skip accounting, or finding quality.
+4. Describe the dimension table as a non-exhaustive candidate catalog, allow
+   evidence-backed custom dimensions, make blocking contextual to the audit,
+   continue safe read-only checks after finding a blocker, and state graceful
+   behavior when an expected tool is unavailable.
+5. Formalize small versioned contracts for the profile, dimension plan, JSONL
+   findings, and `.repo-health.json`; keep schemas and validators as
+   maintainer-side evidence rather than shipped runtime dependencies.
+6. Add deterministic fixtures for a monorepo, documentation product, missing
+   tools, no `origin/main`, and an intentionally dirty non-release workflow.
+7. Because consolidation changes `SKILL.md`, establish a fresh repeated model
+   baseline for the revised payload. Do not carry the v0.3.0 pass rate forward
+   as proof of the new behavior.
+8. Hold a documented go/no-go review for profile modules. The default outcome
+   is continued deferral unless observed repository failures show that the
+   compact core cannot represent necessary evidence.
+
+The following design is retained for possible future use; it is not an approved
+implementation milestone.
 
 Keep the mandatory profile small:
 
@@ -264,15 +331,11 @@ Profile rules:
 - Unknown is valid; never invent a value to activate a check.
 - Modules add questions, not mandatory PASS/FAIL dimensions.
 
-Implement profile modules only after at least five recorded model-regression
-runs establish a reliability and usage baseline. Local runs through an
-authenticated Codex CLI are sufficient; hosted runs are optional. Record the
-CLI/model version, pass or failure, duration, and token usage for each run.
-
-After the baseline is reviewed, profile scaling requires implementation work in
-the canonical `SKILL.md`, deterministic eval fixtures and validators, and the
-model grader. Rerun the model regression after those changes before describing
-the expanded profile contract as verified.
+If the later go/no-go review approves profile scaling, implement one module at a
+time in the canonical `SKILL.md`, deterministic fixtures and validators, and
+the model grader. Each module needs an observed activation use case, its own
+field budget, and fresh regression evidence. Do not implement all five as one
+surface expansion.
 
 ---
 
@@ -280,9 +343,12 @@ the expanded profile contract as verified.
 
 | Order | Action | Effort | Impact |
 |---:|---|---:|---|
-| 1 | Collect at least two more local model-regression runs and record pass rate, CLI version, model identifier when available, duration, and token usage for a five-run baseline. Prefer time-separated runs because run 3 was collected in the same session as run 2. | Observation over multiple runs | High |
-| 2 | Review the baseline and tune the harness only for observed reliability or usage problems. | 0.5-1 day if needed | Medium |
-| 3 | Add evidence-activated profile modules and their field budgets to `SKILL.md`, eval fixtures, validators, and the model grader; then rerun regression. | 1-2 days | Medium |
+| 1 | Collect two more time-separated local v0.3.0 model-regression runs and review the five-run baseline. | Observation over multiple runs | High |
+| 2 | Improve runner metadata and failure-phase reporting only for observability gaps demonstrated by the three existing runs. | 0.5-1 day | High |
+| 3 | Consolidate `SKILL.md`, clarify the candidate-catalog and contextual-blocking contracts, and preserve the verified three-step behavior. | 1-2 days | High |
+| 4 | Formalize the optional interfaces and broaden deterministic fixture coverage. | 1-2 days | High |
+| 5 | Establish a fresh repeated model baseline for the consolidated payload. | Observation over multiple runs | High |
+| 6 | Decide whether profile modules are justified. Keep them deferred by default; if approved, implement and evaluate one module at a time. | Review, then 0.5-1 day per approved module | Medium |
 
 Optional, unordered infrastructure: activate the hosted Codex Action only if a
 maintainer later has API-key billing and wants GitHub-hosted scheduling. It is
@@ -317,7 +383,8 @@ Completed foundation:
 ## 9. Constraints
 
 1. The scan remains read-only and never becomes the fixer.
-2. Repository evidence selects checks; there is no universal checklist.
+2. Repository evidence selects checks; the dimension table is a non-exhaustive
+   candidate catalog, not a universal checklist.
 3. Maintainer scripts never become required runtime payload implicitly.
 4. Instruction-level JSONL and `.repo-health.json` remain labelled as contracts,
    not executable features.
@@ -326,11 +393,14 @@ Completed foundation:
 6. External-facing decisions use current primary sources and record access
    dates; purely local command fixes use local tests.
 7. API authorization and git provenance remain separate controls.
-8. Profile growth follows progressive disclosure and strict field budgets.
+8. Profile growth remains frozen until core consolidation, expanded fixtures,
+   and a fresh model baseline pass a documented go/no-go review.
 9. Human approval separates scan findings from any future synchronization or
    repair workflow.
 10. Repository instruction adapters improve source-checkout routing but do not
     establish installation, selection, or behavioral compatibility.
+11. A material `SKILL.md` change starts a new behavioral evidence baseline;
+    results for an older payload remain historical evidence only.
 
 ---
 
