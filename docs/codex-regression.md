@@ -54,6 +54,17 @@ The command prints the artifact directory. Each run writes:
 - `negative-result.txt`: final response to the narrow implementation prompt.
 - `positive-stderr.log` and `negative-stderr.log`: CLI diagnostics.
 - `grade.json`: deterministic pass/fail details.
+- `run-summary.json`: run timing, CLI/model identity when available,
+  per-scenario status and failure phase, last-event metadata, aggregate usage,
+  grade status, and artifact paths. It is written for both passing and failed
+  runs.
+
+The summary is runner-only observability. It does not change the prompts,
+fixture, Codex command, read-only sandbox, timeout, output schema, or grader.
+Scenario failure phases distinguish startup, tool execution, model inference,
+and output capture; the run-level summary separately identifies fixture setup
+and grading failures. Incomplete runs therefore do not require manual transcript
+reconstruction.
 
 Generated fixtures and artifacts are ignored by git. Use `--fixture-dir` or
 `--output-dir` when a stable diagnostic location is needed.

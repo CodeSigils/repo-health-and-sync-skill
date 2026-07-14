@@ -266,13 +266,13 @@ Completing the current five-run v0.3.0 baseline does not automatically unlock
 profile modules. It only characterizes the released payload. Before adding any
 module, complete these gates in order:
 
-1. Finish the two remaining time-separated v0.3.0 regression runs and review
-   pass rate, runtime, token use, and failure phases.
-2. Improve regression observability for evidence already seen: record CLI and
+1. Improve regression observability for evidence already seen: record CLI and
    model identity when available, elapsed time, usage, last-event time, and
    whether a failure occurred before selection, during tools, during model
    inference, or in grading. Preserve first-attempt failures even if a retry is
    offered for diagnosis.
+2. Finish the two remaining time-separated v0.3.0 regression runs with that
+   observability and review pass rate, runtime, token use, and failure phases.
 3. Consolidate the core methodology while preserving the verified three-step
    contract. Target a 30-50% payload reduction where it can be achieved without
    weakening trigger boundaries, read-only behavior, profile-first ordering,
@@ -343,8 +343,8 @@ surface expansion.
 
 | Order | Action | Effort | Impact |
 |---:|---|---:|---|
-| 1 | Collect two more time-separated local v0.3.0 model-regression runs and review the five-run baseline. | Observation over multiple runs | High |
-| 2 | Improve runner metadata and failure-phase reporting only for observability gaps demonstrated by the three existing runs. | 0.5-1 day | High |
+| 1 | Improve runner metadata and failure-phase reporting only for observability gaps demonstrated by the three existing runs. Do not change model-facing inputs. | 0.5-1 day | High |
+| 2 | Collect two more time-separated local v0.3.0 model-regression runs with the instrumented runner and review the five-run baseline. | Observation over multiple runs | High |
 | 3 | Consolidate `SKILL.md`, clarify the candidate-catalog and contextual-blocking contracts, and preserve the verified three-step behavior. | 1-2 days | High |
 | 4 | Formalize the optional interfaces and broaden deterministic fixture coverage. | 1-2 days | High |
 | 5 | Establish a fresh repeated model baseline for the consolidated payload. | Observation over multiple runs | High |
@@ -373,6 +373,8 @@ Completed foundation:
   and GitHub Release versions.
 - Added and locally verified the non-blocking Codex model regression runner,
   deterministic grader, isolated fixture, and trusted-trigger hosted workflow.
+- Added runner-only timing, usage, last-event, artifact, and failure-phase
+  summaries without changing model-facing regression inputs.
 - Added a minimal root `AGENTS.md` that routes to canonical sources without
   duplicating methodology or maintainer instructions.
 - Verified skills CLI 1.5.16 discovers the single skill directly from
