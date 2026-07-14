@@ -2,7 +2,7 @@
 
 **Status:** Codex-first development
 
-**Last reconciled:** 2026-07-13
+**Last reconciled:** 2026-07-14
 
 This roadmap is based on the current repository, recorded compatibility tests,
 official platform documentation, and the research sources listed below. It
@@ -44,7 +44,7 @@ targets, not verified support claims.
 | Skills CLI 1.5.16 discovers `skills/<name>/SKILL.md` directly and lists Codex, Cursor, OpenCode, GitHub Copilot, and Hermes installation targets. An isolated local `--list` check found exactly `repo-health-scan` without root `plugin.json`. | Treat skills CLI discovery as verified independently of agent execution; do not add duplicate root metadata for this path. |
 | Claude Code reads `CLAUDE.md`, not `AGENTS.md`, and officially supports importing `AGENTS.md` with `@AGENTS.md`. | If Claude Code becomes active, use an import adapter instead of duplicating repository instructions. |
 | Official Codex non-interactive guidance documents `codex exec --json`, ephemeral sessions, explicit sandboxes, and machine-readable output schemas. | Use raw JSONL locally and a schema-constrained final result for deterministic grading. |
-| Official Codex GitHub Action guidance keeps the API key behind a proxy and supports read-only execution on trusted triggers. | Use the official action for manual and scheduled hosted runs; never expose the key to repository shell steps. |
+| Official Codex GitHub Action guidance keeps the API key behind a proxy and supports read-only execution on trusted triggers. | Retain the official Action as optional infrastructure for maintainers with API-key billing; never make it a prerequisite for local evaluation or repository exploration. |
 
 Primary sources and research, accessed 2026-07-12 or 2026-07-13:
 
@@ -88,14 +88,19 @@ Primary sources and research, accessed 2026-07-12 or 2026-07-13:
 | Security and trust | `scripts/check-trust.py` enforces bounded triggers, read-only instructions, opt-in network/output behavior, credential hygiene, versioned compatibility evidence, and payload separation. |
 | Release consistency | The checker validates `SKILL.md`, plugin metadata, `CITATION.cff`, tags, and GitHub releases. Strict CI queries use a read-only job token. |
 | Repository verification | Script self-tests, Ruff, ShellCheck, documentation audit, plugin validation, skill validation, and diff checks pass independently. |
-| Local model regression | The first Codex CLI 0.133.0 run passed positive selection, profile/plan ordering, evidence-backed dimension accounting, seeded finding quality, and negative non-selection. |
+| Local model regression | Two Codex CLI 0.133.0 runs passed positive selection, profile/plan ordering, evidence-backed dimension accounting, seeded finding quality, and negative non-selection. |
 
 ### Remaining Gaps
 
 | Gap | Consequence | Priority |
 |---|---|---|
-| The hosted Codex Action workflow has not completed its first run. | Local auth and execution do not prove the GitHub secret, action, and artifact path work together. | High |
-| The model harness has one passing run and no reliability baseline. | A single pass cannot justify making the workflow blocking or estimate stable runtime and usage. | Medium |
+| The model harness has two passing local runs and no five-run reliability baseline. | Two passes cannot yet justify expanding the profile contract or estimate stable runtime and usage. | High |
+
+The hosted Codex Action is not a product gap. It requires API-key billing, which
+is separate from the ChatGPT subscription used by the current maintainer's
+authenticated local Codex CLI. Keep the workflow available as an optional path,
+but do not use its unverified status to block local development, cloning, skill
+discovery, or profile scaling.
 
 ---
 
@@ -154,7 +159,8 @@ all identify version `0.3.0`.
 
 ### 5.2 Implemented: Model-Driven Regression Harness
 
-**Local result:** `verified_once` on Codex CLI 0.133.0 on 2026-07-13.
+**Local result:** `verified_twice` on Codex CLI 0.133.0 on 2026-07-13 and
+2026-07-14.
 
 The harness now includes:
 
@@ -176,10 +182,11 @@ First-run assertions:
 - All ten candidate dimensions were active or explicitly skipped.
 - The seeded dirty-tree finding named the defect, harm, and remediation.
 
-The hosted workflow remains `pending_first_run`. Keep the deterministic JSON
-eval as the fast CI layer and do not make ordinary pull requests depend on the
-model run until repeated executions demonstrate reliability, runtime, and
-acceptable usage.
+Local regression is the primary reliability path because it can use the current
+maintainer's authenticated Codex CLI. The hosted workflow remains an optional
+`pending_first_run` path for a future maintainer with API-key billing. Keep the
+deterministic JSON eval as the fast CI layer and do not make ordinary pull
+requests depend on model availability.
 
 ### 5.3 Implemented: Minimal Repository Routing
 
@@ -212,6 +219,7 @@ These items are intentionally outside the current Codex-first milestone:
 | `repo-sync` companion skill | Scan findings and the human approval boundary are stable. |
 | Organization-wide scanner and dashboard | Single-repository JSONL behavior is executable and evaluated, not only instructional. |
 | Generic CI integration guide | A real agent runtime and failure policy are selected. |
+| Hosted Codex Action activation | A maintainer has API-key billing and wants scheduled GitHub-hosted model runs. |
 | `CHANGELOG.md` | Release cadence makes a changelog more useful than GitHub release notes alone. |
 
 No deferred item should appear in README as verified support before its own
@@ -256,9 +264,15 @@ Profile rules:
 - Unknown is valid; never invent a value to activate a check.
 - Modules add questions, not mandatory PASS/FAIL dimensions.
 
-Implement profile modules only after repeated model-regression runs establish a
-reliability and usage baseline; otherwise they expand the behavior surface
-before the evaluation path is proven stable.
+Implement profile modules only after at least five recorded model-regression
+runs establish a reliability and usage baseline. Local runs through an
+authenticated Codex CLI are sufficient; hosted runs are optional. Record the
+CLI/model version, pass or failure, duration, and token usage for each run.
+
+After the baseline is reviewed, profile scaling requires implementation work in
+the canonical `SKILL.md`, deterministic eval fixtures and validators, and the
+model grader. Rerun the model regression after those changes before describing
+the expanded profile contract as verified.
 
 ---
 
@@ -266,10 +280,14 @@ before the evaluation path is proven stable.
 
 | Order | Action | Effort | Impact |
 |---:|---|---:|---|
-| 1 | Configure the API-key secret, pass one manual hosted run, then enable the schedule and collect at least five runs with pass rate, duration, and token usage. | 1-2 hr plus observation | High |
-| 2 | Tune the harness only for observed reliability or usage problems. | 0.5-1 day | Medium |
-| 3 | Select one non-Codex agent and verify installation, discovery, positive selection, negative non-selection, and read-only behavior in an isolated fixture. | 0.5-1 day | Medium |
-| 4 | Add evidence-activated profile modules with field budgets. | 1 day | Medium |
+| 1 | Collect at least three more local model-regression runs and record pass rate, CLI version, model identifier when available, duration, and token usage for a five-run baseline. | Observation over multiple runs | High |
+| 2 | Review the baseline and tune the harness only for observed reliability or usage problems. | 0.5-1 day if needed | Medium |
+| 3 | Add evidence-activated profile modules and their field budgets to `SKILL.md`, eval fixtures, validators, and the model grader; then rerun regression. | 1-2 days | Medium |
+
+Optional, unordered infrastructure: activate the hosted Codex Action only if a
+maintainer later has API-key billing and wants GitHub-hosted scheduling. It is
+not required to complete this queue. Non-Codex agent verification remains
+deferred under Section 6 rather than competing with the Codex reliability path.
 
 Completed foundation:
 

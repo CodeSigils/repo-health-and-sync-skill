@@ -158,7 +158,7 @@
       "id": "model-regression-status",
       "description": "Records local and hosted model regression status",
       "type": "regex",
-      "pattern": "Local status: `verified_once`\\. Hosted workflow status: `pending_first_run`"
+      "pattern": "Local status: `verified_twice`\\. Hosted workflow status: `pending_first_run`"
     },
     {
       "id": "model-regression-local-command",

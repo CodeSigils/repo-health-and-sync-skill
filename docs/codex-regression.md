@@ -4,7 +4,11 @@ Status: non-blocking maintainer evaluation implemented against Codex CLI
 0.133.0. Later versions require their own recorded run before they become a
 compatibility claim.
 
-Local status: `verified_once`. Hosted workflow status: `pending_first_run`.
+Local status: `verified_twice`. Hosted workflow status: `pending_first_run`.
+
+Local runs through an authenticated Codex CLI are the primary reliability path.
+The hosted workflow is optional infrastructure for maintainers with API-key
+billing; its status does not block local evaluation or profile scaling.
 
 This harness complements `evals/cases/repo-health-scan.json`. The existing JSON
 contract remains the fast deterministic CI gate; the model regression checks
@@ -73,18 +77,42 @@ usable temporary directory. That limitation did not affect the trigger test or
 the model's identification of the narrow parser fix. The local CLI also logged
 a non-fatal stale model-cache warning; both turns still completed normally.
 
-One pass is not a reliability baseline. Record repeated hosted and local runs
-before using this workflow as a required check or expanding the profile
-contract.
+One pass is not a reliability baseline. Record at least five runs before
+expanding the profile contract. Local runs are sufficient; hosted runs may
+contribute when API-key billing is available.
 
-## GitHub Actions
+## Reliability Run Log
+
+Record each completed run here. Preserve failed runs and notable deviations so
+the baseline reflects model reliability rather than only successful attempts.
+Use `not recorded` for historical data that cannot be recovered.
+
+| Run | Date | Execution | CLI | Model | Grade | Duration | Token usage | Notes |
+|---:|---|---|---|---|---|---|---|---|
+| 1 | 2026-07-13 | Local | 0.133.0 | not recorded | Pass | not recorded | 153,545 input (112,384 cached); 5,141 output; 774 reasoning | Negative-run pytest could not use a temporary directory; non-fatal stale model-cache warning. |
+| 2 | 2026-07-14 | Local | 0.133.0 | not emitted | Pass | 2m 05s | 136,050 input (106,880 cached); 5,535 output; 1,233 reasoning | Positive and negative scenarios passed; non-fatal stale model-cache warning. |
+
+The reliability baseline is complete after five recorded runs include the
+CLI version, pass or failure, duration, and token usage. Record the model when
+the CLI emits it or the run selects one explicitly; do not infer a default model
+from the CLI version. Review the pass rate and deviations before changing the
+harness or expanding `SKILL.md`.
+
+Excluded infrastructure attempt: on 2026-07-14, a run inside the restricted
+network sandbox timed out after 900 seconds immediately after `turn.started`,
+without receiving model content. It is not counted as a model-reliability run;
+the successful run above used the authenticated CLI with network access.
+
+## Optional GitHub Actions
 
 `.github/workflows/codex-regression.yml` runs only by trusted manual dispatch or
 the weekly schedule. It is intentionally absent from push and pull-request
 triggers, so model availability, cost, and nondeterminism cannot block ordinary
 changes.
 
-Configure an `OPENAI_API_KEY` repository secret before dispatching the workflow.
+This path requires API-key billing; a ChatGPT subscription used to authenticate
+the local Codex CLI does not provide the workflow secret. Configure an
+`OPENAI_API_KEY` repository secret before dispatching the workflow.
 The workflow uses the official `openai/codex-action` with its read-only safety
 strategy instead of exposing the key to repository-controlled shell steps. It
 uploads the two final responses and deterministic grade for 14 days. Detailed
@@ -102,9 +130,9 @@ or false, avoiding predictable failures before credentials are provisioned.
 
 A single pass is evidence for that model, CLI, prompt, and fixture execution;
 it is not proof that every future run will pass. Keep this workflow non-blocking
-until repeated scheduled runs establish an acceptable pass rate, runtime, and
-cost. Investigate failures from the captured artifacts before changing the
-skill or grader.
+until at least five recorded local or hosted runs establish an acceptable pass
+rate, runtime, and usage. Investigate failures from the captured artifacts
+before changing the skill or grader.
 
 Official Codex references, accessed 2026-07-13:
 
