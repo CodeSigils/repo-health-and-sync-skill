@@ -276,7 +276,10 @@ These items are intentionally outside the current Codex-first milestone:
 | `CHANGELOG.md` | Release cadence makes a changelog more useful than GitHub release notes alone. |
 
 No deferred item should appear in README as verified support before its own
-fixture or compatibility report exists.
+fixture or compatibility report exists. Apply the claim levels, thin-adapter
+boundary, and runtime certification requirements in
+`docs/portability-contract.md`; do not substitute a universal agent matrix for
+per-target evidence.
 
 ---
 
@@ -425,6 +428,9 @@ Completed foundation:
     establish installation, selection, or behavioral compatibility.
 11. A material `SKILL.md` change starts a new behavioral evidence baseline;
     results for an older payload remain historical evidence only.
+12. Cross-agent support follows `docs/portability-contract.md`: one canonical
+    payload, thin platform adapters, deterministic structural checks, and
+    compatibility claims certified per named runtime and version.
 
 ---
 
@@ -447,6 +453,7 @@ repo-health-and-sync-skill/
 │       └── repo-health-scan.json
 ├── docs/
 │   ├── codex-setup.md                  # verified Codex setup
+│   ├── portability-contract.md         # cross-agent claim and adapter rules
 │   ├── maintaining.md
 │   ├── decisions.md
 │   └── compatibility-reports/

@@ -76,6 +76,9 @@ unsupported frontmatter key. Codex installation, implicit discovery, and
 workflow behavior are tracked in `docs/compatibility-reports/codex.md`; other
 agents remain unverified.
 
+The normative claim levels, adapter boundary, and evidence requirements are
+defined in `docs/portability-contract.md`.
+
 ---
 
 ## CI API Authentication Is Separate From Commit Signing

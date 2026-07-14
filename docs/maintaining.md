@@ -26,6 +26,34 @@ Subject line: `type: scope — description`.
 | `fix:` | Bug fix in SKILL.md |
 | `chore:` | Housekeeping (.gitignore, CI) |
 
+## Change admission gate
+
+Apply this gate before adding methodology, automation, adapters, schemas, or
+shared abstractions. It is a maintainer judgment aid, not an automated score.
+
+1. What observed failure or repeated cost motivates the change?
+2. Which established specification or first-party implementation was checked?
+3. Can an existing mechanism be adopted instead of creating another one?
+4. What is the smallest change that addresses the evidence?
+5. Has the pattern occurred in two concrete uses before shared infrastructure
+   is extracted?
+6. What runtime-payload or maintenance complexity will the change add?
+7. What evidence will show that the change worked or should be removed?
+
+Use these decision rules:
+
+- No observed problem: defer it. Record project-specific possibilities in the
+  roadmap or issue tracker; keep broader research questions in a
+  non-authoritative study log.
+- An established mechanism fits: adopt it and document only the local choice.
+- One concrete use: keep the solution local rather than generalizing it.
+- The behavior surface grows: require proportionate evaluation evidence.
+- A milestone just completed: consolidate and collect evidence before expanding.
+
+Do not create a proposal database, scoring framework, or validator for this
+gate. Revisit that decision only after repeated maintainer failures show that
+the human-reviewed checklist is insufficient.
+
 ## Verification checklist
 
 Before marking work done, run through in order:
@@ -71,6 +99,7 @@ repository-health work to `SKILL.md` and repository changes to this file.
 ├── docs/                          # Maintainer docs (not shipped)
 │   ├── README.md
 │   ├── codex-setup.md
+│   ├── portability-contract.md      # cross-agent claim and adapter rules
 │   ├── maintaining.md
 │   ├── decisions.md
 │   ├── research.md

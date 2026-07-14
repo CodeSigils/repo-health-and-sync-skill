@@ -13,5 +13,7 @@ tools on PATH.
 - [decisions.md](decisions.md) — what was built, why, phase rationale, anti-patterns avoided
 - [codex-setup.md](codex-setup.md) — verified repository-local and plugin setup
 - [codex-regression.md](codex-regression.md) — non-blocking model regression harness
+- [portability-contract.md](portability-contract.md) — canonical payload,
+  adapter, evidence, and per-runtime certification rules
 - [maintaining.md](maintaining.md) — developer workflow and verification
 - [research.md](research.md) — survey data, ecosystem tables, evidence that informed decisions

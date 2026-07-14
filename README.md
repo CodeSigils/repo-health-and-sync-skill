@@ -50,7 +50,9 @@ repository-local and marketplace procedures are in the
 
 Other agents may be able to consume the portable `SKILL.md`, but installation,
 discovery, and workflow behavior remain unverified. Platform-specific setup
-instructions will be added only with a matching compatibility report.
+instructions will be added only with a matching compatibility report. The
+[skill portability contract](docs/portability-contract.md) defines the claim
+levels and evidence required before support is advertised.
 
 ---
 
@@ -120,6 +122,7 @@ Optional behavior is explicit:
 │   ├── README.md
 │   ├── codex-setup.md
 │   ├── codex-regression.md
+│   ├── portability-contract.md
 │   ├── compatibility-reports/
 │   │   └── codex.md
 │   ├── maintaining.md
@@ -180,6 +183,8 @@ one the skill defines.**
 - [Codex setup guide](docs/codex-setup.md) — repository-local and plugin setup
 - [Codex model regression](docs/codex-regression.md) — isolated runner, grader,
   and non-blocking workflow
+- [Skill portability contract](docs/portability-contract.md) — canonical
+  payload, thin adapters, and per-runtime certification
 - [Growth roadmap](repo-health-skill-roadmap.md) — verified scope and ordered
   follow-ups
 - [Maintainer guide](docs/maintaining.md) — repository verification and release
