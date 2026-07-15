@@ -269,14 +269,16 @@ grep -c 'paths:' .github/workflows/*.yml 2>/dev/null && echo "scoped" \
 grep -n 'which\|grep -P\|sed -i[^.]' scripts/*.sh 2>/dev/null \
   | head -10 || echo "no patterns found"
 
-# Attribution drift
+# Attribution drift + secret scan
 if git rev-parse --verify origin/main >/dev/null 2>&1; then
   range="origin/main..HEAD"
 else
   range="HEAD"
 fi
-git log --format="%B" "$range" 2>/dev/null \
-  | grep -c 'Co-authored-by:' || echo "0"
+git log --format="%B" "$range" 2>/dev/null | tee /tmp/commit-bodies.txt | grep -c 'Co-authored-by:' || echo "0"
+# Scan commit bodies for secret-like patterns
+grep -E '(api[_-]?key|secret|token|password|passwd|credential)\s*[:=]\s*[A-Za-z0-9_\-]{20,}' /tmp/commit-bodies.txt >/dev/null && echo "SECRET PATTERN in commit message body" || echo "No secret patterns in commit messages"
+rm -f /tmp/commit-bodies.txt
 
 # .gitignore coverage
 for pat in '.DS_Store' 'node_modules/' '__pycache__/' '.vscode/'; do
