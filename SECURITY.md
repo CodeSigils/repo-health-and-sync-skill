@@ -1,10 +1,12 @@
 # Security Policy
 
-## Supported Versions
+Report security issues privately through the
+[GitHub Security Advisory](https://github.com/CodeSigils/repo-health-and-sync-skill/security/advisories/new)
+rather than opening a public issue.
 
-This repo is a single-SKILL.md methodology skill with CI-only tooling in
-`scripts/`. Security fixes are supported on the latest release and `main`;
-older tags do not receive backports.
+Security concerns in this repository include unsafe instructions in the skill
+methodology, supply-chain risks in CI tooling, or references to compromised
+external resources. Do not include exploit details in public reports.
 
 ## Skill Trust Checklist
 
@@ -24,19 +26,3 @@ run through `python3 scripts/check-trust.py` in local verification and CI.
   scripts, evals, CI, and documentation.
 
 Last reviewed: 2026-07-13 against Codex CLI 0.133.0.
-
-## Reporting a Vulnerability
-
-This project contains no runtime dependencies, no secrets, and no network-facing
-service. It ships a single governance skill
-(`skills/repo-health-and-sync-skill/SKILL.md`) with no supporting scripts or
-reference files — the agent discovers everything at runtime using tools already
-on PATH. CI-only tooling lives in `scripts/` and `.github/` and is not shipped
-to users.
-
-If you find an issue with the content or CI configuration, please open a public
-issue on GitHub.
-
-Do **not** open a public issue if the vulnerability involves the GitHub
-Actions workflow (e.g., leaked secrets in CI logs). Report privately to the
-repository owner via GitHub's security advisory tool.
