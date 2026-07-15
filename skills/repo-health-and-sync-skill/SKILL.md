@@ -322,6 +322,12 @@ and stop. Do not continue checking other dimensions — fix the block first.
 
 | **Structured output** | Emit JSONL for automation | `REPO_HEALTH_OUTPUT=jsonl` env var (opt-in) |
 
+If any finding contains sensitive values (API keys, tokens, passwords,
+connection strings, private URLs), **redact the value before including it in
+the report**. Flag the presence of a potential secret without exposing the
+secret itself — e.g. "a hard-coded credential was found in config.py" not
+"API_KEY = sk-1234...".
+
 Example JSONL output:
 ```jsonl
 {"dimension":"version_alignment","finding":"pyproject=1.2.0 Cargo=1.1.0","harm":"stale release","remediation":"sync to 1.2.0","confidence":0.95}
@@ -372,6 +378,8 @@ check replaces the default probe for that dimension.
 - Producing findings for tooling that is maintainer-only, not shipped runtime
   payload
 - Emitting JSONL when `REPO_HEALTH_OUTPUT=jsonl` was not requested
+- Including credential material, tokens, or secrets in findings without
+  redaction — flag existence, not values
 
 ## Verification
 
@@ -387,6 +395,8 @@ After completing the scan:
 - [ ] Blocking findings are named explicitly and placed first
 - [ ] Maintainer-only scripts are not described as shipped runtime payload
 - [ ] JSONL output is emitted only when `REPO_HEALTH_OUTPUT=jsonl` is set
+- [ ] Credentials, tokens, or secrets are redacted or reported by existence
+  only, not included as raw values in findings
 
 ---
 
