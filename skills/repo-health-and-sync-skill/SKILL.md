@@ -87,6 +87,9 @@ find . -maxdepth 2 -name 'requirements*.txt' -o -name 'Cargo.toml' \
 # Is there a pre-existing health convention?
 cat .repo-health.json 2>/dev/null || echo "no .repo-health.json"
 
+# What does the project's .gitignore cover? (respect it when exploring)
+cat .gitignore 2>/dev/null || echo "no .gitignore"
+
 # Did the user or environment opt into a conditional check?
 printf 'verify_refs=%s\n' "${REPO_HEALTH_VERIFY_REFS:-0}"
 printf 'verify_releases=%s\n' "${REPO_HEALTH_VERIFY_RELEASES:-0}"
