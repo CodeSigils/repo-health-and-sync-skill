@@ -3,12 +3,23 @@
 [![Release](https://img.shields.io/github/v/release/CodeSigils/repo-health-and-sync-skill?label=release)](https://github.com/CodeSigils/repo-health-and-sync-skill/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-A methodology skill that teaches agents how to evaluate any git repository's
-health at runtime. The agent discovers the repo's shape, infers what
-invariants matter, and checks them using tools already on PATH.
+**Repo Health Scan** — audits any git repository for release readiness,
+maintenance drift, and handoff health. The agent discovers the repo's
+shape, infers what invariants matter, and reports findings with concrete
+harm and remediation.
 
-No hardcoded checklists. No reference files. No shipped runtime scripts.
-The methodology is the only shipped skill artifact.
+This skill handles pre-release audits, unfamiliar-repo onboarding,
+dormant-repo revival, CI failure triage, and AI-assisted commit review.
+Works on any git repository — Python, Rust, shell, docs-only, or monorepo.
+
+It does **not** ship hardcoded checklists, runtime scripts, or reference
+files. Pair it with
+[`py-review-skill`](https://github.com/CodeSigils/py-review-skill) for
+dedicated Python code review.
+
+The shipped payload is one `SKILL.md` — no agent-specific commands or
+paths — so it works with any terminal-capable coding agent. It is
+agentskills.io-compatible.
 
 **Compatibility status:** Codex CLI 0.133.0 is the only verified agent target.
 The `SKILL.md` payload is designed to be portable, but other agents are not
