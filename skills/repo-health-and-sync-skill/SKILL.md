@@ -282,6 +282,10 @@ git log --format="%B" "$range" 2>/dev/null \
 for pat in '.DS_Store' 'node_modules/' '__pycache__/' '.vscode/'; do
   grep -q "$pat" .gitignore 2>/dev/null || echo "MISSING: $pat"
 done
+# Secret-bearing patterns — use git check-ignore to handle negations correctly
+for f in .env .env.local .env.production; do
+  git check-ignore --no-index "$f" >/dev/null 2>&1 || echo "MISSING: $f (not ignored)"
+done
 ```
 
 Run only the commands for dimensions you deemed relevant. Skip the rest.
