@@ -208,3 +208,22 @@ platform that can run `git`, `shellcheck`, `python3`, and `gh`.
 - **DCO App**: github.com/dcoapp/app (337★) — Signed-off-by enforcement bot
 - **Linux kernel DCO v1.1**: docs.kernel.org — origin of Signed-off-by
   trailer convention
+
+---
+
+## 9. Secret handling in repository audits (v0.3.0 addition)
+
+**Finding:** Repository audits that extract content via `git log --format=%B`, `cat`, `grep` risk exposing credentials present in commit messages, config files, or ignored files.
+
+**Evidence:**
+- Common secret patterns in commit messages: `api_key=sk-...`, `password=...`, `token=...` (observed in public corpuses)
+- `.gitignore` grep checks produce false negatives when negation patterns exist (`!.env.local`) — `git check-ignore --no-index` correctly respects gitignore semantics
+- Agent skill payloads that instruct "report findings with concrete harm" need an explicit redaction rule to prevent secret leakage in audit output
+
+**Mitigation implemented in methodology:**
+1. Commit-body secret scan (regex for api_key, secret, token, password, credential) during attribution drift check
+2. `.gitignore` secret-pattern check via `git check-ignore --no-index` (handles negations)
+3. Step 3 redaction instruction: "flag existence, not values"
+4. Red Flag + Verification checklist items for secret handling
+
+**Open question:** Whether opt-in `REPO_HEALTH_VERIFY_REFS=1` external URL checks should also scan response bodies for secret patterns.
