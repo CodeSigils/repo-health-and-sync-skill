@@ -8,6 +8,10 @@ Security concerns in this repository include unsafe instructions in the skill
 methodology, supply-chain risks in CI tooling, or references to compromised
 external resources. Do not include exploit details in public reports.
 
+Issues that do not involve the GitHub Actions workflow (leaked secrets in CI
+logs, workflow injection) can be opened as public GitHub issues. Report
+CI-related vulnerabilities through the advisory link above.
+
 ## Skill Trust Checklist
 
 Maintainers must review this checklist whenever the skill instructions,
