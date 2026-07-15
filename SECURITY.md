@@ -28,5 +28,8 @@ run through `python3 scripts/check-trust.py` in local verification and CI.
 - [x] Compatibility claims name the tested agent and exact version.
 - [x] The shipped `SKILL.md` payload remains separate from maintainer-only
   scripts, evals, CI, and documentation.
+- [x] Report guidance instructs agents to redact credentials, tokens, and
+  secrets before including them in findings — flag existence, not values.
 
-Last reviewed: 2026-07-13 against Codex CLI 0.133.0.
+Last reviewed: 2026-07-15 after adding secret redaction guard to SKILL.md Step 3
+report guidance.
