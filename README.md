@@ -139,6 +139,7 @@ Install above).
 │       └── codex-regression.yml      # Non-blocking model evaluation
 ├── .codex-plugin/
 │   └── plugin.json       # Codex plugin manifest
+├── .gitattributes
 ├── .gitignore
 ├── AGENTS.md             # Repository-level agent routing
 ├── CITATION.cff
