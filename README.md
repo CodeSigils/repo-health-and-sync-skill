@@ -113,6 +113,23 @@ Optional behavior is explicit:
 
 ---
 
+## Skill Payload — What Ships to the User
+
+Only the `skills/` directory is the runtime payload. Everything else is
+development infrastructure — scripts, CI, docs, evals, plugin manifests.
+
+```text
+skills/
+└── repo-health-and-sync-skill/
+    └── SKILL.md      # 3-step methodology — discover, infer, report
+```
+
+One file. No scripts, no config files, no dependencies. Copy only
+`skills/repo-health-and-sync-skill/` to your agent's skill directory (see
+Install above).
+
+---
+
 ## Project structure
 
 ```text
