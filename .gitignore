@@ -38,6 +38,12 @@ output/
 venv/
 .ruff_cache/
 
+# Local environment and secret files (keep shareable templates)
+.env
+.env.*
+!.env.example
+!.env.*.example
+
 # Model regression workspaces and captured transcripts
 .codex-regression/
 artifacts/

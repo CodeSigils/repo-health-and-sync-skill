@@ -14,10 +14,11 @@ on:
       - 'repo-health-skill-roadmap.md'
       - 'SECURITY.md'
       - 'LICENSE'
+      - 'CITATION.cff'
       - '.gitignore'
       - '.repo-health.json'
       - '.codex-plugin/plugin.json'
-      - '.github/workflows/ci.yml'
+      - '.github/workflows/**'
   pull_request:
     branches: [main]
     paths:
@@ -30,10 +31,11 @@ on:
       - 'repo-health-skill-roadmap.md'
       - 'SECURITY.md'
       - 'LICENSE'
+      - 'CITATION.cff'
       - '.gitignore'
       - '.repo-health.json'
       - '.codex-plugin/plugin.json'
-      - '.github/workflows/ci.yml'
+      - '.github/workflows/**'
   schedule:
     - cron: "0 9 * * 1"
 
