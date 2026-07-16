@@ -203,6 +203,10 @@ assess its health. Step 1 is not optional.
 **The right number of checks is the one the repo needs, not the
 one the skill defines.**
 
+**Audit without leaking.** Secret checks emit counts, status, or locations —
+never raw credential values or unredacted commit-message contents. Ignored and
+tracked state are separate: `.gitignore` cannot protect a file already in Git.
+
 ---
 
 ## See also

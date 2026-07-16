@@ -38,8 +38,8 @@ Current product assessment:
 
 - The profile-first and evidence-linked planning contract is useful and
   differentiates the skill from a generic health checklist.
-- The current payload is too instruction-heavy for its intended role. At 442
-  lines, overlapping examples, rationalizations, red flags, and repeated design
+- The current payload is too instruction-heavy for its intended role.
+  Overlapping examples, rationalizations, red flags, and repeated design
   principles increase context cost and create more opportunities for partial
   adherence.
 - The ten dimensions behave as an evidence-activated candidate catalog. Calling
@@ -114,14 +114,14 @@ Primary sources and research, accessed 2026-07-12 or 2026-07-13:
 | Security and trust | `scripts/check-trust.py` enforces bounded triggers, read-only instructions, opt-in network/output behavior, credential hygiene, versioned compatibility evidence, and payload separation. |
 | Release consistency | The checker validates `SKILL.md`, plugin metadata, `CITATION.cff`, tags, and GitHub releases. Strict CI queries use a read-only job token. |
 | Repository verification | Script self-tests, Ruff, ShellCheck, documentation audit, plugin validation, skill validation, and diff checks pass independently. |
-| Local model regression | Two Codex CLI 0.133.0 runs passed positive selection, profile/plan ordering, evidence-backed dimension accounting, seeded finding quality, and negative non-selection. |
+| Local model regression | Five Codex CLI 0.133.0 runs are recorded: three passes, one timeout, and one deterministic grading failure. The hardened current payload passed once after the grader exposed and prompted removal of a JSONL/dimension ambiguity. |
 
 ### Remaining Gaps
 
 | Gap | Consequence | Priority |
 |---|---|---|
-| The model harness has three recorded local runs (two passes and one timeout) and no five-run reliability baseline. | A 66.7% observed pass rate requires more evidence and failure review before expanding the profile contract. | High |
-| `SKILL.md` is 442 lines and repeats examples, cautions, and design principles around a compact three-step contract. | Excess instruction surface increases token use and makes partial or inconsistent adherence more likely. | High |
+| Five local runs are recorded, but the last two were same-session and the payload changed between them after a grading failure. | The 60% historical pass rate is diagnostic; the hardened current payload has only one passing run and needs time-separated repeated evidence. | High |
+| `SKILL.md` repeats examples, cautions, and design principles around a compact three-step contract. | Excess instruction surface increases token use and makes partial or inconsistent adherence more likely. | High |
 | The fixed dimension table is presented alongside a "not a checklist" claim, and blocking behavior is more rigid than the contextual-severity principle. | Agents may anchor on the catalog as exhaustive or stop an audit before reporting other useful evidence. | High |
 | `.repo-health.json` and JSONL are agent-interpreted examples without versioned deterministic schemas. | Different agents may produce incompatible behavior while appearing to support the same interface. | Medium |
 | Deterministic fixtures cover this skill pack and one Python library shape. | The contract has limited evidence for missing tools, monorepos, docs products, repositories without `origin/main`, and intentionally dirty development trees. | Medium |
@@ -135,16 +135,20 @@ discovery, or profile scaling.
 
 ### Current Decision Gate
 
-The repository is under a model-facing change freeze until the five-run v0.3.0
-baseline is complete and reviewed. Do not change `SKILL.md`, the regression
-prompt, the graded workflow contract, or the model output schema during the two
-remaining time-separated runs. Maintainer documentation and fixes that preserve
-the model-facing inputs may continue.
+The initial five-run evidence set is recorded and reviewed, but it is not a
+stable baseline for one payload. An observed secret-exposure risk justified a
+security change during the former freeze, and run 4 then exposed a JSONL versus
+dimension ambiguity that was corrected before run 5. Freeze further
+model-facing changes while collecting time-separated repeats of the hardened
+payload. Maintainer documentation and fixes that preserve model-facing inputs
+may continue.
 
 The required sequence is:
 
-1. Collect runs four and five without changing the released payload.
-2. Review the five-run pass rate, failure phases, runtime, and token use.
+1. **Completed:** record and review the initial five runs, preserving the
+   timeout, grading failure, runtime, and token evidence.
+2. Collect time-separated repeated runs for the hardened payload without
+   changing model-facing inputs.
 3. Consolidate the core methodology and contextual blocking behavior only if
    the baseline review supports proceeding.
 4. Establish a fresh repeated baseline for the consolidated payload.
@@ -212,8 +216,10 @@ all identify version `0.3.0`.
 
 ### 5.2 Implemented: Model-Driven Regression Harness
 
-**Local result:** `verified_twice` on Codex CLI 0.133.0 on 2026-07-13 and
-2026-07-14.
+**Local result:** five runs recorded on Codex CLI 0.133.0 through 2026-07-16:
+three passes, one timeout, and one deterministic grading failure. The current
+hardened payload has one passing run; see `docs/codex-regression.md` for the
+full evidence and same-session caveat.
 
 The harness now includes:
 
@@ -287,15 +293,16 @@ per-target evidence.
 
 **Status:** profile modules are explicitly deferred.
 
-Completing the current five-run v0.3.0 baseline does not automatically unlock
-profile modules. It only characterizes the released payload. Before adding any
-module, complete these gates in order:
+The initial five-run evidence set does not automatically unlock profile modules,
+especially because it spans payload changes. Before adding any module, complete
+these gates in order:
 
 1. **Completed:** regression observability records CLI and model identity when
    available, elapsed time, usage, last-event time, failure phase, and preserved
    first-attempt outcomes. This shipped in commit `f21214c`.
-2. Finish the two remaining time-separated v0.3.0 regression runs with that
-   observability and review pass rate, runtime, token use, and failure phases.
+2. **Completed with caveat:** five runs now record observability and failure
+   phases, but runs 4 and 5 were same-session and straddled a payload fix; treat
+   them as diagnostic evidence rather than a stable repeated baseline.
 3. Consolidate the core methodology while preserving the verified three-step
    contract. Target a 30-50% payload reduction where it can be achieved without
    weakening trigger boundaries, read-only behavior, profile-first ordering,
@@ -366,10 +373,10 @@ surface expansion.
 
 | Order | Action | Effort | Impact |
 |---:|---|---:|---|
-| 1 | Collect two more time-separated local v0.3.0 model-regression runs with the instrumented runner. Preserve model-facing inputs and all first-attempt outcomes. | Observation over multiple runs | High |
-| 2 | Review the five-run baseline before authorizing payload changes: pass rate, failure phases, runtime, token use, and evidence quality. | 0.5 day | High |
-| 3 | If the review supports proceeding, consolidate `SKILL.md`, clarify the candidate-catalog and contextual-blocking contracts, and preserve the verified three-step behavior. | 1-2 days | High |
-| 4 | Establish a fresh repeated model baseline for the consolidated payload; do not reuse the v0.3.0 rate as proof. | Observation over multiple runs | High |
+| 1 | Collect time-separated local regression runs for the hardened payload without changing model-facing inputs. Preserve all first-attempt outcomes. | Observation over multiple runs | High |
+| 2 | Review the hardened-payload pass rate, failure phases, runtime, token use, and evidence quality. | 0.5 day | High |
+| 3 | If that review supports proceeding, consolidate `SKILL.md`, clarify the candidate-catalog and contextual-blocking contracts, and preserve the verified three-step behavior. | 1-2 days | High |
+| 4 | Establish a fresh repeated model baseline for the consolidated payload; do not reuse earlier rates as proof. | Observation over multiple runs | High |
 | 5 | Formalize the optional interfaces and broaden deterministic fixture coverage against the stable consolidated contract. | 1-2 days | High |
 | 6 | Decide whether profile modules are justified. Keep them deferred by default; if approved, implement and evaluate one module at a time. | Review, then 0.5-1 day per approved module | Medium |
 

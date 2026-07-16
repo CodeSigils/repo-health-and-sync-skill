@@ -213,7 +213,10 @@ platform that can run `git`, `shellcheck`, `python3`, and `gh`.
 
 ## 9. Secret handling in repository audits (v0.3.0 addition)
 
-**Finding:** Repository audits that extract content via `git log --format=%B`, `cat`, `grep` risk exposing credentials present in commit messages, config files, or ignored files.
+**Finding:** Repository audits that print content from commit metadata or
+configuration files risk exposing credentials present in messages, config, or
+ignored files. Detection should return counts, status, or locations without
+echoing matching values.
 
 **Evidence:**
 - Common secret patterns in commit messages: `api_key=sk-...`, `password=...`, `token=...` (observed in public corpuses)
@@ -221,9 +224,16 @@ platform that can run `git`, `shellcheck`, `python3`, and `gh`.
 - Agent skill payloads that instruct "report findings with concrete harm" need an explicit redaction rule to prevent secret leakage in audit output
 
 **Mitigation implemented in methodology:**
-1. Commit-body secret scan (regex for api_key, secret, token, password, credential) during attribution drift check
-2. `.gitignore` secret-pattern check via `git check-ignore --no-index` (handles negations)
-3. Step 3 redaction instruction: "flag existence, not values"
-4. Red Flag + Verification checklist items for secret handling
+1. Commit-metadata secret scan for assignment-style secrets, known token
+   prefixes, private-key headers, and credential-bearing URLs; emit status only,
+   never raw subjects, bodies, or matching values.
+2. `.gitignore` secret-pattern check via `git check-ignore --no-index` so
+   negations are handled correctly.
+3. Separate tracked-file check for sensitive environment filenames because
+   `.gitignore` does not affect files already in Git.
+4. Secret redaction plus revocation/rotation guidance for possible historical
+   exposure.
+5. Red Flag and Verification checklist items that prohibit raw commit-metadata
+   output and require tracked-file awareness.
 
 **Open question:** Whether opt-in `REPO_HEALTH_VERIFY_REFS=1` external URL checks should also scan response bodies for secret patterns.

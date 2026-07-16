@@ -21,6 +21,8 @@ FORBIDDEN_ACTIONS = {
 SECRET_PATTERNS = {
     "private key": re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----"),
     "GitHub token": re.compile(r"\b(?:gh[oprsu]_[A-Za-z0-9_]{20,})\b"),
+    "GitHub fine-grained token": re.compile(r"\bgithub_pat_[A-Za-z0-9_]{20,}\b"),
+    "AWS access key": re.compile(r"\bAKIA[A-Z0-9]{16}\b"),
     "OpenAI-style secret": re.compile(r"\bsk-[A-Za-z0-9_-]{20,}\b"),
 }
 
@@ -77,9 +79,12 @@ def validate_repo(root: Path = REPO_ROOT) -> list[str]:
     """Return violations of the documented trust contract."""
     errors: list[str] = []
     skill = read(root, SKILL)
+    normalized_skill = " ".join(skill.split())
     description = frontmatter_description(skill)
     security = read(root, "SECURITY.md")
     readme = read(root, "README.md")
+    maintaining = read(root, "docs/maintaining.md")
+    ci = read(root, ".github/workflows/ci.yml")
     codex_report = read(root, "docs/compatibility-reports/codex.md")
 
     if "Use when" not in description or "Not for" not in description:
@@ -97,6 +102,30 @@ def validate_repo(root: Path = REPO_ROOT) -> list[str]:
         errors.append("external reference checks are not explicitly opt-in")
     if "REPO_HEALTH_OUTPUT=jsonl" not in skill:
         errors.append("JSONL output is not explicitly opt-in")
+    if "Structured output is an output mode, not a health dimension." not in skill:
+        errors.append("structured output can be mistaken for a health dimension")
+
+    required_secret_guards = (
+        "must not appear in commit subjects or bodies",
+        "recommend revocation or rotation",
+        "does not remove historical exposure",
+        "never raw subjects or bodies",
+        "git ls-files -- .env '.env.*'",
+        "do not echo the full file into the transcript",
+    )
+    for guard in required_secret_guards:
+        if guard not in normalized_skill:
+            errors.append(f"skill lacks secret-safe history guidance: {guard}")
+    forbidden_history_output = (
+        'git log --format="%B" -5 | head',
+        "git log origin/main..HEAD --oneline",
+        "tee /tmp/commit-bodies.txt",
+        'cat .repo-health.json 2>/dev/null',
+        'cat .gitignore 2>/dev/null',
+    )
+    for probe in forbidden_history_output:
+        if probe in skill:
+            errors.append(f"skill prints or persists raw commit metadata: {probe}")
 
     if not re.search(r"Status: `workflow_verified`", codex_report):
         errors.append("Codex compatibility is not workflow_verified")
@@ -107,6 +136,10 @@ def validate_repo(root: Path = REPO_ROOT) -> list[str]:
         errors.append("README does not separate payload from maintainer tooling")
     if "## Skill Trust Checklist" not in security:
         errors.append("SECURITY.md lacks the maintainer trust checklist")
+    if "must not include secrets" not in maintaining:
+        errors.append("maintainer commit convention lacks a no-secrets rule")
+    if "python -m pip install ruff==0.15.21" not in ci:
+        errors.append("CI does not pin the reviewed Ruff version")
 
     errors.extend(scan_secrets(root))
     return errors
@@ -126,6 +159,10 @@ def run_self_tests() -> int:
     assert SECRET_PATTERNS["private key"].search(
         "-----BEGIN OPENSSH PRIVATE KEY-----"
     )
+    assert SECRET_PATTERNS["GitHub fine-grained token"].search(
+        "github_pat_abcdefghijklmnopqrstuvwxyz123456"
+    )
+    assert SECRET_PATTERNS["AWS access key"].search("AKIAABCDEFGHIJKLMNOP")
     print("PASS: check-trust.py self-tests")
     return 0
 

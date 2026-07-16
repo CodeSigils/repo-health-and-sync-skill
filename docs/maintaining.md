@@ -18,6 +18,13 @@ why:  <reason — design rationale, observed failure, user request, or finding>
 
 Subject line: `type: scope — description`.
 
+Commit subjects and bodies must not include secrets, credentials, access
+tokens, private keys, sensitive values, or secret-bearing URLs. Describe the
+change generically and redact sensitive identifiers. If a secret may have been
+committed, stop before publishing and recommend revocation or rotation; editing
+the message or deleting a file does not undo exposure from a commit that was
+already shared.
+
 | Type | When to use |
 | :--- | :---------- |
 | `feat:` | New methodology addition |
@@ -65,6 +72,7 @@ Before marking work done, run through in order:
 5. **Eval contract valid** — `python3 scripts/validate-evals.py`
 6. **Trust contract valid** — `python3 scripts/check-trust.py`
 7. **Versions aligned** — `python3 scripts/check-version-consistency.py`
+8. **Python lint clean** — `python3 -m ruff check scripts skills`
 
 The model regression is deliberately outside this required fast checklist.
 After a material `SKILL.md` workflow or trigger change, run
@@ -88,7 +96,10 @@ repository-health work to `SKILL.md` and repository changes to this file.
 ## Project structure
 
 ```text
-├── .github/workflows/ci.yml
+├── .github/workflows/
+│   ├── ci.yml
+│   └── codex-regression.yml       # Scheduled/manual non-blocking model evaluation
+├── .codex-plugin/plugin.json      # Codex distribution manifest
 ├── .gitignore
 ├── .gitattributes
 ├── AGENTS.md                      # Repository-level agent routing
@@ -98,7 +109,11 @@ repository-health work to `SKILL.md` and repository changes to this file.
 ├── SECURITY.md
 ├── docs/                          # Maintainer docs (not shipped)
 │   ├── README.md
+│   ├── codex-regression.md
 │   ├── codex-setup.md
+│   ├── compatibility-reports/
+│   │   └── codex.md
+│   ├── evidence-urls.json
 │   ├── portability-contract.md      # cross-agent claim and adapter rules
 │   ├── maintaining.md
 │   ├── decisions.md
@@ -111,6 +126,7 @@ repository-health work to `SKILL.md` and repository changes to this file.
 │   ├── check-expiry.py
 │   ├── check-portability.py
 │   ├── check-trust.py
+│   ├── check-version-consistency.py
 │   ├── doc-audit.py
 │   ├── extract-tests.py
 │   ├── grade-codex-transcript.py

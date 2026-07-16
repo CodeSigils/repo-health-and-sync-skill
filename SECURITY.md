@@ -30,6 +30,16 @@ run through `python3 scripts/check-trust.py` in local verification and CI.
   scripts, evals, CI, and documentation.
 - [x] Report guidance instructs agents to redact credentials, tokens, and
   secrets before including them in findings — flag existence, not values.
+- [x] Commit-quality probes emit counts or status only; they do not print or
+  persist raw commit subjects or bodies.
+- [x] Commit subjects and bodies must not contain credentials, tokens, private
+  keys, sensitive values, or secret-bearing URLs.
+- [x] `.gitignore` coverage checks account for negations and separately detect
+  sensitive environment files that Git already tracks.
+- [x] Suspected historical exposure is reported without the value and includes
+  revocation or rotation guidance.
+- [x] CI installs a reviewed, pinned Ruff version rather than an unbounded
+  latest release.
 
-Last reviewed: 2026-07-15 after adding secret redaction guard to SKILL.md Step 3
-report guidance.
+Last reviewed: 2026-07-16 after hardening commit-metadata inspection,
+tracked-secret detection, `.gitignore` guidance, and CI dependency pinning.

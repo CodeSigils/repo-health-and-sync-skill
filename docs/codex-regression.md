@@ -4,7 +4,8 @@ Status: non-blocking maintainer evaluation implemented against Codex CLI
 0.133.0. Later versions require their own recorded run before they become a
 compatibility claim.
 
-Local status: `verified_twice`. Hosted workflow status: `pending_first_run`.
+Local status: `five_runs_recorded_current_payload_verified_once`. Hosted
+workflow status: `pending_first_run`.
 
 Local runs through an authenticated Codex CLI are the primary reliability path.
 The hosted workflow is optional infrastructure for maintainers with API-key
@@ -103,20 +104,27 @@ Use `not recorded` for historical data that cannot be recovered.
 | 1 | 2026-07-13 | Local | 0.133.0 | not recorded | Pass | not recorded | 153,545 input (112,384 cached); 5,141 output; 774 reasoning | Negative-run pytest could not use a temporary directory; non-fatal stale model-cache warning. |
 | 2 | 2026-07-14 | Local | 0.133.0 | not emitted | Pass | 2m 05s | 136,050 input (106,880 cached); 5,535 output; 1,233 reasoning | Positive and negative scenarios passed; non-fatal stale model-cache warning. |
 | 3 | 2026-07-14 | Local | 0.133.0 | not emitted | Timeout | 15m 00s | unavailable; no `turn.completed` event | Positive scenario selected the skill and began discovery, then stopped emitting events; negative scenario did not run. Same-session evidence. |
+| 4 | 2026-07-16 | Local | 0.133.0 | not emitted | Fail | 3m 28s | 147,894 input (118,144 cached); 6,279 output; 1,512 reasoning | Positive and negative scenarios completed; deterministic grading exposed that the standalone JSONL row could be mistaken for a health dimension. |
+| 5 | 2026-07-16 | Local | 0.133.0 | not emitted | Pass | 2m 30s | 142,893 input (101,248 cached); 5,577 output; 1,330 reasoning | Same-session rerun after clarifying that structured output is an output mode, not a dimension; positive and negative scenarios passed. |
 
 Runs 1-3 predate the `run-summary.json` observability added in `f21214c`.
 Their committed log entries remain the authoritative historical evidence; do
 not manufacture or backfill generated summaries. Structured summaries begin
 with the first subsequent run, including when that run fails or times out.
 
-The reliability baseline is complete after five recorded runs include the
-CLI version, pass or failure, duration, and token usage. Record the model when
-the CLI emits it or the run selects one explicitly; do not infer a default model
-from the CLI version. Review the pass rate and deviations before changing the
+The initial evidence checkpoint requires five recorded runs with CLI version,
+pass or failure, duration, and token usage. Record the model when the CLI emits
+it or the run selects one explicitly; do not infer a default model from the CLI
+version. A stable reliability baseline additionally requires repeated runs of
+the same payload. Review the pass rate and deviations before changing the
 harness or expanding `SKILL.md`.
 
-Current baseline: three of five runs recorded, with two passes and one timeout
-(66.7% pass rate). Two more runs are required before the baseline review.
+Current evidence: five runs recorded, with three passes, one timeout, and one
+deterministic grading failure (60% pass rate). Run 4 found a real instruction
+ambiguity; run 5 passed after the targeted correction. Runs 4 and 5 were in the
+same session and the payload changed between them, so these five runs are a
+diagnostic history, not a stable repeated baseline for the hardened payload.
+The current payload has one passing run and still needs time-separated repeats.
 
 Excluded infrastructure attempt: on 2026-07-14, a run inside the restricted
 network sandbox timed out after 900 seconds immediately after `turn.started`,

@@ -66,13 +66,15 @@ ls *.json *.toml *.yaml *.yml *.cfg 2>/dev/null
 ls *file 2>/dev/null
 ls Dockerfile Containerfile 2>/dev/null
 
-# What's the commit culture like?
-git log --oneline -20
-git log --format="%B" -5 | head -30
+# What's the commit culture like? Count patterns without printing message text,
+# because subjects and bodies can themselves contain credentials.
+printf 'recent_commits=%s\n' "$(git rev-list --count --max-count=20 HEAD 2>/dev/null || echo 0)"
+printf 'conventional_subjects=%s\n' "$(git log --format='%s' -20 2>/dev/null | grep -Ec '^(feat|fix|docs|chore|refactor|test|ci|build|perf|revert)(\([^)]*\))?!?:' || true)"
+printf 'informative_bodies=%s\n' "$(git log --format='%b' -5 2>/dev/null | grep -Ec '^(what|why):' || true)"
 git status --short --branch
 git tag --list 'v*' --sort=-version:refname | head -5
 if git rev-parse --verify origin/main >/dev/null 2>&1; then
-  git log origin/main..HEAD --oneline | head -20
+  printf 'branch_commits_outside_base=%s\n' "$(git rev-list --count origin/main..HEAD)"
 fi
 
 # What automation exists?
@@ -85,10 +87,10 @@ find . -maxdepth 2 -name 'requirements*.txt' -o -name 'Cargo.toml' \
   -o -name 'go.mod' -o -name 'package.json' 2>/dev/null | head -10
 
 # Is there a pre-existing health convention?
-cat .repo-health.json 2>/dev/null || echo "no .repo-health.json"
+test -f .repo-health.json && echo ".repo-health.json present" || echo "no .repo-health.json"
 
 # What does the project's .gitignore cover? (respect it when exploring)
-cat .gitignore 2>/dev/null || echo "no .gitignore"
+test -f .gitignore && echo ".gitignore present" || echo "no .gitignore"
 
 # Did the user or environment opt into a conditional check?
 printf 'verify_refs=%s\n' "${REPO_HEALTH_VERIFY_REFS:-0}"
@@ -183,7 +185,7 @@ else
   echo "CLEAN: working tree has no uncommitted changes"
 fi
 if git rev-parse --verify origin/main >/dev/null 2>&1; then
-  git log origin/main..HEAD --oneline | wc -l
+  git rev-list --count origin/main..HEAD
 else
   echo "origin/main unavailable"
 fi
@@ -272,25 +274,34 @@ grep -c 'paths:' .github/workflows/*.yml 2>/dev/null && echo "scoped" \
 grep -n 'which\|grep -P\|sed -i[^.]' scripts/*.sh 2>/dev/null \
   | head -10 || echo "no patterns found"
 
-# Attribution drift + secret scan
+# Attribution drift + secret scan. Print counts/status only, never message text.
 if git rev-parse --verify origin/main >/dev/null 2>&1; then
   range="origin/main..HEAD"
 else
-  range="HEAD"
+  range=""
+  echo "SKIP: commit metadata scan requires origin/main"
 fi
-git log --format="%B" "$range" 2>/dev/null | tee /tmp/commit-bodies.txt | grep -c 'Co-authored-by:' || echo "0"
-# Scan commit bodies for secret-like patterns
-grep -E '(api[_-]?key|secret|token|password|passwd|credential)\s*[:=]\s*[A-Za-z0-9_\-]{20,}' /tmp/commit-bodies.txt >/dev/null && echo "SECRET PATTERN in commit message body" || echo "No secret patterns in commit messages"
-rm -f /tmp/commit-bodies.txt
+if [ -n "$range" ]; then
+  printf 'coauthored_trailers=%s\n' "$(git log --format='%B' "$range" 2>/dev/null | grep -c '^Co-authored-by:' || true)"
+  if git log --format='%B' "$range" 2>/dev/null \
+    | grep -Eq '(api[_-]?key|secret|token|password|passwd|credential)[[:space:]]*[:=][[:space:]]*[A-Za-z0-9_-]{20,}|-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----|gh[oprsu]_[A-Za-z0-9_]{20,}|github_pat_[A-Za-z0-9_]{20,}|AKIA[A-Z0-9]{16}|sk-[A-Za-z0-9_-]{20,}|https?://[^[:space:]@]+@'; then
+    echo "SECRET-LIKE VALUE: commit metadata contains a potential credential"
+  else
+    echo "No secret-like values detected in commit metadata"
+  fi
+fi
 
-# .gitignore coverage
+# .gitignore coverage — use Git's matcher so negations are respected
 for pat in '.DS_Store' 'node_modules/' '__pycache__/' '.vscode/'; do
-  grep -q "$pat" .gitignore 2>/dev/null || echo "MISSING: $pat"
+  git check-ignore --no-index "$pat" >/dev/null 2>&1 || echo "MISSING: $pat"
 done
 # Secret-bearing patterns — use git check-ignore to handle negations correctly
 for f in .env .env.local .env.production; do
   git check-ignore --no-index "$f" >/dev/null 2>&1 || echo "MISSING: $f (not ignored)"
 done
+# Ignoring a file does not protect a copy that is already tracked.
+tracked_sensitive=$(git ls-files -- .env '.env.*' | grep -Ev '^\.env(?:\..*)?\.example$' | wc -l)
+printf 'tracked_sensitive_env_files=%s\n' "$tracked_sensitive"
 ```
 
 Run only the commands for dimensions you deemed relevant. Skip the rest.
@@ -329,13 +340,28 @@ If there is a blocking issue (dirty tree, shell script that literally
 cannot run, version drift that would break a publish), say so explicitly
 and stop. Do not continue checking other dimensions — fix the block first.
 
-| **Structured output** | Emit JSONL for automation | `REPO_HEALTH_OUTPUT=jsonl` env var (opt-in) |
+Structured output is an output mode, not a health dimension. Do not include it
+in the dimension plan. Emit JSONL only when `REPO_HEALTH_OUTPUT=jsonl` is set;
+otherwise use the normal human-readable report.
 
 If any finding contains sensitive values (API keys, tokens, passwords,
 connection strings, private URLs), **redact the value before including it in
 the report**. Flag the presence of a potential secret without exposing the
 secret itself — e.g. "a hard-coded credential was found in config.py" not
 "API_KEY = sk-1234...".
+
+Credentials, tokens, private keys, sensitive values, and secret-bearing URLs
+must not appear in commit subjects or bodies. If secret-like material is found
+in tracked files or commit metadata, do not print it. Report only its location
+or existence, stop before lower-priority checks, and recommend revocation or
+rotation. Adding a path to `.gitignore` or deleting it from the current tree
+does not remove historical exposure.
+
+When recommending `.gitignore` changes, preserve existing project-specific and
+security rules, prefer targeted additions over wholesale replacement, retain a
+sanitized `!.env.example` when used, and avoid broad `*.key` or `*.pem` rules
+without checking for intentional public certificates or fixtures. Treat
+lockfile policy as an application-versus-library decision, not a generic ignore.
 
 Example JSONL output:
 ```jsonl
@@ -359,7 +385,9 @@ overrides the heuristic discovery in Step 2:
 }
 ```
 
-Read it if it exists. Merge its settings into your dimension list.
+Read it if it exists, but do not echo the full file into the transcript. Inspect
+only the settings needed for the plan and redact any sensitive values. Merge its
+settings into your dimension list.
 If it declares a custom consistency check (`"require": [...]`), that
 check replaces the default probe for that dimension.
 
@@ -389,6 +417,9 @@ check replaces the default probe for that dimension.
 - Emitting JSONL when `REPO_HEALTH_OUTPUT=jsonl` was not requested
 - Including credential material, tokens, or secrets in findings without
   redaction — flag existence, not values
+- Printing raw commit subjects or bodies while checking commit quality or
+  secret patterns
+- Assuming `.gitignore` protects sensitive files that Git already tracks
 
 ## Verification
 
@@ -406,6 +437,8 @@ After completing the scan:
 - [ ] JSONL output is emitted only when `REPO_HEALTH_OUTPUT=jsonl` is set
 - [ ] Credentials, tokens, or secrets are redacted or reported by existence
   only, not included as raw values in findings
+- [ ] Commit-message checks emitted counts or status only, never raw subjects or bodies
+- [ ] Sensitive ignore candidates were checked for tracked-file exposure
 
 ---
 
