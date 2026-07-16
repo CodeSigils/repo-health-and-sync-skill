@@ -112,6 +112,10 @@ def validate_repo(root: Path = REPO_ROOT) -> list[str]:
         "never raw subjects or bodies",
         "git ls-files -- .env '.env.*'",
         "do not echo the full file into the transcript",
+        "Secret-pattern matching is heuristic",
+        "prefer its existing read-only check",
+        "capture only its exit status when output may contain matches",
+        "only when observed ecosystem evidence makes them relevant",
     )
     for guard in required_secret_guards:
         if guard not in normalized_skill:
@@ -119,6 +123,7 @@ def validate_repo(root: Path = REPO_ROOT) -> list[str]:
     forbidden_history_output = (
         'git log --format="%B" -5 | head',
         "git log origin/main..HEAD --oneline",
+        'range="origin/main..HEAD"',
         "tee /tmp/commit-bodies.txt",
         'cat .repo-health.json 2>/dev/null',
         'cat .gitignore 2>/dev/null',
@@ -126,6 +131,8 @@ def validate_repo(root: Path = REPO_ROOT) -> list[str]:
     for probe in forbidden_history_output:
         if probe in skill:
             errors.append(f"skill prints or persists raw commit metadata: {probe}")
+    if "origin/main" in skill:
+        errors.append("skill hard-codes origin/main instead of discovering a bounded base")
 
     if not re.search(r"Status: `workflow_verified`", codex_report):
         errors.append("Codex compatibility is not workflow_verified")

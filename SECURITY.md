@@ -38,6 +38,10 @@ run through `python3 scripts/check-trust.py` in local verification and CI.
   sensitive environment files that Git already tracks.
 - [x] Suspected historical exposure is reported without the value and includes
   revocation or rotation guidance.
+- [x] Branch-only history checks discover the configured upstream or remote
+  default branch instead of assuming `origin/main`; unavailable bases are skipped.
+- [x] Secret-pattern matches are treated as heuristic, and project-native
+  scanners or additional sensitive filenames run only when repository evidence activates them.
 - [x] CI installs a reviewed, pinned Ruff version rather than an unbounded
   latest release.
 

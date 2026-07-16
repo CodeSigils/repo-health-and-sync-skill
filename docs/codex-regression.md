@@ -4,7 +4,7 @@ Status: non-blocking maintainer evaluation implemented against Codex CLI
 0.133.0. Later versions require their own recorded run before they become a
 compatibility claim.
 
-Local status: `five_runs_recorded_current_payload_verified_once`. Hosted
+Local status: `nine_runs_recorded_current_payload_verified_once`. Hosted
 workflow status: `pending_first_run`.
 
 Local runs through an authenticated Codex CLI are the primary reliability path.
@@ -106,6 +106,10 @@ Use `not recorded` for historical data that cannot be recovered.
 | 3 | 2026-07-14 | Local | 0.133.0 | not emitted | Timeout | 15m 00s | unavailable; no `turn.completed` event | Positive scenario selected the skill and began discovery, then stopped emitting events; negative scenario did not run. Same-session evidence. |
 | 4 | 2026-07-16 | Local | 0.133.0 | not emitted | Fail | 3m 28s | 147,894 input (118,144 cached); 6,279 output; 1,512 reasoning | Positive and negative scenarios completed; deterministic grading exposed that the standalone JSONL row could be mistaken for a health dimension. |
 | 5 | 2026-07-16 | Local | 0.133.0 | not emitted | Pass | 2m 30s | 142,893 input (101,248 cached); 5,577 output; 1,330 reasoning | Same-session rerun after clarifying that structured output is an output mode, not a dimension; positive and negative scenarios passed. |
+| 6 | 2026-07-16 | Local | 0.133.0 | not emitted | Pass | 2m 08s | 141,350 input (120,704 cached); 5,410 output; 813 reasoning | Final recommendation pass: bounded upstream/default-base resolution, heuristic scanner guidance, and positive/negative scenarios passed. |
+| 7 | 2026-07-16 | Local | 0.133.0 | not emitted | Pass | 2m 11s | 139,874 input (101,760 cached); 4,973 output; 446 reasoning | Exact final payload after adding quiet/redacted native-scanner output handling; positive and negative scenarios passed. |
+| 8 | 2026-07-16 | Local | 0.133.0 | not emitted | Fail | 2m 34s | 160,054 input (117,376 cached); 6,249 output; 748 reasoning | Consolidated payload completed both scenarios; deterministic grading found that the profile and dimension plan were emitted in the same message. |
+| 9 | 2026-07-16 | Local | 0.133.0 | not emitted | Pass | 2m 32s | 117,709 input (79,360 cached); 6,936 output; 1,155 reasoning | Exact consolidated payload passed after requiring the profile to be emitted in its own message before dimension planning. |
 
 Runs 1-3 predate the `run-summary.json` observability added in `f21214c`.
 Their committed log entries remain the authoritative historical evidence; do
@@ -119,12 +123,13 @@ version. A stable reliability baseline additionally requires repeated runs of
 the same payload. Review the pass rate and deviations before changing the
 harness or expanding `SKILL.md`.
 
-Current evidence: five runs recorded, with three passes, one timeout, and one
-deterministic grading failure (60% pass rate). Run 4 found a real instruction
-ambiguity; run 5 passed after the targeted correction. Runs 4 and 5 were in the
-same session and the payload changed between them, so these five runs are a
-diagnostic history, not a stable repeated baseline for the hardened payload.
-The current payload has one passing run and still needs time-separated repeats.
+Current evidence: nine runs recorded, with six passes, one timeout, and two
+deterministic grading failures (66.7% pass rate). Runs 4 and 8 found real
+instruction ambiguities; runs 5 and 9 passed after targeted corrections. The
+payload changed between adjacent same-session runs, so this is diagnostic
+history, not a stable repeated baseline. Run 9 verifies the exact consolidated,
+hardened payload, which has one passing run and still needs time-separated
+repeats.
 
 Excluded infrastructure attempt: on 2026-07-14, a run inside the restricted
 network sandbox timed out after 900 seconds immediately after `turn.started`,

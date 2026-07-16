@@ -38,10 +38,9 @@ Current product assessment:
 
 - The profile-first and evidence-linked planning contract is useful and
   differentiates the skill from a generic health checklist.
-- The current payload is too instruction-heavy for its intended role.
-  Overlapping examples, rationalizations, red flags, and repeated design
-  principles increase context cost and create more opportunities for partial
-  adherence.
+- The payload was consolidated from 492 to 415 lines while retaining inline
+  probes and the complete security contract. Its remaining size is dominated by
+  operational examples rather than repeated rationalizations and checklists.
 - The ten dimensions behave as an evidence-activated candidate catalog. Calling
   the method "not a checklist" without that qualification overstates the
   distinction.
@@ -114,14 +113,13 @@ Primary sources and research, accessed 2026-07-12 or 2026-07-13:
 | Security and trust | `scripts/check-trust.py` enforces bounded triggers, read-only instructions, opt-in network/output behavior, credential hygiene, versioned compatibility evidence, and payload separation. |
 | Release consistency | The checker validates `SKILL.md`, plugin metadata, `CITATION.cff`, tags, and GitHub releases. Strict CI queries use a read-only job token. |
 | Repository verification | Script self-tests, Ruff, ShellCheck, documentation audit, plugin validation, skill validation, and diff checks pass independently. |
-| Local model regression | Five Codex CLI 0.133.0 runs are recorded: three passes, one timeout, and one deterministic grading failure. The hardened current payload passed once after the grader exposed and prompted removal of a JSONL/dimension ambiguity. |
+| Local model regression | Nine Codex CLI 0.133.0 runs are recorded: six passes, one timeout, and two deterministic grading failures. The exact consolidated payload passed once after the latest run exposed and corrected profile/plan message ordering. |
 
 ### Remaining Gaps
 
 | Gap | Consequence | Priority |
 |---|---|---|
-| Five local runs are recorded, but the last two were same-session and the payload changed between them after a grading failure. | The 60% historical pass rate is diagnostic; the hardened current payload has only one passing run and needs time-separated repeated evidence. | High |
-| `SKILL.md` repeats examples, cautions, and design principles around a compact three-step contract. | Excess instruction surface increases token use and makes partial or inconsistent adherence more likely. | High |
+| Nine local runs are recorded, but the payload changed across recent runs and several were same-session. | The 66.7% historical pass rate is diagnostic; the exact current payload has only one passing run and needs time-separated repeated evidence. | High |
 | The fixed dimension table is presented alongside a "not a checklist" claim, and blocking behavior is more rigid than the contextual-severity principle. | Agents may anchor on the catalog as exhaustive or stop an audit before reporting other useful evidence. | High |
 | `.repo-health.json` and JSONL are agent-interpreted examples without versioned deterministic schemas. | Different agents may produce incompatible behavior while appearing to support the same interface. | Medium |
 | Deterministic fixtures cover this skill pack and one Python library shape. | The contract has limited evidence for missing tools, monorepos, docs products, repositories without `origin/main`, and intentionally dirty development trees. | Medium |
@@ -216,8 +214,8 @@ all identify version `0.3.0`.
 
 ### 5.2 Implemented: Model-Driven Regression Harness
 
-**Local result:** five runs recorded on Codex CLI 0.133.0 through 2026-07-16:
-three passes, one timeout, and one deterministic grading failure. The current
+**Local result:** nine runs recorded on Codex CLI 0.133.0 through 2026-07-16:
+six passes, one timeout, and two deterministic grading failures. The current
 hardened payload has one passing run; see `docs/codex-regression.md` for the
 full evidence and same-session caveat.
 

@@ -24,41 +24,37 @@ metadata:
 
 # Repo Health Scan
 
-A three-step methodology for evaluating any git repository's health.
-The agent discovers, prioritises, and verifies — in that order.
+A three-step methodology: discover the repository, infer its local invariants,
+then report verified findings. Repository evidence—not a universal
+checklist—determines which checks apply.
 
-Unlike a checklist, this methodology does not prescribe what to check.
-It teaches the agent how to decide. Every repo is different. The right
-checks for a 200K-line monorepo with 5 package managers are not the
-right checks for a 12-line shell script. The agent decides.
+Four rules govern the scan:
 
----
+- Let observed repository evidence activate checks; do not bring a universal
+  checklist.
+- Emit the repo profile and dimension plan before running dimension probes.
+- Skip speculative checks: every invariant must trace to a concrete failure.
+- Report concrete harm and remediation while keeping sensitive values out of
+  commands, transcripts, and findings.
 
 ## When to Use
 
-- Before cutting a release tag or publishing a GitHub Release
+- Before a release, archive, handoff, or project revival
 - When onboarding onto an unfamiliar repository
-- When CI is failing and the cause is not obvious
-- Before handing a project to a new maintainer
-- When reviving a dormant repository
+- When CI is failing and the cause is unclear
 - After a large batch of AI-assisted commits
 
 ## When Not to Use
 
-- For a task scoped to one file, one bug, or one feature
-- For ordinary implementation work where the repository's overall health is not
-  in question
-- For repositories without git history, unless the user only wants a filesystem
-  shape summary
-- As an automatic fixer; this skill reports health findings and remediations,
-  but does not mutate the repository
-
----
+- For a task scoped to one file, bug, or feature
+- For ordinary implementation work when overall repository health is not at issue
+- For repositories without git history, except for a filesystem shape summary
+- As an automatic fixer; this skill reports but does not mutate the repository
 
 ## Step 1: Discover the repo's shape
 
-Run these probes before forming any judgment about health. Do not guess
-or infer from the repo name. Inspect the filesystem.
+Run these probes before judging health. Inspect the repository; do not infer its
+shape from its name.
 
 ```bash
 # What languages and tools does this project actually use?
@@ -73,8 +69,13 @@ printf 'conventional_subjects=%s\n' "$(git log --format='%s' -20 2>/dev/null | g
 printf 'informative_bodies=%s\n' "$(git log --format='%b' -5 2>/dev/null | grep -Ec '^(what|why):' || true)"
 git status --short --branch
 git tag --list 'v*' --sort=-version:refname | head -5
-if git rev-parse --verify origin/main >/dev/null 2>&1; then
-  printf 'branch_commits_outside_base=%s\n' "$(git rev-list --count origin/main..HEAD)"
+base_ref=$(git rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2>/dev/null || true)
+if [ -z "$base_ref" ]; then
+  base_ref=$(git for-each-ref --format='%(symref:short)' 'refs/remotes/*/HEAD' | sed -n '1p')
+fi
+printf 'base_ref=%s\n' "${base_ref:-unavailable}"
+if [ -n "$base_ref" ] && git rev-parse --verify "$base_ref" >/dev/null 2>&1; then
+  printf 'branch_commits_outside_base=%s\n' "$(git rev-list --count "$base_ref"..HEAD)"
 fi
 
 # What automation exists?
@@ -100,7 +101,8 @@ printf 'verify_releases=%s\n' "${REPO_HEALTH_VERIFY_RELEASES:-0}"
 From this output, form and **emit** a concise structured repo profile before
 checking any dimension. Separate observed facts from inferred labels. The
 profile must be visible in the transcript as a `REPO PROFILE` block; do not keep
-it only in internal reasoning or defer it to the final report:
+it only in internal reasoning or defer it to the final report. Emit the profile
+in its own message; do not combine that message with the dimension plan:
 
 ```yaml
 # REPO PROFILE
@@ -127,25 +129,21 @@ inferred:
 Do not run a dimension-specific command before emitting this block. If you
 cannot write it, run more discovery probes.
 
----
-
 ## Step 2: Infer what invariants matter
 
 Given the emitted repo profile, ask: what invariants would break if they
 drifted?
 
-For each dimension below, check whether the repo profile makes the invariant
-relevant. Before running any dimension command, emit a `DIMENSION PLAN` that:
+Before running any dimension command, emit a `DIMENSION PLAN` that:
 
 - lists each active dimension with one or more exact profile paths in
   `activated_by`;
 - lists each inactive dimension with a concrete `skip_reason`; and
 - accounts for every candidate dimension in the table as active or skipped.
 
-Use paths such as `observed.ci` or `inferred.release_model`. A request or
-environment flag may also activate a dimension when recorded in the observed
-profile. Do not activate a dimension from an assumption that is absent from the
-profile.
+Use paths such as `observed.ci` or `inferred.release_model`. A recorded request
+or environment flag may also activate a dimension; an unobserved assumption may
+not.
 
 ```yaml
 # DIMENSION PLAN
@@ -157,9 +155,6 @@ skipped:
     skip_reason: no platform or user requirement appears in the profile
 ```
 
-Skip dimensions that do not apply; do not probe them or produce a PASS/FAIL for
-them.
-
 | Dimension | Ask | Relevant when |
 |-----------|-----|---------------|
 | **History hygiene** | Is the working tree clean? Are there unpushed commits? | Always — cheap, universal |
@@ -169,7 +164,7 @@ them.
 | **Commit quality** | Are messages structured? Are bodies informative? | Commits on this branch |
 | **CI efficiency** | Is CI scoped to what changed? | CI config exists |
 | **Cross-platform** | Do scripts use portable constructs? | .sh files + any macOS/BSD users |
-| **Attribution drift** | Are unauthorized `Co-authored-by:` trailers present? | Commits on the current branch that are not yet in `origin/main` |
+| **Attribution drift** | Are unauthorized `Co-authored-by:` trailers present? | Commits outside the discovered upstream or remote-default base |
 | **File coverage** | Does .gitignore cover agent/OS/build artifacts? | .gitignore exists |
 | **External reference health** | Do all `https://` refs in docs/config resolve? | `REPO_HEALTH_VERIFY_REFS=1` env var (opt-in) |
 
@@ -184,10 +179,14 @@ if [ -n "$(git status --porcelain)" ]; then
 else
   echo "CLEAN: working tree has no uncommitted changes"
 fi
-if git rev-parse --verify origin/main >/dev/null 2>&1; then
-  git rev-list --count origin/main..HEAD
+base_ref=$(git rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2>/dev/null || true)
+if [ -z "$base_ref" ]; then
+  base_ref=$(git for-each-ref --format='%(symref:short)' 'refs/remotes/*/HEAD' | sed -n '1p')
+fi
+if [ -n "$base_ref" ] && git rev-parse --verify "$base_ref" >/dev/null 2>&1; then
+  git rev-list --count "$base_ref"..HEAD
 else
-  echo "origin/main unavailable"
+  echo "base reference unavailable"
 fi
 
 # Shell correctness
@@ -275,16 +274,20 @@ grep -n 'which\|grep -P\|sed -i[^.]' scripts/*.sh 2>/dev/null \
   | head -10 || echo "no patterns found"
 
 # Attribution drift + secret scan. Print counts/status only, never message text.
-if git rev-parse --verify origin/main >/dev/null 2>&1; then
-  range="origin/main..HEAD"
+base_ref=$(git rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2>/dev/null || true)
+if [ -z "$base_ref" ]; then
+  base_ref=$(git for-each-ref --format='%(symref:short)' 'refs/remotes/*/HEAD' | sed -n '1p')
+fi
+if [ -n "$base_ref" ] && git rev-parse --verify "$base_ref" >/dev/null 2>&1; then
+  range="$base_ref..HEAD"
 else
   range=""
-  echo "SKIP: commit metadata scan requires origin/main"
+  echo "SKIP: commit metadata scan requires an upstream or remote-default base"
 fi
 if [ -n "$range" ]; then
   printf 'coauthored_trailers=%s\n' "$(git log --format='%B' "$range" 2>/dev/null | grep -c '^Co-authored-by:' || true)"
   if git log --format='%B' "$range" 2>/dev/null \
-    | grep -Eq '(api[_-]?key|secret|token|password|passwd|credential)[[:space:]]*[:=][[:space:]]*[A-Za-z0-9_-]{20,}|-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----|gh[oprsu]_[A-Za-z0-9_]{20,}|github_pat_[A-Za-z0-9_]{20,}|AKIA[A-Z0-9]{16}|sk-[A-Za-z0-9_-]{20,}|https?://[^[:space:]@]+@'; then
+    | grep -Eq '(api[_-]?key|secret|token|password|passwd|credential)[[:space:]]*[:=][[:space:]]*[A-Za-z0-9_-]{20,}|-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----|gh[oprsu]_[A-Za-z0-9_]{20,}|github_pat_[A-Za-z0-9_]{20,}|AKIA[A-Z0-9]{16}|sk-[A-Za-z0-9_-]{20,}|https?://[^[:space:]/:@]+:[^[:space:]@]+@'; then
     echo "SECRET-LIKE VALUE: commit metadata contains a potential credential"
   else
     echo "No secret-like values detected in commit metadata"
@@ -304,11 +307,17 @@ tracked_sensitive=$(git ls-files -- .env '.env.*' | grep -Ev '^\.env(?:\..*)?\.e
 printf 'tracked_sensitive_env_files=%s\n' "$tracked_sensitive"
 ```
 
+Secret-pattern matching is heuristic, not proof that a repository is clean. If
+the repo profile identifies a project-native secret scanner, prefer its existing
+read-only check; use its documented quiet or redacted mode, or capture only its
+exit status when output may contain matches. Do not install or configure a new
+scanner during an audit. Test additional sensitive filenames such as `.npmrc`
+or `.pypirc` only when observed ecosystem evidence makes them relevant, and
+report counts or paths, never values.
+
 Run only the commands for dimensions you deemed relevant. Skip the rest.
 Do not emit PASS/WARNING/BLOCKING for skipped dimensions — they do not
 apply to this repo.
-
----
 
 ## Step 3: Report findings with judgment, not labels
 
@@ -316,29 +325,21 @@ For each active dimension, report what you found. Do not use a
 pre-defined severity scale. Use language that reflects actual harm:
 
 ```text
-SHELL CORRECTNESS — 3 scripts, 6 SC warnings
+SHELL CORRECTNESS — 3 scripts, 6 warnings
   shellcheck reports SC2086 (unquoted var) in scripts/deploy.sh:17
   This causes silent failure when a path contains spaces.
   Remediation: wrap "$var" consistently. 5-minute fix.
 
-COMMIT QUALITY — 10 conventional, 3 unstructured
-  The unstructured commits are on a WIP branch (fix/parser-edge-case).
-  The main branch is clean. No action needed.
-
 VERSION ALIGNMENT — DRIFT
   package.json says 1.3.0, pyproject.toml says 1.2.0
-  One of them is wrong. Cross-reference the latest tag.
+  Publishing now would release inconsistent metadata.
+  Remediation: cross-reference the latest tag and align both files.
 ```
 
-If all active dimensions are healthy, report that in one line:
+If all active dimensions are healthy, report one line such as
+`PASS — 4 dimensions checked, all healthy.`
 
-```text
-PASS — 4 dimensions checked, all healthy.
-```
-
-If there is a blocking issue (dirty tree, shell script that literally
-cannot run, version drift that would break a publish), say so explicitly
-and stop. Do not continue checking other dimensions — fix the block first.
+Name a blocking issue explicitly and stop before lower-priority checks.
 
 Structured output is an output mode, not a health dimension. Do not include it
 in the dimension plan. Emit JSONL only when `REPO_HEALTH_OUTPUT=jsonl` is set;
@@ -366,7 +367,6 @@ lockfile policy as an application-versus-library decision, not a generic ignore.
 Example JSONL output:
 ```jsonl
 {"dimension":"version_alignment","finding":"pyproject=1.2.0 Cargo=1.1.0","harm":"stale release","remediation":"sync to 1.2.0","confidence":0.95}
-{"dimension":"external_reference_health","finding":"https://example.com/docs 404","harm":"dead link in README","remediation":"update URL","confidence":1.0}
 ```
 
 ---
@@ -385,110 +385,31 @@ overrides the heuristic discovery in Step 2:
 }
 ```
 
-Read it if it exists, but do not echo the full file into the transcript. Inspect
-only the settings needed for the plan and redact any sensitive values. Merge its
-settings into your dimension list.
-If it declares a custom consistency check (`"require": [...]`), that
-check replaces the default probe for that dimension.
+Inspect only settings needed for the plan; do not echo the full file into the
+transcript, and redact sensitive values. Merge the settings into the dimension
+list. A custom required check replaces the default probe for that dimension.
 
----
+## Completion contract
 
-## Common Rationalizations
+Before delivering the report, confirm that:
 
-| Rationalization | Reality |
-|---|---|
-| "I know this repo well enough to skip Step 1." | Repository shape changes. Run the probes and write the profile before judging. |
-| "CI is green, so the repo is healthy." | CI only checks what it is configured to check. Version drift, stale docs, and attribution drift can be invisible. |
-| "This checklist does not mention it, so I should skip it." | There is no universal checklist. Step 2 asks what would break in this repo if it drifted. |
-| "I should run every probe to be thorough." | Irrelevant probes create noise. Only check dimensions activated by the repo profile. |
-| "This finding is minor, so I will omit it." | Report concrete harm and let the human decide whether to act. |
-
-## Red Flags
-
-- Reporting PASS for a dimension that was skipped
-- Running a dimension probe before emitting the structured repo profile and
-  dimension plan
-- Activating a dimension without naming its profile evidence
-- Treating missing tags, missing CI, or missing package manifests as defects
-  without explaining concrete harm
-- Applying a universal severity scale instead of judging local impact
-- Producing findings for tooling that is maintainer-only, not shipped runtime
-  payload
-- Emitting JSONL when `REPO_HEALTH_OUTPUT=jsonl` was not requested
-- Including credential material, tokens, or secrets in findings without
-  redaction — flag existence, not values
-- Printing raw commit subjects or bodies while checking commit quality or
-  secret patterns
-- Assuming `.gitignore` protects sensitive files that Git already tracks
-
-## Verification
-
-After completing the scan:
-
-- [ ] A concise structured repo profile was written before dimension checks
-- [ ] The profile separates observed facts from inferred labels
-- [ ] A dimension plan accounts for every candidate before probes run
-- [ ] Every active dimension cites profile evidence
-- [ ] Only dimensions relevant to that profile were checked
-- [ ] No skipped dimension was reported as PASS
-- [ ] Every finding describes concrete harm, not abstract nonconformance
-- [ ] Blocking findings are named explicitly and placed first
-- [ ] Maintainer-only scripts are not described as shipped runtime payload
-- [ ] JSONL output is emitted only when `REPO_HEALTH_OUTPUT=jsonl` is set
-- [ ] Credentials, tokens, or secrets are redacted or reported by existence
-  only, not included as raw values in findings
-- [ ] Commit-message checks emitted counts or status only, never raw subjects or bodies
-- [ ] Sensitive ignore candidates were checked for tracked-file exposure
-
----
-
-## What this skill does not do
-
-- It does not contain a checklist. Every repo is different.
-- It does not ship scripts. The agent uses `git`, `shellcheck`,
-  `python3`, `gh`, and whatever else is on PATH.
-- It does not maintain reference files. Runtime discovery replaces
-  lookup tables.
-- It does not prescribe severity. The agent judges actual harm.
-- It does not gate Phase C. Reverse sync is a separate concern from
-  health scanning. If the repo needs a sync step, the agent designs
-  it from the repo's sync targets, not from a pre-written procedure.
-
----
-
-## Design principles (read before Step 1)
-
-**The repo tells you what it needs.** Do not bring expectations. A
-10-year-old project with 10K commits and no tags is valid if that's
-how they work. Judge drift from local invariants, not from a universal
-standard.
-
-**Every invariant traces to a concrete failure.** If you cannot think
-of a specific problem that would occur when this invariant breaks, the
-check is speculative. Skip it.
-
-**Run once, observe broadly.** One `ls`, one `find`, one `git log`
-should give you the repo's shape. Do not chain five commands to
-confirm what the first two already showed.
-
-**Write the profile before the checks.** If you don't know the repo's
-observed languages, tools, CI system, shipped payload, script surface, and
-inferred repo type, you cannot meaningfully assess its health. Step 1 is
-not optional.
-
-**The right number of checks is the one the repo needs, not the
-one the skill defines.**
-
----
+- the profile preceded all dimension probes and separates observations from
+  inferences;
+- the plan accounts for every candidate dimension, cites activation evidence,
+  and does not report skipped dimensions as healthy;
+- checks and findings concern the shipped repository surface, not unrelated
+  maintainer tooling;
+- every finding states concrete harm and remediation, with blocking findings
+  first;
+- JSONL was emitted only when requested;
+- secret checks exposed only counts, status, or locations—never raw subjects or
+  bodies or sensitive values; and
+- sensitive ignore candidates were checked against both ignore rules and
+  tracked files.
 
 ## Attribution drift dimension clarification
 
-The **Attribution drift** check scans `origin/main..HEAD` — this covers
-commits on the current branch that are not yet in `origin/main`. On a
-fresh clone with no local commits, this range is empty and the check
-correctly reports 0 trailers found. 
-
-If you need to scan all commits in the repo (including history), adjust
-the range to `HEAD` or use `git log --all`. The default range is
-designed for pre-push/pre-merge validation where only new commits
-matter.
+The **Attribution drift** check scans from the current branch's upstream, or a
+remote default branch when no upstream exists. If neither can be resolved, skip
+the dimension rather than scanning all history. The bounded range is for
+pre-push or pre-merge validation; expanding it requires explicit audit scope.

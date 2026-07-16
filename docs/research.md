@@ -235,5 +235,11 @@ echoing matching values.
    exposure.
 5. Red Flag and Verification checklist items that prohibit raw commit-metadata
    output and require tracked-file awareness.
+6. Bounded branch-history checks resolve the current upstream or remote default
+   instead of assuming `origin/main`; no-base repositories skip rather than scan
+   all history.
+7. Pattern matching is explicitly heuristic. Existing project-native scanners
+   and ecosystem-specific sensitive filenames are used only when discovery
+   identifies them.
 
 **Open question:** Whether opt-in `REPO_HEALTH_VERIFY_REFS=1` external URL checks should also scan response bodies for secret patterns.
