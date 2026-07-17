@@ -138,47 +138,50 @@ Install above).
 │       ├── ci.yml                    # Deterministic CI pipeline
 │       └── codex-regression.yml      # Non-blocking model evaluation
 ├── .codex-plugin/
-│   └── plugin.json       # Codex plugin manifest
-├── .gitattributes
-├── .gitignore
-├── AGENTS.md             # Repository-level agent routing
-├── CITATION.cff
-├── LICENSE
-├── README.md
-├── repo-health-skill-roadmap.md
-├── SECURITY.md
-├── docs/                 # Maintainer documentation
-│   ├── README.md
-│   ├── codex-setup.md
-│   ├── codex-regression.md
-│   ├── portability-contract.md
+│   └── plugin.json                   # Codex plugin manifest
+├── .gitattributes                    # Git text normalization and Linguist overrides
+├── .gitignore                        # Python, OS, and editor artifact ignore rules
+├── AGENTS.md                         # Repository-level agent routing
+├── CITATION.cff                      # Citation metadata for academic reference
+├── LICENSE                           # MIT license text
+├── README.md                         # Project documentation and usage guide
+├── repo-health-skill-roadmap.md      # Development roadmap and future plans
+├── SECURITY.md                       # Security policy and vulnerability reporting
+├── docs/                             # Maintainer documentation
+│   ├── README.md                     # Document index and navigation
+│   ├── codex-setup.md                # Verified Codex repository-local and plugin setup
+│   ├── codex-regression.md           # Non-blocking model regression harness docs
+│   ├── portability-contract.md       # Cross-agent portability guarantees
 │   ├── compatibility-reports/
-│   │   └── codex.md
-│   ├── maintaining.md
-│   ├── decisions.md
-│   ├── evidence-urls.json
-│   ├── research.md
-│   └── doc-standards.json
+│   │   └── codex.md                  # Compatibility evidence for Codex CLI
+│   ├── maintaining.md                # Release and maintenance procedures
+│   ├── decisions.md                  # Architecture decision records
+│   ├── evidence-urls.json            # External URL inventory for verification
+│   ├── research.md                   # Design research and ecosystem analysis
+│   └── doc-standards.json            # Documentation quality and style rules
 ├── evals/
 │   ├── cases/
-│   │   └── repo-health-scan.json  # Local behavioral contract
-│   └── codex/                     # Model prompts and output schema
-├── scripts/              # CI-only tooling (not shipped)
-│   ├── check-expiry.py
-│   ├── check-portability.py
-│   ├── check-trust.py
-│   ├── check-version-consistency.py
-│   ├── doc-audit.py
-│   ├── extract-tests.py
-│   ├── grade-codex-transcript.py
-│   ├── run-codex-regression.py
-│   ├── validate-evals.py
-│   ├── validate-scripts.py
-│   ├── verify.sh
-│   └── verify-urls.py
+│   │   └── repo-health-scan.json     # Local behavioral contract for the skill
+│   └── codex/                        # Model prompts and output schema for regressions
+│       ├── negative-prompt.md        # Prompt that should trigger skip behavior
+│       ├── positive-prompt.md        # Prompt that should trigger full scan
+│       └── positive-result.schema.json  # Expected output schema for positive case
+├── scripts/                          # CI-only tooling (not shipped)
+│   ├── check-expiry.py               # Scans for expired doc and config references
+│   ├── check-portability.py          # Validates no agent-specific references in skills
+│   ├── check-trust.py                # Validates security and trust contract
+│   ├── check-version-consistency.py  # Checks version alignment across manifests and tags
+│   ├── doc-audit.py                  # Manifest-driven doc completeness checker
+│   ├── extract-tests.py              # Extracts test fixtures from script docstrings
+│   ├── grade-codex-transcript.py     # Grades Codex regression artifacts deterministically
+│   ├── run-codex-regression.py       # Runs isolated Codex skill regressions
+│   ├── validate-evals.py             # Validates eval contract structure
+│   ├── validate-scripts.py           # Validates script quality conventions
+│   ├── verify.sh                     # Repository structure consistency check
+│   └── verify-urls.py                # Checks external URL references are reachable
 ├── skills/
 │   └── repo-health-and-sync-skill/
-│       └── SKILL.md      # The entire skill — one file, nothing else
+│       └── SKILL.md                  # The entire skill — one file, nothing else
 ```
 
 ---
