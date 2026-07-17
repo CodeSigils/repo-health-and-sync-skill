@@ -10,8 +10,10 @@ Thumbs.db
 .idea/
 *.sublime-*
 
-# Temp files
+# Temp and cache
 tmp/
+.cache/
+*.log
 
 # Agent local state (committed instruction files excluded)
 .claude/*.local.*
