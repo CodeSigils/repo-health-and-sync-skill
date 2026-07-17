@@ -18,6 +18,8 @@ CLAUDE.local.md
 AGENT.md
 GEMINI.md
 gemini-debug.log
+.hermes/
+.gemini/
 .open-mem/
 .omo/
 .agents/
