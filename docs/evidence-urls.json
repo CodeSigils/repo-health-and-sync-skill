@@ -42,7 +42,7 @@
       "url": "https://github.com/NousResearch/Agents.gitignore",
       "expected_statuses": [200, 404],
       "source_section": "docs/",
-      "notes": "Community agent gitignore reference"
+      "notes": "Community agent gitignore reference — currently returns 404"
     },
     {
       "name": "GFM Tables spec",

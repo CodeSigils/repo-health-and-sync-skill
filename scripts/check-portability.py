@@ -97,13 +97,14 @@ def scan_file(path: Path) -> list[tuple[Path, int, str, str]]:
     file_exempt = any("# portability: allow-platform-ref" in line for line in text.splitlines()[:3])
     if file_exempt:
         return []
+    violations: list[tuple[Path, int, str, str]] = []
     for line_no, line in enumerate(text.splitlines(), start=1):
         if "# portability: allow-platform-ref" in line:
             continue
         for label, pattern in FORBIDDEN_PATTERNS:
             if pattern.search(line):
-                return [(Path("dummy"), 1, "test", "test")]
-    return []
+                violations.append((path, line_no, label, line.rstrip()))
+    return violations
 
 
 def run_self_tests() -> int:

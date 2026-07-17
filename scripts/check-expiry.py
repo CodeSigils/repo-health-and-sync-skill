@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 from datetime import datetime, date
 from pathlib import Path
 from typing import Any
@@ -63,9 +64,9 @@ def find_expiry_dates(file_path: Path) -> list[tuple[str, date, int]]:
     return results
 
 
-def check_file_expiry(file_path: Path, strict: bool = False) -> tuple[list[tuple[str, date, int]], list[str]]:
+def check_file_expiry(file_path: Path, strict: bool = False) -> tuple[list[str], list[str]]:
     """Check a file for expired/missing expiry dates.
-    Returns (expired_entries, missing_entries).
+    Returns (expired_messages, missing_entries).
     """
     expired = []
     missing = []
@@ -215,9 +216,40 @@ def main() -> int:
     if args.self_test:
         return run_self_tests()
 
-    # Main checking logic here
-    # ... (existing main logic)
+    errors: list[str] = []
+    notes: list[str] = []
+    today = date.today()
 
+    # Scan SKILL.md
+    skill_path = ROOT / "skills" / "repo-health-and-sync-skill" / "SKILL.md"
+    if skill_path.exists():
+        expired, missing = check_file_expiry(skill_path, strict=args.strict)
+        errors.extend(expired)
+        notes.extend(missing)
+        yaml_expired = [e for e, d, _ in check_yaml_frontmatter(skill_path) if d < today]
+        errors.extend(yaml_expired)
+
+    # Scan docs/ for expiration fields
+    for f in sorted(ROOT.glob("docs/*.md")):
+        expired, missing = check_file_expiry(f, strict=args.strict)
+        errors.extend(expired)
+        notes.extend(missing)
+
+    # Scan evidence-urls.json
+    urls_path = ROOT / "docs" / "evidence-urls.json"
+    if urls_path.exists():
+        json_expired, json_missing = check_json_file(urls_path)
+        expired_strs = [e for e, d, _ in json_expired]
+        errors.extend(expired_strs)
+        notes.extend(json_missing)
+
+    for n in notes:
+        print(f"NOTE: {n}")
+    if errors:
+        for e in errors:
+            print(f"EXPIRED: {e}", file=sys.stderr)
+        return 1
+    print("PASS: no expired references found")
     return 0
 
 

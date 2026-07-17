@@ -115,7 +115,9 @@ Both use the same architecture: policy documentation → local commit-msg hook �
 shared checker script → CI gate. No surveyed project uses hook-only or CI-only
 for enforcement that matters. The current methodology teaches agents to check
 for unauthorized `Co-authored-by:` trailers via `git log --format="%B"`,
-eliminating the need for a shipped Python checker script.
+eliminating the need for a shipped Python checker script. (Note: the earlier
+`check-commit-trailers.py` script that this replaced was removed from the
+repository; git-log-based detection is the sole approach.)
 
 ---
 

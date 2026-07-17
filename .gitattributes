@@ -10,6 +10,5 @@ SKILL.md linguist-documentation
 README.md linguist-documentation
 
 # Declare scripts explicitly
-scripts/check-commit-trailers.py linguist-language=Python
 scripts/doc-audit.py linguist-language=Python
 scripts/verify.sh linguist-language=Shell
