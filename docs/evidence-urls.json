@@ -38,11 +38,11 @@
       "notes": "Official Go .gitignore template"
     },
     {
-      "name": "NousResearch Agents gitignore",
-      "url": "https://github.com/NousResearch/Agents.gitignore",
-      "expected_statuses": [200, 404],
+      "name": "Agents.gitignore template",
+      "url": "https://github.com/github/gitignore/blob/main/Global/Agents.gitignore",
+      "expected_statuses": [200],
       "source_section": "docs/",
-      "notes": "Community agent gitignore reference — currently returns 404"
+      "notes": "Official agent artifact gitignore template at github/gitignore (Global/Agents.gitignore)"
     },
     {
       "name": "GFM Tables spec",
