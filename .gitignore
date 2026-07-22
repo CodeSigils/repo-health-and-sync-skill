@@ -1,6 +1,10 @@
 # OS junk
 .DS_Store
+.AppleDouble
+.LSOverride
+._*
 Thumbs.db
+[Dd]esktop.ini
 *.swp
 *.swo
 *~
@@ -12,6 +16,7 @@ Thumbs.db
 
 # Temp and cache
 tmp/
+.tmp/
 .cache/
 *.log
 
