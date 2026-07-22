@@ -43,6 +43,8 @@ __pycache__/
 output/
 .venv/
 venv/
+env/
+ENV/
 .ruff_cache/
 
 # Local environment and secret files (keep shareable templates)
