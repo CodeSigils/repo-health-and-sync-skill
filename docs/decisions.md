@@ -1,4 +1,4 @@
-# Decisions — Repo Health Scan (v0.2.0)
+# Decisions — Repo Health Scan (v0.3.0)
 
 **Purpose:** Records the design decisions that shaped the current methodology.
 The skill itself is `skills/repo-health-and-sync-skill/SKILL.md`. Research

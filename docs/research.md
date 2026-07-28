@@ -1,4 +1,4 @@
-# Research — Repo Health Scan (v0.2.0)
+# Research — Repo Health Scan (v0.3.0)
 
 **Purpose:** Evidence base that informed the current methodology design.
 Contains ecosystem survey data, cross-platform consumption patterns, and

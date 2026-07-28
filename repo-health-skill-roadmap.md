@@ -2,7 +2,7 @@
 
 **Status:** Codex-first development
 
-**Last reconciled:** 2026-07-14
+**Last reconciled:** 2026-07-27
 
 This roadmap is based on the current repository, recorded compatibility tests,
 official platform documentation, and the research sources listed below. It
@@ -111,8 +111,11 @@ Primary sources and research, accessed 2026-07-12 or 2026-07-13:
 | Eval contract | `evals/cases/repo-health-scan.json` covers positive/negative triggers, this skill pack, and a Python library using `uv`. |
 | Eval validation | `scripts/validate-evals.py` enforces profile-first ordering, activation evidence, skip reasons, and fixture diversity. |
 | Security and trust | `scripts/check-trust.py` enforces bounded triggers, read-only instructions, opt-in network/output behavior, credential hygiene, versioned compatibility evidence, and payload separation. |
+| Secret scanning | Skill scans `.gitignore` for secret patterns (`.env`, credentials) and commit message bodies for leaked secrets; report includes redaction guard. Evidence: commits `92d7481`, `fa0b8f9`, `063778c`. |
+| Audit hardening | Repository audits streamlined; coverage gaps closed; portability scanner fixed; expiry checker wired. Evidence: commits `1aef227`, `a54272b`, `988322d`. |
 | Release consistency | The checker validates `SKILL.md`, plugin metadata, `CITATION.cff`, tags, and GitHub releases. Strict CI queries use a read-only job token. |
 | Repository verification | Script self-tests, Ruff, ShellCheck, documentation audit, plugin validation, skill validation, and diff checks pass independently. |
+| Evidence URL tracking | `docs/evidence-urls.json` upgraded to v3 schema with status, source_type, domain_tag, and last_verified fields. All 11 URLs verified reachable. |
 | Local model regression | Nine Codex CLI 0.133.0 runs are recorded: six passes, one timeout, and two deterministic grading failures. The exact consolidated payload passed once after the latest run exposed and corrected profile/plan message ordering. |
 
 ### Remaining Gaps
@@ -409,6 +412,18 @@ Completed foundation:
   duplicating methodology or maintainer instructions.
 - Verified skills CLI 1.5.16 discovers the single skill directly from
   `skills/` without a root `plugin.json`.
+- Added secret scanning: `.gitignore` secret pattern detection, commit body
+  secret scanning, and report redaction guard (`92d7481`, `fa0b8f9`).
+- Hardened repository audits: streamlined audit flow, closed coverage gaps,
+  pinned `setup-python`, fixed portability scanner, wired expiry checker
+  (`1aef227`, `a54272b`, `988322d`).
+- Completed `.gitignore` coverage: added `.hermes/`, `.gemini/`, `tmp/`,
+  `.cache/`, `*.log`, virtualenv patterns (`5a01331`–`9575140`).
+- Replaced dead NousResearch URL with canonical `github/gitignore`
+  `Agents.gitignore` (`cb13205`).
+- Upgraded `docs/evidence-urls.json` from v1 to v3 schema with status
+  tracking, source_type classification, domain tagging, and ISO
+  `last_verified` dates (`2402213`).
 
 ---
 
