@@ -1,12 +1,16 @@
 {
-  "version": 1,
-  "description": "Machine-readable URL evidence index for documentation references.",
+  "version": 3,
+  "description": "Machine-readable URL evidence index for documentation references. v3 adds: status tracking, source_type classification, domain tagging, last_verified (ISO), versioned_url for versioned references.",
   "urls": [
     {
       "name": "GitHub gitignore templates",
       "url": "https://github.com/github/gitignore",
       "expected_statuses": [200],
       "source_section": "docs/",
+      "domain_tag": "gitignore",
+      "source_type": "official_docs",
+      "status": "active",
+      "last_verified": "2026-07-27",
       "notes": "Primary source for language-specific .gitignore templates"
     },
     {
@@ -14,6 +18,10 @@
       "url": "https://github.com/github/gitignore/blob/main/Python.gitignore",
       "expected_statuses": [200],
       "source_section": "docs/",
+      "domain_tag": "gitignore",
+      "source_type": "official_docs",
+      "status": "active",
+      "last_verified": "2026-07-27",
       "notes": "Official Python .gitignore template"
     },
     {
@@ -21,6 +29,10 @@
       "url": "https://github.com/github/gitignore/blob/main/Node.gitignore",
       "expected_statuses": [200],
       "source_section": "docs/",
+      "domain_tag": "gitignore",
+      "source_type": "official_docs",
+      "status": "active",
+      "last_verified": "2026-07-27",
       "notes": "Official Node.js .gitignore template"
     },
     {
@@ -28,6 +40,10 @@
       "url": "https://github.com/github/gitignore/blob/main/Rust.gitignore",
       "expected_statuses": [200],
       "source_section": "docs/",
+      "domain_tag": "gitignore",
+      "source_type": "official_docs",
+      "status": "active",
+      "last_verified": "2026-07-27",
       "notes": "Official Rust .gitignore template"
     },
     {
@@ -35,6 +51,10 @@
       "url": "https://github.com/github/gitignore/blob/main/Go.gitignore",
       "expected_statuses": [200],
       "source_section": "docs/",
+      "domain_tag": "gitignore",
+      "source_type": "official_docs",
+      "status": "active",
+      "last_verified": "2026-07-27",
       "notes": "Official Go .gitignore template"
     },
     {
@@ -42,6 +62,10 @@
       "url": "https://github.com/github/gitignore/blob/main/Global/Agents.gitignore",
       "expected_statuses": [200],
       "source_section": "docs/",
+      "domain_tag": "gitignore",
+      "source_type": "official_docs",
+      "status": "active",
+      "last_verified": "2026-07-27",
       "notes": "Official agent artifact gitignore template at github/gitignore (Global/Agents.gitignore)"
     },
     {
@@ -49,6 +73,10 @@
       "url": "https://github.github.com/gfm/#tables-extension-",
       "expected_statuses": [200],
       "source_section": "docs/",
+      "domain_tag": "markdown-specification",
+      "source_type": "specification",
+      "status": "active",
+      "last_verified": "2026-07-27",
       "notes": "GitHub Flavored Markdown specification for table parsing"
     },
     {
@@ -56,6 +84,10 @@
       "url": "https://docs.github.com/en/actions/tutorials/authenticate-with-github_token",
       "expected_statuses": [200],
       "source_section": "docs/decisions.md",
+      "domain_tag": "authentication",
+      "source_type": "official_docs",
+      "status": "active",
+      "last_verified": "2026-07-27",
       "notes": "Primary source for passing GITHUB_TOKEN to GitHub CLI through GH_TOKEN"
     },
     {
@@ -63,6 +95,10 @@
       "url": "https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits",
       "expected_statuses": [200],
       "source_section": "docs/decisions.md",
+      "domain_tag": "authentication",
+      "source_type": "official_docs",
+      "status": "active",
+      "last_verified": "2026-07-27",
       "notes": "Primary source for SSH, GPG, and S/MIME commit signing"
     },
     {
@@ -70,6 +106,10 @@
       "url": "https://developers.openai.com/codex/noninteractive",
       "expected_statuses": [200],
       "source_section": "docs/codex-regression.md",
+      "domain_tag": "agent-tooling",
+      "source_type": "official_docs",
+      "status": "active",
+      "last_verified": "2026-07-27",
       "notes": "Official source for codex exec JSONL, ephemeral sessions, sandboxing, and automation authentication"
     },
     {
@@ -77,6 +117,10 @@
       "url": "https://developers.openai.com/codex/github-action",
       "expected_statuses": [200],
       "source_section": "docs/codex-regression.md",
+      "domain_tag": "agent-tooling",
+      "source_type": "official_docs",
+      "status": "active",
+      "last_verified": "2026-07-27",
       "notes": "Official source for API-key proxying, read-only safety, output schemas, and trusted workflow triggers"
     }
   ]
