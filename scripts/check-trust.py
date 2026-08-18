@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Validate the skill's security and trust contract."""
 
 from __future__ import annotations

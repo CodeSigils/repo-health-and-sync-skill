@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Verify reachable HTTP(S) URLs referenced by docs and skill files.
 
 The URL list lives in docs/evidence-urls.json so the research evidence base has
@@ -67,7 +66,7 @@ def validate_entry_v1(entry: dict[str, Any]) -> None:
         raise ValueError("expected_statuses must be a non-empty list")
     for status in entry["expected_statuses"]:
         if not isinstance(status, int):
-            raise ValueError("expected_statuses must contain integers")
+            raise TypeError("expected_statuses must contain integers")
 
 
 def validate_entry_v3(entry: dict[str, Any]) -> None:
@@ -188,7 +187,7 @@ def check_self_test() -> int:
     try:
         validate_entry({"name": "test", "url": "https://example.com", "expected_statuses": ["200"]})
         assert False, "should have failed"
-    except ValueError:
+    except TypeError:
         print("  PASS  validate_entry v1 non-int status")
 
     # Test validate_entry (v3)
@@ -242,13 +241,13 @@ def summary_report(entries: list[dict[str, Any]], version: int) -> None:
 
     print(f"  Total URLs: {len(entries)}")
     print(f"  Schema version: {version}")
-    print(f"\n  By domain_tag:")
+    print("\n  By domain_tag:")
     for tag, count in domain_counts.most_common():
         print(f"    {tag:<30s} {count}")
-    print(f"\n  By source_type:")
+    print("\n  By source_type:")
     for st, count in source_type_counts.most_common():
         print(f"    {st:<30s} {count}")
-    print(f"\n  By status:")
+    print("\n  By status:")
     for s, count in status_counts.most_common():
         print(f"    {s:<30s} {count}")
 
@@ -257,7 +256,7 @@ def main() -> int:
     if "--self-test" in sys.argv:
         return check_self_test()
 
-    version, description, entries = load_manifest()
+    version, _description, entries = load_manifest()
     summary_mode = "--summary" in sys.argv
 
     print("=== Evidence URL Re-verification ===")
@@ -311,13 +310,13 @@ def main() -> int:
 
         if version >= 3:
             print(
-                f"  {entry['name']:<30s} {str(status):<8s} {expected_text:<12s} "
-                f"{str(redirects):<9s} {content_label:<12s} {url_status:<12s} {note:<10s}{marker}"
+                f"  {entry['name']:<30s} {status!s:<8s} {expected_text:<12s} "
+                f"{redirects!s:<9s} {content_label:<12s} {url_status:<12s} {note:<10s}{marker}"
             )
         else:
             print(
-                f"  {entry['name']:<30s} {str(status):<8s} {expected_text:<12s} "
-                f"{str(redirects):<9s} {content_label:<12s} {note:<10s}{marker}"
+                f"  {entry['name']:<30s} {status!s:<8s} {expected_text:<12s} "
+                f"{redirects!s:<9s} {content_label:<12s} {note:<10s}{marker}"
             )
 
     if drift_found:

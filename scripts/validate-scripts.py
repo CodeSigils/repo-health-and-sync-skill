@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Validate script quality for repo-health scripts."""
 
 from __future__ import annotations
@@ -89,9 +88,9 @@ def check_script(script_path: Path) -> list[str]:
                     errors.append(f"{script_path.name}:{i}: open() missing encoding=")
                 break
 
-    # Check for shebang
-    if not lines[0].startswith("#!/usr/bin/env python3"):
-        errors.append(f"{script_path.name}: missing #!/usr/bin/env python3 shebang")
+    # Shebangs are intentionally omitted (EXE001)
+    if lines[0].startswith("#!"):
+        errors.append(f"{script_path.name}: unexpected shebang — scripts are invoked via python3")
 
     return errors
 
@@ -108,6 +107,7 @@ def run_self_tests() -> list[str]:
             capture_output=True,
             text=True,
             timeout=30,
+            check=False,
         )
         if result.returncode != 0:
             errors.append(f"{script}: self-test failed: {result.stderr}")

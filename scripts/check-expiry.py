@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 check-expiry.py — Scan for expired references in documentation and config files.
 
@@ -16,7 +15,7 @@ from __future__ import annotations
 import json
 import re
 import sys
-from datetime import datetime, date
+from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Any
 
@@ -35,7 +34,7 @@ def parse_date(date_str: str) -> date | None:
     date_str = date_str.strip()
     for fmt in DATE_FORMATS:
         try:
-            return datetime.strptime(date_str, fmt).date()
+            return datetime.strptime(date_str, fmt).replace(tzinfo=UTC).date()
         except ValueError:
             continue
     return None
@@ -80,7 +79,7 @@ def check_file_expiry(file_path: Path, strict: bool = False) -> tuple[list[str],
     if not expiries and strict:
         missing.append(f"{file_path}: no Expires: field found")
 
-    today = date.today()
+    today = datetime.now(tz=UTC).date()
     for line, expiry_date, line_no in expiries:
         if expiry_date < today:
             expired.append(f"{file_path}:{line_no}: expired on {expiry_date} ({line})")
@@ -134,7 +133,7 @@ def check_json_file(file_path: Path) -> tuple[list[tuple[str, date, int]], list[
             if "expires" in obj or "expire" in obj:
                 date_str = obj.get("expires") or obj.get("expire")
                 expiry = parse_date(str(date_str))
-                if expiry and expiry < date.today():
+                if expiry and expiry < datetime.now(tz=UTC).date():
                     expired.append((f"{file_path}: {path}.expires", expiry, 0))
             for k, v in obj.items():
                 check_obj(v, f"{path}.{k}" if path else k)
@@ -218,7 +217,7 @@ def main() -> int:
 
     errors: list[str] = []
     notes: list[str] = []
-    today = date.today()
+    today = datetime.now(tz=UTC).date()
 
     # Scan SKILL.md
     skill_path = ROOT / "skills" / "repo-health-and-sync-skill" / "SKILL.md"

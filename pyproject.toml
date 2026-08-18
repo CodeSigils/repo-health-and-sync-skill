@@ -1,0 +1,18 @@
+[project]
+name = "repo-health-and-sync-skill-maintenance"
+version = "0.0.0"
+description = "Maintainer tooling for the repo-health-and-sync-skill repository"
+requires-python = ">=3.13"
+dependencies = []
+
+[dependency-groups]
+dev = [
+  "ruff==0.16.3",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 120
+target-version = "py313"

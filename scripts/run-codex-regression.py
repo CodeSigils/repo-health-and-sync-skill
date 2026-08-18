@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Run isolated positive and negative Codex skill regressions."""
 
 from __future__ import annotations

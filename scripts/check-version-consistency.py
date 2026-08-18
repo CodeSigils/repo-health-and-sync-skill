@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Check local release versions, git tags, and GitHub releases."""
 
 from __future__ import annotations

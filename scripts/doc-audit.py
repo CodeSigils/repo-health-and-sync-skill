@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """doc-audit.py — Manifest-driven documentation completeness checker.
 
 Reads a JSON manifest declaring required patterns in documentation files

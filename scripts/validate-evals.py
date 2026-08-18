@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Validate local repo-health behavioral eval contracts."""
 
 from __future__ import annotations

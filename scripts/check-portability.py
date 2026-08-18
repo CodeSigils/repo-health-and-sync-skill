@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Check for agent-specific references in portable skill files.
 
 A generalized portability gate for agentskills.io-compatible skill repos.

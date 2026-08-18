@@ -2,7 +2,7 @@
 
 **Status:** Codex-first development
 
-**Last reconciled:** 2026-07-27
+**Last reconciled:** 2026-08-18
 
 This roadmap is based on the current repository, recorded compatibility tests,
 official platform documentation, and the research sources listed below. It
@@ -460,10 +460,18 @@ Completed foundation:
 repo-health-and-sync-skill/
 ├── .codex-plugin/
 │   └── plugin.json
-├── .github/workflows/ci.yml
-├── AGENTS.md                         # repository routing only
+├── .github/
+│   ├── dependabot.yml              # github-actions auto-update
+│   └── workflows/
+│       ├── ci.yml                  # Deterministic CI pipeline
+│       └── codex-regression.yml    # Non-blocking model evaluation
+├── AGENTS.md                       # repository routing only
+├── CITATION.cff
+├── LICENSE
 ├── README.md
 ├── SECURITY.md
+├── pyproject.toml                  # non-package maintainer environment
+├── uv.lock                         # exact transitive dependency lock
 ├── repo-health-skill-roadmap.md
 ├── skills/
 │   └── repo-health-and-sync-skill/
@@ -472,12 +480,23 @@ repo-health-and-sync-skill/
 │   └── cases/
 │       └── repo-health-scan.json
 ├── docs/
-│   ├── codex-setup.md                  # verified Codex setup
-│   ├── portability-contract.md         # cross-agent claim and adapter rules
+│   ├── codex-setup.md              # verified Codex setup
+│   ├── portability-contract.md     # cross-agent claim and adapter rules
 │   ├── maintaining.md
 │   ├── decisions.md
 │   └── compatibility-reports/
 │       └── codex.md
-└── scripts/                            # maintainer-only validation
-    └── check-trust.py                  # security and trust contract
+└── scripts/                        # maintainer-only validation
+    ├── check-expiry.py
+    ├── check-portability.py
+    ├── check-trust.py
+    ├── check-version-consistency.py
+    ├── doc-audit.py
+    ├── extract-tests.py
+    ├── grade-codex-transcript.py
+    ├── run-codex-regression.py
+    ├── validate-evals.py
+    ├── validate-scripts.py
+    ├── verify.sh
+    └── verify-urls.py
 ```

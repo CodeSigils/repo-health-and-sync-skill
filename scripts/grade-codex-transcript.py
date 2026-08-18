@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Grade Codex repo-health regression artifacts deterministically."""
 
 from __future__ import annotations

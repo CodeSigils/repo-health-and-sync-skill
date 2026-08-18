@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Extract test fixtures from script self-tests.
 
 Parses the do_self_test() function of a script and extracts test cases

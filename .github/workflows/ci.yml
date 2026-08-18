@@ -19,6 +19,8 @@ on:
       - '.repo-health.json'
       - '.codex-plugin/plugin.json'
       - '.github/workflows/**'
+      - 'pyproject.toml'
+      - 'uv.lock'
   pull_request:
     branches: [main]
     paths:
@@ -36,8 +38,14 @@ on:
       - '.repo-health.json'
       - '.codex-plugin/plugin.json'
       - '.github/workflows/**'
+      - 'pyproject.toml'
+      - 'uv.lock'
   schedule:
     - cron: "0 9 * * 1"
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
@@ -45,6 +53,7 @@ permissions:
 jobs:
   lint:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
         with:
@@ -53,10 +62,10 @@ jobs:
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: '3.13'
-      - name: Install validation dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install ruff==0.15.21
+      - name: Install uv
+        uses: astral-sh/setup-uv@e58605a9b6da7c637471fab8847a5e5a6b8df081 # v5
+      - name: Install dependencies
+        run: uv sync
       - name: Check cross-agent portability
         run: python3 scripts/check-portability.py
       - name: Self-test — doc audit
@@ -84,7 +93,7 @@ jobs:
       - name: Shell script lint
         run: shellcheck scripts/*.sh
       - name: Python script lint
-        run: python3 -m ruff check scripts/ skills/
+        run: uv run ruff check scripts/ skills/
       - name: Version consistency check
         env:
           GH_TOKEN: ${{ github.token }}
@@ -92,6 +101,7 @@ jobs:
 
   full-verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     needs: lint
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
@@ -102,6 +112,7 @@ jobs:
 
   phase-b-gate:
     runs-on: ubuntu-latest
+    timeout-minutes: 3
     needs: lint
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     env:
@@ -122,6 +133,7 @@ jobs:
 
   check-expiry:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     needs: lint
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     steps:
@@ -133,6 +145,7 @@ jobs:
 
   verify-urls:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: lint
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     steps:
