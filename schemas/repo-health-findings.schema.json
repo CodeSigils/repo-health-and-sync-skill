@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/CodeSigils/repo-health-and-sync-skill/schemas/repo-health-findings.schema.json",
+  "title": "Repo Health Findings (JSONL)",
+  "version": "1.0.0",
+  "description": "Per-finding JSONL records emitted when REPO_HEALTH_OUTPUT=jsonl. One line per finding.",
+  "type": "object",
+  "required": ["dimension", "finding", "harm", "remediation", "confidence"],
+  "additionalProperties": false,
+  "properties": {
+    "dimension": { "type": "string" },
+    "finding": { "type": "string" },
+    "harm": { "type": "string" },
+    "remediation": { "type": "string" },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "severity": { "type": "string", "enum": ["blocking", "warning", "info"] },
+    "evidence": { "type": "object" }
+  }
+}

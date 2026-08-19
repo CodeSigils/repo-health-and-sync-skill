@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/CodeSigils/repo-health-and-sync-skill/schemas/dimension-plan.schema.json",
+  "title": "Dimension Plan",
+  "version": "1.0.0",
+  "description": "Dimension activation plan emitted in Step 2 (Infer). Lists active and skipped dimensions with evidence.",
+  "type": "object",
+  "required": ["active", "skipped"],
+  "additionalProperties": false,
+  "properties": {
+    "active": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "activated_by"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string" },
+          "activated_by": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "skipped": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "skip_reason"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string" },
+          "skip_reason": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

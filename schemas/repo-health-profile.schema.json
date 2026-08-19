@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/CodeSigils/repo-health-and-sync-skill/schemas/repo-health-profile.schema.json",
+  "title": "Repo Health Profile",
+  "version": "1.0.0",
+  "description": "Structured repository profile emitted in Step 1 (Discover). Contains observed facts and inferred labels.",
+  "type": "object",
+  "required": ["observed", "inferred"],
+  "additionalProperties": false,
+  "properties": {
+    "observed": {
+      "type": "object",
+      "required": ["vcs"],
+      "additionalProperties": false,
+      "properties": {
+        "vcs": { "type": "string", "enum": ["git"] },
+        "languages": { "type": "array", "items": { "type": "string" } },
+        "package_managers": { "type": "array", "items": { "type": "string" } },
+        "ci": { "type": "string" },
+        "script_surface": { "type": "string" },
+        "version_sources": { "type": "array", "items": { "type": "string" } },
+        "tags": { "type": "boolean" },
+        "branch_commits_outside_base": { "type": ["integer", "string"] },
+        "platform_requirements": { "type": "array", "items": { "type": "string" } },
+        "verify_refs": { "type": "boolean" },
+        "verify_releases": { "type": "boolean" },
+        "shipped_payload": { "type": "string" },
+        "recent_commits": { "type": "integer" },
+        "conventional_subjects": { "type": "integer" },
+        "informative_bodies": { "type": "integer" },
+        "base_ref": { "type": "string" },
+        "shell_files": { "type": "boolean" },
+        "gitignore": { "type": "boolean" }
+      }
+    },
+    "inferred": {
+      "type": "object",
+      "required": ["repo_type", "release_model", "risk_context"],
+      "additionalProperties": false,
+      "properties": {
+        "repo_type": { "type": "string" },
+        "release_model": { "type": "string" },
+        "risk_context": { "type": "string" }
+      }
+    }
+  }
+}

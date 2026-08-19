@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/CodeSigils/repo-health-and-sync-skill/schemas/repo-health-config.schema.json",
+  "title": "Repo Health Configuration (.repo-health.json)",
+  "version": "1.0.0",
+  "description": "Optional repository-level configuration to override heuristic discovery in Step 2.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "skip": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Dimension names to skip (e.g., ['shell-correctness'])"
+    },
+    "require": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Custom dimension names to require beyond the candidate catalog"
+    },
+    "version_sources": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Explicit version source files (paths relative to repo root)"
+    },
+    "commit_format": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": { "type": "string", "enum": ["conventional"] },
+        "required_fields": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "description": "Expected commit message format"
+    },
+    "portability": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "allow_platform_ref": {
+          "type": "boolean",
+          "description": "Allow agent-specific references in skill files (for single-runtime skills)"
+        }
+      }
+    }
+  }
+}
