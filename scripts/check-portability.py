@@ -175,32 +175,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    import argparse
-
-    parser = argparse.ArgumentParser(description="Check for agent-specific references in portable skill files.")
-    parser.add_argument("--self-test", action="store_true", help="Run internal self-tests")
-    args = parser.parse_args()
-
-    if args.self_test:
-        sys.exit(run_self_tests())
-
-    if repo_allows_platform_refs():
-        print("PASS: platform-specific references explicitly allowed by .repo-health.json")
-        sys.exit(0)
-
-    violations: list[tuple[Path, int, str, str]] = []
-    for path in sorted(SKILLS_DIR.rglob("*.md")):
-        try:
-            violations.extend(scan_file(path))
-        except OSError as exc:
-            print(f"FAIL: could not read {path}: {exc}", file=sys.stderr)
-            sys.exit(1)
-
-    if violations:
-        print("FAIL: agent-specific references found in skills/ — will break non-Hermes agents:")
-        for path, line_no, label, line in violations:
-            print(f"  {path}:{line_no}: {label}: {line}")
-        sys.exit(1)
-
-    print("PASS: no agent-specific references in skills/")
-    sys.exit(0)
+    sys.exit(main())

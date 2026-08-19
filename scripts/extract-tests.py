@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import ast
 import json
+import platform
 import sys
 from pathlib import Path
 
@@ -69,7 +70,7 @@ def create_fixtures(script_name: str, tests: list[dict]) -> list[dict]:
 
         fixture = {
             "name": label,
-            "python_version": "3.13",
+            "python_version": platform.python_version(),
             "maturity": "automation",
             "toolchain": ["ruff", "shellcheck"],
             "changed_files": [
