@@ -134,6 +134,11 @@ cannot write it, run more discovery probes.
 Given the emitted repo profile, ask: what invariants would break if they
 drifted?
 
+The dimension table below is a **non-exhaustive candidate catalog** — not a
+universal checklist. The agent may add custom dimensions when repository
+evidence supports them; every custom dimension must still cite `activated_by`
+evidence from the profile.
+
 Before running any dimension command, emit a `DIMENSION PLAN` that:
 
 - lists each active dimension with one or more exact profile paths in
@@ -170,7 +175,17 @@ skipped:
 
 Only after emitting the dimension plan, run the smallest command or command
 block that answers each active dimension. Do not run probes for skipped
-dimensions:
+dimensions.
+
+**Blocking behavior is contextual.** When a finding represents a genuine
+release blocker (e.g., version drift, secret in tracked file, dirty tree at
+release), report it first and **continue safe read-only checks** for remaining
+active dimensions — do not stop the audit. Stop only when the finding requires
+human remediation before any further probing is meaningful.
+
+**Graceful tool absence.** If an expected tool (`shellcheck`, `gh`, `python3`)
+is unavailable, skip the dependent dimension with a clear `skip_reason` citing
+the missing tool. Do not treat missing tools as failures.
 
 ```bash
 # History hygiene
@@ -339,7 +354,9 @@ VERSION ALIGNMENT — DRIFT
 If all active dimensions are healthy, report one line such as
 `PASS — 4 dimensions checked, all healthy.`
 
-Name a blocking issue explicitly and stop before lower-priority checks.
+Report blocking findings first, then continue safe read-only checks for remaining
+active dimensions. Stop only when the finding requires human remediation before
+any further probing is meaningful.
 
 Structured output is an output mode, not a health dimension. Do not include it
 in the dimension plan. Emit JSONL only when `REPO_HEALTH_OUTPUT=jsonl` is set;
