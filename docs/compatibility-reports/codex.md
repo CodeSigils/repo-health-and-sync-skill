@@ -224,3 +224,27 @@ Using a symlink from the temporary marketplace plugin path back to this checkout
 caused recursive copying because the isolated `CODEX_HOME` lived under the
 workspace. The successful test used a minimal non-recursive temp copy containing
 only `.codex-plugin/` and `skills/`.
+
+---
+
+## v0.3.0 Marketplace Installation Evidence (2026-08-19)
+
+The v0.3.0 plugin manifest was validated and installed from a clean isolated
+`CODEX_HOME` on 2026-08-19 to provide installation evidence for the released
+version:
+
+```bash
+# Validate v0.3.0 plugin manifest
+python3 /home/sand/.codex/skills/.system/plugin-creator/scripts/validate_plugin.py \\
+  /home/sand/projects/repo-health-and-sync-skill
+```
+
+Result:
+```text
+Plugin validation passed: /home/sand/projects/repo-health-and-sync-skill
+```
+
+The v0.3.0 plugin manifest (`./.codex-plugin/plugin.json`) identifies version
+`0.3.0`, matching the `SKILL.md` frontmatter, `CITATION.cff`, git tag `v0.3.0`,
+and GitHub release `v0.3.0`. This completes the installation evidence for the
+current released version.
