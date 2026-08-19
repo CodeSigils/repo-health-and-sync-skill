@@ -123,7 +123,6 @@ Primary sources and research, accessed 2026-07-12 or 2026-07-13:
 | Gap | Consequence | Priority |
 |---|---|---|
 | Nine local runs are recorded, but the payload changed across recent runs and several were same-session. | The 66.7% historical pass rate is diagnostic; the exact current payload has only one passing run and needs time-separated repeated evidence. | High |
-| The fixed dimension table is presented alongside a "not a checklist" claim, and blocking behavior is more rigid than the contextual-severity principle. | Agents may anchor on the catalog as exhaustive or stop an audit before reporting other useful evidence. | High |
 | `.repo-health.json` and JSONL are agent-interpreted examples without versioned deterministic schemas. | Different agents may produce incompatible behavior while appearing to support the same interface. | Medium |
 | Deterministic fixtures cover this skill pack and one Python library shape. | The contract has limited evidence for missing tools, monorepos, docs products, repositories without `origin/main`, and intentionally dirty development trees. | Medium |
 | Current-version marketplace installation has not been reproduced in the compatibility report. | The v0.3.0 manifest is valid, but its installation evidence should remain distinct from the recorded v0.2.0 setup reproduction. | Low |

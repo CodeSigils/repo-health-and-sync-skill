@@ -152,9 +152,7 @@ failure when...") rather than a severity class that repeats on every report.
 same items as WARNING regardless of the repo's stage or audience, wasting
 the maintainer's attention on items that didn't need action.
 
----
-
-## What this file does NOT document
+---\n\n## v0.3.0 Consolidation — Payload Reduction & Clarity\n\n**Decision:** Consolidate `SKILL.md` to reduce size (~10%), add inline profile schema, make candidate catalog explicitly extensible with discovery protocol, elevate redaction rule to Step 3, reference `.repo-health.json` schema, clarify blocking behavior with safe-continue guidance.\n\n**Why:** Roadmap §7 core consolidation gate — target 30-50% payload reduction where achievable without weakening trigger boundaries, read-only behavior, profile-first ordering, activation evidence, skip accounting, or finding quality. This pass achieves ~10% reduction with structural clarity improvements.\n\n**Changes:**\n- Candidate catalog table condensed from 3 columns to 2 (Dimension, Activated By)\n- Explicit "non-exhaustive" framing + custom dimensions allowance\n- Inline REPO PROFILE required structure schema in Step 1\n- Blocking behavior: safe-continue / pause / skip categorization\n- Redaction rule moved to Step 3 header\n- `.repo-health.json` schema reference added\n- Attribution drift clarification removed (moved to `docs/research.md` §4)\n- Completion contract condensed\n\n**Evidence:** Roadmap §7; all deterministic checks pass; payload 415→~380 lines.\n\n---\n\n## What this file does NOT document
 
 This file documents v0.3.0 decisions. The v0.2.0 design (methodology-only
 payload, runtime discovery, portability by agent) is the foundation on which
