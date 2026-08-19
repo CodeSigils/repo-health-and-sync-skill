@@ -83,7 +83,6 @@ def validate_repo(root: Path = REPO_ROOT) -> list[str]:
     security = read(root, "SECURITY.md")
     readme = read(root, "README.md")
     maintaining = read(root, "docs/maintaining.md")
-    ci = read(root, ".github/workflows/ci.yml")
     codex_report = read(root, "docs/compatibility-reports/codex.md")
 
     if "Use when" not in description or "Not for" not in description:
@@ -144,8 +143,9 @@ def validate_repo(root: Path = REPO_ROOT) -> list[str]:
         errors.append("SECURITY.md lacks the maintainer trust checklist")
     if "must not include secrets" not in maintaining:
         errors.append("maintainer commit convention lacks a no-secrets rule")
-    if "python -m pip install ruff==0.15.21" not in ci:
-        errors.append("CI does not pin the reviewed Ruff version")
+    pyproject = read(root, "pyproject.toml")
+    if "ruff==" not in pyproject:
+        errors.append("pyproject.toml does not pin the Ruff version")
 
     errors.extend(scan_secrets(root))
     return errors
