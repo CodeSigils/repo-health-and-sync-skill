@@ -1,5 +1,6 @@
 # Repo Health Scan
 
+[![CI](https://github.com/CodeSigils/repo-health-and-sync-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/CodeSigils/repo-health-and-sync-skill/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/CodeSigils/repo-health-and-sync-skill?label=release)](https://github.com/CodeSigils/repo-health-and-sync-skill/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
