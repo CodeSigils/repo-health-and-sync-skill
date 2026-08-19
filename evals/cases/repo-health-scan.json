@@ -217,6 +217,349 @@
           }
         ]
       }
+    },
+    {
+      "name": "monorepo-workspace",
+      "profile": {
+        "observed": {
+          "vcs": "git",
+          "languages": [
+            "TypeScript",
+            "Python"
+          ],
+          "package_managers": [
+            "npm",
+            "uv"
+          ],
+          "ci": "GitHub Actions",
+          "shell_files": false,
+          "recent_commits": true,
+          "gitignore": true,
+          "version_sources": [
+            "packages/frontend/package.json",
+            "packages/backend/pyproject.toml",
+            "packages/shared/package.json"
+          ],
+          "script_surface": "maintainer-only",
+          "shipped_payload": "none"
+        },
+        "inferred": {
+          "repo_type": "monorepo",
+          "release_model": "independent packages",
+          "risk_context": "routine review"
+        }
+      },
+      "expected": {
+        "active_dimensions": [
+          {
+            "name": "history_hygiene",
+            "activated_by": [
+              "observed.vcs"
+            ]
+          },
+          {
+            "name": "version_alignment",
+            "activated_by": [
+              "observed.version_sources"
+            ]
+          },
+          {
+            "name": "ci_efficiency",
+            "activated_by": [
+              "observed.ci"
+            ]
+          },
+          {
+            "name": "commit_quality",
+            "activated_by": [
+              "observed.recent_commits"
+            ]
+          },
+          {
+            "name": "file_coverage",
+            "activated_by": [
+              "observed.gitignore"
+            ]
+          }
+        ],
+        "skipped_dimensions": [
+          {
+            "name": "shell_correctness",
+            "skip_reason": "The profile records no shell files."
+          },
+          {
+            "name": "cross_platform",
+            "skip_reason": "The profile records no shell surface or platform-specific user requirement."
+          },
+          {
+            "name": "tag_release_integrity",
+            "skip_reason": "The profile contains no tag or release evidence for the workspace root."
+          },
+          {
+            "name": "attribution_drift",
+            "skip_reason": "No unreleased branch commits or attribution policy appears in the profile."
+          },
+          {
+            "name": "external_reference_health",
+            "skip_reason": "The opt-in environment flag was not set."
+          }
+        ]
+      }
+    },
+    {
+      "name": "docs-only-product",
+      "profile": {
+        "observed": {
+          "vcs": "git",
+          "languages": [
+            "Markdown"
+          ],
+          "package_managers": [],
+          "ci": "GitHub Actions",
+          "shell_files": false,
+          "recent_commits": true,
+          "gitignore": true,
+          "version_sources": [],
+          "script_surface": "none",
+          "shipped_payload": "documentation"
+        },
+        "inferred": {
+          "repo_type": "documentation",
+          "release_model": "git tags",
+          "risk_context": "handoff"
+        }
+      },
+      "expected": {
+        "active_dimensions": [
+          {
+            "name": "history_hygiene",
+            "activated_by": [
+              "observed.vcs"
+            ]
+          },
+          {
+            "name": "ci_efficiency",
+            "activated_by": [
+              "observed.ci"
+            ]
+          },
+          {
+            "name": "commit_quality",
+            "activated_by": [
+              "observed.recent_commits"
+            ]
+          },
+          {
+            "name": "file_coverage",
+            "activated_by": [
+              "observed.gitignore"
+            ]
+          }
+        ],
+        "skipped_dimensions": [
+          {
+            "name": "shell_correctness",
+            "skip_reason": "The profile records no shell files."
+          },
+          {
+            "name": "version_alignment",
+            "skip_reason": "The profile contains no version sources."
+          },
+          {
+            "name": "cross_platform",
+            "skip_reason": "The profile records no shell surface or platform-specific user requirement."
+          },
+          {
+            "name": "tag_release_integrity",
+            "skip_reason": "The profile contains no tag or release evidence."
+          },
+          {
+            "name": "attribution_drift",
+            "skip_reason": "No unreleased branch commits or attribution policy appears in the profile."
+          },
+          {
+            "name": "external_reference_health",
+            "skip_reason": "The opt-in environment flag was not set."
+          }
+        ]
+      }
+    },
+    {
+      "name": "missing-tools-no-origin-main",
+      "profile": {
+        "observed": {
+          "vcs": "git",
+          "languages": [
+            "Python"
+          ],
+          "package_managers": [
+            "pip"
+          ],
+          "ci": "none",
+          "shell_files": true,
+          "recent_commits": true,
+          "gitignore": true,
+          "version_sources": [
+            "pyproject.toml"
+          ],
+          "script_surface": "maintainer-only",
+          "shipped_payload": "single SKILL.md"
+        },
+        "inferred": {
+          "repo_type": "skill-pack",
+          "release_model": "git tags",
+          "risk_context": "pre-release"
+        }
+      },
+      "expected": {
+        "active_dimensions": [
+          {
+            "name": "history_hygiene",
+            "activated_by": [
+              "observed.vcs"
+            ]
+          },
+          {
+            "name": "shell_correctness",
+            "activated_by": [
+              "observed.shell_files"
+            ]
+          },
+          {
+            "name": "version_alignment",
+            "activated_by": [
+              "observed.version_sources"
+            ]
+          },
+          {
+            "name": "tag_release_integrity",
+            "activated_by": [
+              "inferred.release_model",
+              "inferred.risk_context"
+            ]
+          },
+          {
+            "name": "commit_quality",
+            "activated_by": [
+              "observed.recent_commits"
+            ]
+          },
+          {
+            "name": "file_coverage",
+            "activated_by": [
+              "observed.gitignore"
+            ]
+          }
+        ],
+        "skipped_dimensions": [
+          {
+            "name": "ci_efficiency",
+            "skip_reason": "The profile records no CI configuration."
+          },
+          {
+            "name": "cross_platform",
+            "skip_reason": "No macOS or BSD user evidence appears in the profile."
+          },
+          {
+            "name": "attribution_drift",
+            "skip_reason": "No upstream or remote-default base resolved; no attribution policy."
+          },
+          {
+            "name": "external_reference_health",
+            "skip_reason": "The opt-in environment flag was not set."
+          }
+        ]
+      }
+    },
+    {
+      "name": "dirty-development-tree",
+      "profile": {
+        "observed": {
+          "vcs": "git",
+          "languages": [
+            "Python",
+            "shell"
+          ],
+          "package_managers": [
+            "uv"
+          ],
+          "ci": "GitHub Actions",
+          "shell_files": true,
+          "recent_commits": true,
+          "gitignore": true,
+          "version_sources": [
+            "pyproject.toml"
+          ],
+          "script_surface": "maintainer-only",
+          "shipped_payload": "library",
+          "working_tree_dirty": true
+        },
+        "inferred": {
+          "repo_type": "library",
+          "release_model": "PyPI package",
+          "risk_context": "active development"
+        }
+      },
+      "expected": {
+        "active_dimensions": [
+          {
+            "name": "history_hygiene",
+            "activated_by": [
+              "observed.vcs"
+            ]
+          },
+          {
+            "name": "shell_correctness",
+            "activated_by": [
+              "observed.shell_files"
+            ]
+          },
+          {
+            "name": "version_alignment",
+            "activated_by": [
+              "observed.version_sources"
+            ]
+          },
+          {
+            "name": "tag_release_integrity",
+            "activated_by": [
+              "inferred.release_model"
+            ]
+          },
+          {
+            "name": "ci_efficiency",
+            "activated_by": [
+              "observed.ci"
+            ]
+          },
+          {
+            "name": "commit_quality",
+            "activated_by": [
+              "observed.recent_commits"
+            ]
+          },
+          {
+            "name": "file_coverage",
+            "activated_by": [
+              "observed.gitignore"
+            ]
+          }
+        ],
+        "skipped_dimensions": [
+          {
+            "name": "cross_platform",
+            "skip_reason": "No macOS or BSD user evidence appears in the profile."
+          },
+          {
+            "name": "attribution_drift",
+            "skip_reason": "No unreleased branch commits or attribution policy appears in the profile."
+          },
+          {
+            "name": "external_reference_health",
+            "skip_reason": "The opt-in environment flag was not set."
+          }
+        ]
+      }
     }
   ]
 }
