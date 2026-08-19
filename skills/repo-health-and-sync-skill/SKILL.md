@@ -65,7 +65,7 @@ ls Dockerfile Containerfile 2>/dev/null
 # What's the commit culture like? Count patterns without printing message text,
 # because subjects and bodies can themselves contain credentials.
 printf 'recent_commits=%s\n' "$(git rev-list --count --max-count=20 HEAD 2>/dev/null || echo 0)"
-printf 'conventional_subjects=%s\n' "$(git log --format='%s' -20 2>/dev/null | grep -Ec '^(feat|fix|docs|chore|refactor|test|ci|build|perf|revert)(\([^)]*\))?!?:' || true)"
+printf 'conventional_subjects=%s\n' "$(git log --format='%s' -20 2>/dev/null | grep -Ec '^(feat|fix|docs|chore|refactor|test|ci|build|perf|revert)(\\([^)]*\\))?!?:' || true)"
 printf 'informative_bodies=%s\n' "$(git log --format='%b' -5 2>/dev/null | grep -Ec '^(what|why):' || true)"
 git status --short --branch
 git tag --list 'v*' --sort=-version:refname | head -5
@@ -104,26 +104,29 @@ profile must be visible in the transcript as a `REPO PROFILE` block; do not keep
 it only in internal reasoning or defer it to the final report. Emit the profile
 in its own message; do not combine that message with the dimension plan:
 
+### REPO PROFILE (required structure)
+
 ```yaml
-# REPO PROFILE
 observed:
   vcs: git
-  languages: Python + shell
-  package_managers: pip
-  ci: GitHub Actions
-  script_surface: maintainer-only Python + shell
-  version_sources: [SKILL.md, plugin.json, CITATION.cff, git tags]
-  tags: present
-  branch_commits_outside_base: none
-  platform_requirements: none found
-  verify_refs: false
-  verify_releases: false
-  shipped_payload: single SKILL.md
+  languages: [string]
+  package_managers: [string]
+  ci: string | null
+  shell_files: boolean
+  recent_commits: boolean
+  gitignore: boolean
+  version_sources: [string]
+  script_surface: string
+  shipped_payload: string
+  tags_present: boolean
+  base_ref: string | null
+  verify_refs: boolean
+  verify_releases: boolean
 
 inferred:
-  repo_type: skill-pack
-  release_model: git tags
-  risk_context: pre-release
+  repo_type: string
+  release_model: string
+  risk_context: string
 ```
 
 Do not run a dimension-specific command before emitting this block. If you
@@ -134,17 +137,18 @@ cannot write it, run more discovery probes.
 Given the emitted repo profile, ask: what invariants would break if they
 drifted?
 
-The dimension table below is a **non-exhaustive candidate catalog** — not a
-universal checklist. The agent may add custom dimensions when repository
-evidence supports them; every custom dimension must still cite `activated_by`
-evidence from the profile.
+The candidate catalog below is **non-exhaustive** — not a universal checklist.
+The agent discovers applicable dimensions from this catalog; every active
+dimension must cite `activated_by` evidence from the profile. Custom dimensions
+are allowed when repo evidence supports a check not in the catalog; they must
+still cite `activated_by` evidence.
 
 Before running any dimension command, emit a `DIMENSION PLAN` that:
 
 - lists each active dimension with one or more exact profile paths in
   `activated_by`;
 - lists each inactive dimension with a concrete `skip_reason`; and
-- accounts for every candidate dimension in the table as active or skipped.
+- accounts for every candidate dimension in the catalog as active or skipped.
 
 Use paths such as `observed.ci` or `inferred.release_model`. A recorded request
 or environment flag may also activate a dimension; an unobserved assumption may
@@ -154,24 +158,26 @@ not.
 # DIMENSION PLAN
 active:
   - name: shell_correctness
-    activated_by: [observed.script_surface]
+    activated_by: [observed.shell_files]
 skipped:
   - name: cross_platform
     skip_reason: no platform or user requirement appears in the profile
 ```
 
-| Dimension | Ask | Relevant when |
-|-----------|-----|---------------|
-| **History hygiene** | Is the working tree clean? Are there unpushed commits? | Always — cheap, universal |
-| **Shell correctness** | Do .sh files pass shellcheck with no SC-level issues? | Any .sh files exist |
-| **Version alignment** | Do version fields across manifests agree? | 2+ version sources |
-| **Tag/release integrity** | Do local version tags align, and, when opted in, do GitHub releases overlap? | Any tags exist |
-| **Commit quality** | Are messages structured? Are bodies informative? | Commits on this branch |
-| **CI efficiency** | Is CI scoped to what changed? | CI config exists |
-| **Cross-platform** | Do scripts use portable constructs? | .sh files + any macOS/BSD users |
-| **Attribution drift** | Are unauthorized `Co-authored-by:` trailers present? | Commits outside the discovered upstream or remote-default base |
-| **File coverage** | Does .gitignore cover agent/OS/build artifacts? | .gitignore exists |
-| **External reference health** | Do all `https://` refs in docs/config resolve? | `REPO_HEALTH_VERIFY_REFS=1` env var (opt-in) |
+### Candidate Catalog (non-exhaustive)
+
+| Dimension | Activated By |
+|-----------|--------------|
+| history_hygiene | always |
+| shell_correctness | observed.shell_files |
+| version_alignment | len(observed.version_sources) ≥ 2 |
+| tag_release_integrity | inferred.release_model exists |
+| commit_quality | observed.recent_commits |
+| ci_efficiency | observed.ci |
+| cross_platform | observed.shell_files + inferred.platform_requirements |
+| attribution_drift | observed.branch_commits_outside_base > 0 |
+| file_coverage | observed.gitignore |
+| external_reference_health | env:REPO_HEALTH_VERIFY_REFS=1 |
 
 Only after emitting the dimension plan, run the smallest command or command
 block that answers each active dimension. Do not run probes for skipped
@@ -182,6 +188,10 @@ release blocker (e.g., version drift, secret in tracked file, dirty tree at
 release), report it first and **continue safe read-only checks** for remaining
 active dimensions — do not stop the audit. Stop only when the finding requires
 human remediation before any further probing is meaningful.
+
+Safe to continue after a blocker: history_hygiene, file_coverage, commit_quality.
+Pause (may need remediation context): version_alignment, tag_release_integrity, ci_efficiency.
+Skip if tools unavailable: cross_platform (needs shellcheck), external_reference_health (needs gh, opt-in).
 
 **Graceful tool absence.** If an expected tool (`shellcheck`, `gh`, `python3`)
 is unavailable, skip the dependent dimension with a clear `skip_reason` citing
@@ -336,6 +346,14 @@ apply to this repo.
 
 ## Step 3: Report findings with judgment, not labels
 
+**Redaction rule:** Never include raw credential values, tokens, keys, or
+secret-bearing URLs in findings. Report only:
+- Dimension name
+- Finding summary (e.g., "hard-coded credential in config.py")
+- Concrete harm
+- Remediation
+- Confidence (0–1)
+
 For each active dimension, report what you found. Do not use a
 pre-defined severity scale. Use language that reflects actual harm:
 
@@ -391,7 +409,9 @@ Example JSONL output:
 ## Optional: Pre-flight contract
 
 Some repos carry a `.repo-health.json` at the root. When present, it
-overrides the heuristic discovery in Step 2:
+overrides the heuristic discovery in Step 2. Schema:
+[`schemas/repo-health-config.schema.json`](../schemas/repo-health-config.schema.json)
+(maintainer-side evidence).
 
 ```json
 {
@@ -423,10 +443,3 @@ Before delivering the report, confirm that:
   bodies or sensitive values; and
 - sensitive ignore candidates were checked against both ignore rules and
   tracked files.
-
-## Attribution drift dimension clarification
-
-The **Attribution drift** check scans from the current branch's upstream, or a
-remote default branch when no upstream exists. If neither can be resolved, skip
-the dimension rather than scanning all history. The bounded range is for
-pre-push or pre-merge validation; expanding it requires explicit audit scope.
