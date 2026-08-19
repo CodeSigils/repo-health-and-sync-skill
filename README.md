@@ -39,6 +39,27 @@ See [SKILL.md](skills/repo-health-and-sync-skill/SKILL.md) for the full three-st
 
 ---
 
+## Candidate Dimensions
+
+The agent activates only relevant checks from this catalog — not a universal checklist:
+
+| Dimension | Activated When |
+|-----------|----------------|
+| History hygiene | Always (cheap, universal) |
+| Shell correctness | Any `.sh` files exist |
+| Version alignment | ≥2 version sources found |
+| Tag/release integrity | Any tags exist |
+| Commit quality | Commits on this branch |
+| CI efficiency | CI config exists |
+| Cross-platform | `.sh` files + macOS/BSD user evidence |
+| Attribution drift | Commits outside upstream/remote-default base |
+| File coverage | `.gitignore` exists |
+| External reference health | `REPO_HEALTH_VERIFY_REFS=1` set |
+
+*Not a checklist — the agent may add custom dimensions when repo evidence supports them.*
+
+---
+
 ## Install
 
 Clone this repo and make the skill discoverable:
