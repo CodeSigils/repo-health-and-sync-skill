@@ -20,7 +20,9 @@ import re
 import sys
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+from _common import ROOT as REPO_ROOT
+from _common import read_json
+
 SKILLS_DIR = REPO_ROOT / "skills"
 CONFIG_PATH = REPO_ROOT / ".repo-health.json"
 SINGLE_RUNTIME_COMPAT = {"hermes", "codex", "claude", "gemini", "opencode", "cursor"}
@@ -49,7 +51,7 @@ FORBIDDEN_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
 def repo_allows_platform_refs() -> bool:
     """Return true when the repo explicitly declares platform refs intentional."""
     try:
-        data = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
+        data = read_json(CONFIG_PATH)
     except (OSError, json.JSONDecodeError):
         return False
     portability = data.get("portability", {})

@@ -156,8 +156,11 @@ the maintainer's attention on items that didn't need action.
 
 ## What this file does NOT document
 
-This file documents v0.2.0 decisions. The v0.1.0 design (B-phases, 14
-reference files, 10 shipped scripts, payload sync process) is archived in
-git history (commits 2691398, 78b31c7). See also the agent-concepts-study
-note `2026-07-12-skill-repo-structural-diversity-and-optimal-patterns.md`
-for the structural analysis that motivated the v0.2.0 design.
+This file documents v0.3.0 decisions. The v0.2.0 design (methodology-only
+payload, runtime discovery, portability by agent) is the foundation on which
+v0.3.0 added shared tooling (`scripts/_common.py`) and hardened CI (uv,
+Node 24, dependabot). The v0.1.0 design (B-phases, 14 reference files, 10
+shipped scripts, payload sync process) is archived in git history (commits
+2691398, 78b31c7). See also the agent-concepts-study note
+`2026-07-12-skill-repo-structural-diversity-and-optimal-patterns.md` for the
+structural analysis that motivated the v0.2.0 design.

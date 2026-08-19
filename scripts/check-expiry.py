@@ -19,7 +19,8 @@ from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Any
 
-ROOT = Path(__file__).resolve().parents[1]
+from _common import ROOT, read_json
+
 EXPIRY_RE = re.compile(r"^\s*Expires?:\s*(.+?)\s*$", re.IGNORECASE | re.MULTILINE)
 DATE_FORMATS = [
     "%Y-%m-%d",
@@ -121,7 +122,7 @@ def check_yaml_frontmatter(file_path: Path) -> list[tuple[str, date, int]]:
 def check_json_file(file_path: Path) -> tuple[list[tuple[str, date, int]], list[str]]:
     """Check JSON files for expires fields."""
     try:
-        data = json.loads(file_path.read_text(encoding="utf-8"))
+        data = read_json(file_path)
     except (OSError, json.JSONDecodeError):
         return [], []
 

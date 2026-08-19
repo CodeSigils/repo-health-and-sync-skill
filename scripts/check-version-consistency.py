@@ -10,6 +10,8 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
+from _common import read_json
+
 LOCAL_VERSION_SOURCES = {
     "SKILL.md": Path("skills/repo-health-and-sync-skill/SKILL.md"),
     "plugin.json": Path(".codex-plugin/plugin.json"),
@@ -47,7 +49,7 @@ def read_skill_version(path: Path) -> str | None:
 def read_plugin_version(path: Path) -> str | None:
     """Extract version from the Codex plugin manifest."""
     try:
-        data = json.loads(path.read_text(encoding="utf-8"))
+        data = read_json(path)
     except (OSError, json.JSONDecodeError):
         return None
     version = data.get("version")

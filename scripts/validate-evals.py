@@ -8,6 +8,8 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from _common import read_json, validate_dimensions
+
 DEFAULT_CASE = Path("evals/cases/repo-health-scan.json")
 DIMENSIONS = {
     "history_hygiene",
@@ -21,16 +23,6 @@ DIMENSIONS = {
     "file_coverage",
     "external_reference_health",
 }
-
-
-def resolve_path(data: dict[str, Any], dotted_path: str) -> Any:
-    """Resolve a dotted profile path, returning None when it is absent."""
-    value: Any = data
-    for part in dotted_path.split("."):
-        if not isinstance(value, dict) or part not in value:
-            return None
-        value = value[part]
-    return value
 
 
 def validate_case(data: Any) -> list[str]:
@@ -142,61 +134,9 @@ def validate_case(data: Any) -> list[str]:
             errors.append(f"{prefix}.expected.skipped_dimensions must be non-empty")
             skipped = []
 
-        active_names: set[str] = set()
-        for dimension in active:
-            if not isinstance(dimension, dict) or not isinstance(
-                dimension.get("name"), str
-            ):
-                errors.append(f"{prefix} has an invalid active dimension")
-                continue
-            name = dimension["name"]
-            if name in active_names:
-                errors.append(f"{prefix} repeats active dimension {name}")
-            active_names.add(name)
-            evidence = dimension.get("activated_by")
-            if not isinstance(evidence, list) or not evidence:
-                errors.append(
-                    f"{prefix} active dimension {name} lacks activated_by evidence"
-                )
-                continue
-            for path in evidence:
-                if not isinstance(path, str) or not resolve_path(profile, path):
-                    errors.append(
-                        f"{prefix} active dimension {name} references missing profile evidence: {path}"
-                    )
-
-        skipped_names: set[str] = set()
-        for dimension in skipped:
-            if not isinstance(dimension, dict) or not isinstance(
-                dimension.get("name"), str
-            ):
-                errors.append(f"{prefix} has an invalid skipped dimension")
-                continue
-            name = dimension["name"]
-            if name in skipped_names:
-                errors.append(f"{prefix} repeats skipped dimension {name}")
-            skipped_names.add(name)
-            if (
-                not isinstance(dimension.get("skip_reason"), str)
-                or not dimension["skip_reason"].strip()
-            ):
-                errors.append(
-                    f"{prefix} skipped dimension {dimension['name']} lacks a reason"
-                )
-
-        overlap = active_names & skipped_names
-        if overlap:
-            errors.append(
-                f"{prefix} dimensions cannot be both active and skipped: {sorted(overlap)}"
-            )
-        accounted_for = active_names | skipped_names
-        if accounted_for != DIMENSIONS:
-            missing = sorted(DIMENSIONS - accounted_for)
-            unknown = sorted(accounted_for - DIMENSIONS)
-            if missing:
-                errors.append(f"{prefix} omits dimensions: {missing}")
-            if unknown:
-                errors.append(f"{prefix} contains unknown dimensions: {unknown}")
+        errors.extend(validate_dimensions(
+            active, skipped, DIMENSIONS, profile, prefix=f"{prefix}.",
+        ))
 
     if "skill-pack" not in repo_types:
         errors.append("fixtures must include a skill-pack profile")
@@ -275,7 +215,7 @@ def main() -> int:
     if args.self_test:
         return run_self_tests()
     try:
-        data = json.loads(args.case.read_text(encoding="utf-8"))
+        data = read_json(args.case)
     except (OSError, json.JSONDecodeError) as exc:
         print(f"ERROR: cannot read {args.case}: {exc}", file=sys.stderr)
         return 1

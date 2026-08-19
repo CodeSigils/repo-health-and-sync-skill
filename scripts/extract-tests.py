@@ -16,6 +16,8 @@ import platform
 import sys
 from pathlib import Path
 
+from _common import ROOT
+
 
 def extract_test_cases(script_path: Path) -> list[dict]:
     """Extract test cases from a script's do_self_test() function."""
@@ -110,7 +112,7 @@ def main() -> int:
         print("Error: --script required", file=sys.stderr)
         return 1
 
-    script_path = Path(__file__).resolve().parents[1] / "scripts" / args.script
+    script_path = ROOT / "scripts" / args.script
     if not script_path.exists():
         print(f"Script not found: {script_path}", file=sys.stderr)
         return 1

@@ -25,13 +25,12 @@ PY_SCRIPTS_WITH_SELF_TEST = [
 
 ALL_SCRIPTS = sorted(
     p.name for p in SCRIPTS_DIR.iterdir()
-    if p.is_file() and (p.suffix in (".py", ".sh"))
+    if p.is_file() and (p.suffix in (".py", ".sh")) and not p.name.startswith("_")
 )
 
 REQUIRED_PATTERNS = [
     (r"def (?:do_self_test|run_self_tests|check_self_test|self_test)\(\)", "missing --self-test function"),
     (r"if __name__ == \"__main__\"", "missing main entry point"),
-    (r"encoding=\"utf-8\"", "missing UTF-8 encoding on open()"),
 ]
 
 FORBIDDEN_PATTERNS = [

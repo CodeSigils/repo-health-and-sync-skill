@@ -14,7 +14,9 @@ from pathlib import Path
 from time import monotonic
 from typing import Any
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+from _common import ROOT as REPO_ROOT
+from _common import read_json
+
 SKILL_SOURCE = REPO_ROOT / "skills/repo-health-and-sync-skill/SKILL.md"
 POSITIVE_PROMPT = REPO_ROOT / "evals/codex/positive-prompt.md"
 NEGATIVE_PROMPT = REPO_ROOT / "evals/codex/negative-prompt.md"
@@ -428,7 +430,7 @@ def run_self_tests() -> int:
         command = codex_command(
             "codex", fixture, POSITIVE_PROMPT, fixture / "result.json", RESULT_SCHEMA
         )
-        assert isinstance(json.loads(RESULT_SCHEMA.read_text(encoding="utf-8")), dict)
+        assert isinstance(read_json(RESULT_SCHEMA), dict)
         assert command == [
             "codex",
             "exec",

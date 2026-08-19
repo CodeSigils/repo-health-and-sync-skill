@@ -12,16 +12,16 @@ Usage:
 
 from __future__ import annotations
 
-import json
 import re
 import sys
 from pathlib import Path
 
+from _common import read_json
+
 
 def load_manifest(manifest_path: Path) -> dict:
     """Load and return the JSON manifest as a dict."""
-    with open(manifest_path, encoding="utf-8") as f:
-        return json.load(f)
+    return read_json(manifest_path)
 
 
 def check_regex(filepath: Path, pattern: str) -> bool:

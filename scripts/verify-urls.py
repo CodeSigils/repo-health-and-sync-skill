@@ -27,7 +27,8 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
-ROOT = Path(__file__).resolve().parents[1]
+from _common import ROOT, read_json
+
 MANIFEST_PATH = ROOT / "docs" / "evidence-urls.json"
 
 VALID_STATUS_VALUES = {"active", "retracted", "moved", "deprecated", "unknown"}
@@ -40,7 +41,7 @@ VALID_SOURCE_TYPES = {
 def load_manifest(path: Path = MANIFEST_PATH) -> tuple[int, str, list[dict[str, Any]]]:
     """Load URL entries from the evidence manifest. Returns (version, description, urls)."""
     try:
-        manifest = json.loads(path.read_text(encoding="utf-8"))
+        manifest = read_json(path)
     except OSError as exc:
         raise SystemExit(f"FAIL: could not read {path}: {exc}") from exc
     except json.JSONDecodeError as exc:

@@ -9,13 +9,10 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
+from _common import read_json, validate_dimensions
+
 DEFAULT_CONTRACT = Path("evals/cases/repo-health-scan.json")
 SEVERITY_ORDER = {"blocking": 0, "warning": 1, "info": 2}
-
-
-def read_json(path: Path) -> Any:
-    """Read a UTF-8 JSON document."""
-    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def expected_dimensions(contract: dict[str, Any]) -> set[str]:
@@ -29,16 +26,6 @@ def expected_dimensions(contract: dict[str, Any]) -> set[str]:
                 if isinstance(name, str):
                     dimensions.add(name)
     return dimensions
-
-
-def resolve_profile_path(profile: dict[str, Any], dotted_path: str) -> Any:
-    """Resolve evidence such as observed.vcs in a profile."""
-    value: Any = profile
-    for part in dotted_path.split("."):
-        if not isinstance(value, dict) or part not in value:
-            return None
-        value = value[part]
-    return value
 
 
 def validate_transcript(path: Path, label: str) -> list[str]:
@@ -166,52 +153,11 @@ def grade_positive(result: dict[str, Any], dimensions: set[str]) -> list[str]:
     if not isinstance(active, list) or not isinstance(skipped, list):
         return errors + ["dimension plan must contain active and skipped lists"]
 
-    active_names: set[str] = set()
-    for item in active:
-        if not isinstance(item, dict) or not isinstance(item.get("name"), str):
-            errors.append("active dimension is malformed")
-            continue
-        name = item["name"]
-        if name in active_names:
-            errors.append(f"active dimension {name} is duplicated")
-        active_names.add(name)
-        evidence = item.get("activated_by")
-        if not isinstance(evidence, list) or not evidence:
-            errors.append(f"active dimension {name} lacks activated_by evidence")
-            continue
-        for path in evidence:
-            if not isinstance(path, str) or not resolve_profile_path(profile, path):
-                errors.append(
-                    f"active dimension {name} references missing profile evidence: {path}"
-                )
-
-    skipped_names: set[str] = set()
-    for item in skipped:
-        if not isinstance(item, dict) or not isinstance(item.get("name"), str):
-            errors.append("skipped dimension is malformed")
-            continue
-        name = item["name"]
-        if name in skipped_names:
-            errors.append(f"skipped dimension {name} is duplicated")
-        skipped_names.add(name)
-        if item.get("status") != "SKIP":
-            errors.append(f"skipped dimension {name} is not marked SKIP")
-        if (
-            not isinstance(item.get("skip_reason"), str)
-            or not item["skip_reason"].strip()
-        ):
-            errors.append(f"skipped dimension {name} lacks a reason")
-
-    overlap = active_names & skipped_names
-    if overlap:
-        errors.append(f"dimensions cannot be active and skipped: {sorted(overlap)}")
-    accounted_for = active_names | skipped_names
-    if accounted_for != dimensions:
-        errors.append(
-            "dimension accounting mismatch: "
-            f"missing={sorted(dimensions - accounted_for)}, "
-            f"unknown={sorted(accounted_for - dimensions)}"
-        )
+    errors.extend(validate_dimensions(
+        active, skipped, dimensions, profile, check_skip_status=True,
+    ))
+    if any("active dimension" in e or "skipped dimension" in e or "dimension accounting" in e for e in errors):
+        return errors
 
     findings = events[2].get("findings")
     if not isinstance(findings, list) or not findings:

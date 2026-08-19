@@ -123,6 +123,7 @@ repository-health work to `SKILL.md` and repository changes to this file.
 │   └── cases/
 │       └── repo-health-scan.json  # Local behavioral contract
 ├── scripts/                       # CI-only tooling (not shipped)
+│   ├── _common.py                 # Shared utilities (ROOT, read_json, validate_dimensions)
 │   ├── check-expiry.py
 │   ├── check-portability.py
 │   ├── check-trust.py

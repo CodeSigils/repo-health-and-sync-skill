@@ -6,7 +6,8 @@ import re
 import sys
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+from _common import ROOT as REPO_ROOT
+
 SKILL = Path("skills/repo-health-and-sync-skill/SKILL.md")
 
 FORBIDDEN_ACTIONS = {
