@@ -146,7 +146,9 @@ skills/
     └── SKILL.md      # 3-step methodology — discover, infer, report
 ```
 
-One file. No scripts, no config files, no dependencies. Copy only
+One file. No separate scripts, no config files, no runtime dependencies.
+The methodology contains inline command examples the agent executes using
+`git`, `shellcheck`, `python3`, `gh` already on PATH. Copy only
 `skills/repo-health-and-sync-skill/` to your agent's skill directory (see
 Install above).
 
