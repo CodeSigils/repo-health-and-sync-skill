@@ -171,6 +171,11 @@ Install above).
 ├── README.md                         # Project documentation and usage guide
 ├── repo-health-skill-roadmap.md      # Development roadmap and future plans
 ├── SECURITY.md                       # Security policy and vulnerability reporting
+├── schemas/                          # Versioned JSON schemas for optional interfaces
+│   ├── dimension-plan.schema.json
+│   ├── repo-health-config.schema.json
+│   ├── repo-health-findings.schema.json
+│   └── repo-health-profile.schema.json
 ├── docs/                             # Maintainer documentation
 │   ├── README.md                     # Document index and navigation
 │   ├── codex-setup.md                # Verified Codex repository-local and plugin setup
