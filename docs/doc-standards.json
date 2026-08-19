@@ -182,9 +182,9 @@
   "docs/decisions.md": [
     {
       "id": "describes-current-architecture",
-      "description": "Preserves the historical v0.2.0 architecture decisions",
+      "description": "Preserves the current architecture decisions heading",
       "type": "regex",
-      "pattern": "Decisions — Repo Health Scan \\(v0\\.2\\.0\\)"
+      "pattern": "Decisions — Repo Health Scan \\(v0\\.3\\.0\\)"
     }
   ]
 }
