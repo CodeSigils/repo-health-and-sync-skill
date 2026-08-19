@@ -166,6 +166,8 @@ Install above).
 ├── AGENTS.md                         # Repository-level agent routing
 ├── CITATION.cff                      # Citation metadata for academic reference
 ├── LICENSE                           # MIT license text
+├── pyproject.toml                    # Non-package maintainer environment
+├── uv.lock                           # Exact transitive dependency lock
 ├── README.md                         # Project documentation and usage guide
 ├── repo-health-skill-roadmap.md      # Development roadmap and future plans
 ├── SECURITY.md                       # Security policy and vulnerability reporting
