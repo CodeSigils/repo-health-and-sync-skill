@@ -160,3 +160,25 @@ jobs:
           fetch-depth: 0
       - name: Verify referenced URLs
         run: python3 scripts/verify-urls.py --attempts 3 --retry-delay 2
+
+  # A dependency pull request can sit mergeable for weeks without any check
+  # going red, and the configured open-pull-requests limit then silently
+  # blocks the next update. A red check emails the owner, so the backlog is
+  # made to fail the scheduled run once it is stale; the comment is written for
+  # whoever reviews the pull request, the non-zero exit is for the owner.
+  dependency-backlog:
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+    needs: lint
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    permissions:
+      contents: read
+      pull-requests: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+      - name: Comment on and fail on stale dependency pull requests
+        run: python3 scripts/check-dependency-backlog.py --post

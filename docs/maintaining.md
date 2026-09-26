@@ -132,6 +132,37 @@ permissions change.
 See [codex-regression.md](codex-regression.md) for artifacts, grading, and the
 current evidence boundary.
 
+### Dependency pull request backlog
+
+Two dependabot pull requests sat mergeable for twelve days in September 2026.
+Nothing was red: the checks passed, the pull requests were mergeable, and the
+scheduled run reported success. What made the stall invisible is that a stale
+pull request produces no failing signal, and Dependabot's
+`open-pull-requests-limit` then quietly blocks the next update while reporting
+success.
+
+`scripts/check-dependency-backlog.py` closes that gap. On the weekly schedule it
+comments on each dependency pull request at or over seven days old and fails the
+run. The comment is for whoever reviews the pull request; the non-zero exit is
+what notifies the owner, and a failed scheduled run needs no notification
+configuration. The comment is rewritten in place through a marker rather than
+added again each week.
+
+Run it locally to see the report without posting anything:
+
+```
+python3 scripts/check-dependency-backlog.py --days 7
+```
+
+Flags: `--post` writes the comment, `--days N` changes the threshold, and
+`--repo OWNER/NAME` overrides repository resolution. Exit codes follow the
+repository convention: `0` clean, `1` findings, `2` could not run.
+
+Do not add this to the fast verification checklist. It queries the GitHub API, so
+it is a scheduled staleness check like `check-expiry.py` and `verify-urls.py`,
+not a local check. Its `--self-test` is offline and already runs under
+`validate-scripts.py`.
+
 ## Release process
 
 Releases are created by `.github/workflows/release.yml` from a pushed semantic
