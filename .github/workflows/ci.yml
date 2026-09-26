@@ -20,9 +20,15 @@ concurrency:
 permissions:
   contents: read
 
+# Runner image is pinned to the OS LTS rather than `ubuntu-latest`.
+# GitHub announced that `ubuntu-latest` moves from 24.04 to 26.04 on
+# 2026-10-19; pinning now keeps a scheduled run on a known image instead of
+# changing the interpreter under the weekly checks without a commit. The
+# ubuntu-26.04 image is public preview, not generally available.
+
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -81,7 +87,7 @@ jobs:
           --require-github-release-query --allow-release-prep
 
   full-verify:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
     needs: lint
     steps:
@@ -92,7 +98,7 @@ jobs:
         run: bash scripts/verify.sh
 
   phase-b-gate:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 3
     needs: lint
     if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
@@ -132,7 +138,7 @@ jobs:
           python3 scripts/check-commit-convention.py --range "${COMMIT_RANGE}"
 
   check-expiry:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
     needs: lint
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
@@ -144,7 +150,7 @@ jobs:
         run: python3 scripts/check-expiry.py --strict
 
   verify-urls:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     needs: lint
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'

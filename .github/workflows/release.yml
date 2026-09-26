@@ -8,9 +8,15 @@ on:
 permissions:
   contents: read
 
+# Runner image is pinned to the OS LTS rather than `ubuntu-latest`.
+# GitHub announced that `ubuntu-latest` moves from 24.04 to 26.04 on
+# 2026-10-19; pinning now keeps a scheduled run on a known image instead of
+# changing the interpreter under the weekly checks without a commit. The
+# ubuntu-26.04 image is public preview, not generally available.
+
 jobs:
   verify:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     permissions:
       contents: read
@@ -54,7 +60,7 @@ jobs:
 
   release:
     needs: verify
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
     permissions:
       contents: write
