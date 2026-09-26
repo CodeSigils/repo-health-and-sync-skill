@@ -429,6 +429,8 @@ def main() -> int:
 
     for problem in problems:
         print(f"FAIL: {problem}", file=sys.stderr)
+    if problems:
+        return 2
 
     if args.post:
         if not stale:
@@ -437,13 +439,13 @@ def main() -> int:
             for issue in publish(repo, pull, age, args.days, now):
                 print(f"FAIL: {issue}", file=sys.stderr)
                 problems.append(issue)
-        if stale:
+        if stale and not problems:
             print(f"NOTE: status comments written for {len(stale)} pull request(s)")
     elif stale:
         print("NOTE: run with --post to write the status comments onto the pull requests")
 
     if problems:
-        return 1
+        return 2
     return 1 if stale else 0
 
 

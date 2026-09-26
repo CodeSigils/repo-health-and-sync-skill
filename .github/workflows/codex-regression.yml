@@ -3,7 +3,8 @@ name: Codex regression
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 8 * * 1"
+    # Avoid GitHub Actions' high-contention start-of-hour schedule slot.
+    - cron: "29 8 * * 1"
 
 permissions:
   contents: read
@@ -12,16 +13,10 @@ concurrency:
   group: codex-regression
   cancel-in-progress: false
 
-# Runner image is pinned to the OS LTS rather than `ubuntu-latest`.
-# GitHub announced that `ubuntu-latest` moves from 24.04 to 26.04 on
-# 2026-10-19; pinning now keeps a scheduled run on a known image instead of
-# changing the interpreter under the weekly checks without a commit. The
-# ubuntu-26.04 image is public preview, not generally available.
-
 jobs:
   model-regression:
     if: github.event_name == 'workflow_dispatch' || vars.CODEX_REGRESSION_ENABLED == 'true'
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
