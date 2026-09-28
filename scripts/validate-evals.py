@@ -22,6 +22,7 @@ DIMENSIONS = {
     "attribution_drift",
     "file_coverage",
     "external_reference_health",
+    "reliability_test_gaps",
 }
 
 REQUIRED_OBSERVED_FIELDS = {
@@ -34,6 +35,7 @@ REQUIRED_OBSERVED_FIELDS = {
     "gitignore",
     "version_sources",
     "script_surface",
+    "reliability_audit_requested",
     "shipped_payload",
 }
 
@@ -176,6 +178,7 @@ def run_self_tests() -> int:
         "gitignore": False,
         "version_sources": [],
         "script_surface": "none",
+        "reliability_audit_requested": False,
         "shipped_payload": "none",
     }
     valid = {

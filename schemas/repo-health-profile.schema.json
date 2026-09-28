@@ -10,7 +10,7 @@
   "properties": {
     "observed": {
       "type": "object",
-      "required": ["vcs", "languages", "package_managers", "ci", "shell_files", "recent_commits", "gitignore", "version_sources", "script_surface", "shipped_payload"],
+      "required": ["vcs", "languages", "package_managers", "ci", "shell_files", "recent_commits", "gitignore", "version_sources", "script_surface", "reliability_audit_requested", "shipped_payload"],
       "additionalProperties": false,
       "properties": {
         "vcs": { "type": "string", "enum": ["git"] },
@@ -18,6 +18,7 @@
         "package_managers": { "type": "array", "items": { "type": "string" } },
         "ci": { "type": ["string", "null"] },
         "script_surface": { "type": "string" },
+        "reliability_audit_requested": { "type": "boolean" },
         "version_sources": { "type": "array", "items": { "type": "string" } },
         "tags_present": { "type": "boolean" },
         "branch_commits_outside_base": { "type": ["integer", "null"] },

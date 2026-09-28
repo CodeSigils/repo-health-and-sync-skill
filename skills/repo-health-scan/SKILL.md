@@ -136,6 +136,7 @@ observed:
   gitignore: boolean
   version_sources: [string]
   script_surface: string
+  reliability_audit_requested: boolean
   shipped_payload: string
   tags_present: boolean
   base_ref: string | null
@@ -157,9 +158,9 @@ cannot write it, run more discovery probes.
 
 The profile is a machine-readable contract, not a prose summary. The core
 fields (`vcs`, languages, package managers, CI, shell/filesystem signals,
-version sources, script surface, and shipped payload) are mandatory. Extended
-fields are emitted when their probes apply; use `null`, `false`, or `[]` when a
-known extended fact is absent.
+version sources, script surface, reliability-audit request, and shipped
+payload) are mandatory. Extended fields are emitted when their probes apply;
+use `null`, `false`, or `[]` when a known extended fact is absent.
 Keep scalar fields canonical (`vcs: git`, `ci: null` when no CI is present,
 `base_ref: null` when no bounded base resolves); put explanations in the
 dimension plan or report, not inside scalar values. `workflow_files` and
@@ -205,7 +206,10 @@ an observed tag/release file or opt-in flag); commit quality uses
 `observed.gitignore`; attribution drift uses a positive
 `observed.branch_commits_outside_base`; and external reference health uses the
 true `observed.verify_refs` opt-in. Cross-platform checks additionally require
-inferred platform evidence.
+inferred platform evidence. Reliability test gaps use
+`observed.reliability_audit_requested`, which is true only when the user
+explicitly asks for a reliability, failure-semantics, entry-point, or test-gap
+audit.
 
 ```yaml
 # DIMENSION PLAN
@@ -231,6 +235,7 @@ skipped:
 | attribution_drift         | observed.branch_commits_outside_base > 0                                                         |
 | file_coverage             | observed.gitignore                                                                               |
 | external_reference_health | env:REPO_HEALTH_VERIFY_REFS=1                                                                    |
+| reliability_test_gaps     | observed.reliability_audit_requested                                                             |
 
 Only after emitting the dimension plan, run the smallest command or command
 block that answers each active dimension. Do not run probes for skipped
@@ -446,6 +451,41 @@ report counts or paths, never values.
 Run only the commands for dimensions you deemed relevant. Skip the rest.
 Do not emit PASS/WARNING/BLOCKING for skipped dimensions — they do not
 apply to this repo.
+
+### Reliability and test-gap audit
+
+When `reliability_test_gaps` is active, extend the evidence-activated scan with
+this focused, read-only review. This is not a default code-style review: skip
+it when the request is only for release readiness, routine maintenance, or a
+narrow change.
+
+First read the maintenance and operational documentation, CI workflows, test
+configuration, and executable entry points. State the observable contract for
+each relevant entry point: inputs, output or summary behavior, side effects,
+and exit status. Infer a distinction between a finding and an incomplete run
+only from repository evidence; do not impose a universal exit-code scheme.
+
+For each relevant public `main()` or CLI path, trace file reads, parsing,
+subprocess, credential, network/API, and output-writing boundaries. Look for:
+
+- uncaught exceptions and error paths that collapse into a findings status;
+- partial output that is presented as a complete result;
+- empty or success reports that assert an input had no results when it could
+  not be read; and
+- error output that might expose a credential or sensitive response.
+
+Audit tests at the public entry point as well as helpers. Identify only
+evidence-backed gaps in clean success, findings or drift, absent credentials,
+network/API failure, malformed responses, unreadable input, and partial-result
+behavior. Run the repository's existing read-only verification commands first.
+Use a small temporary adversarial fixture only when it can reproduce a concrete
+suspected defect; do not alter tracked inputs or manufacture speculative cases.
+
+In the final report, rank confirmed findings and include the exact path and
+line, violated contract and user impact, reproduction or reasoning, and the
+smallest proposed regression test. If no finding is confirmed, say so and list
+the entry points and failure boundaries checked. Do not modify files unless the
+user separately asks for an implementation.
 
 ## Step 3: Report findings with judgment, not labels
 

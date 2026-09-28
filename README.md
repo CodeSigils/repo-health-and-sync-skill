@@ -10,6 +10,11 @@ maintenance drift, and handoff health. The agent discovers the repo's
 shape, infers what invariants matter, and reports findings with concrete
 harm and remediation.
 
+For an explicit reliability or test-gap request, it additionally traces public
+entry-point failure semantics and coverage without changing the audited
+repository. Routine health and release audits remain scoped to the
+evidence-activated dimensions they need.
+
 This skill handles pre-release audits, unfamiliar-repo onboarding,
 dormant-repo revival, CI failure triage, and AI-assisted commit review.
 Works on any git repository — Python, Rust, shell, docs-only, or monorepo.

@@ -15,7 +15,7 @@ DEFAULT_CONTRACT = Path("evals/cases/repo-health-scan.json")
 SEVERITY_ORDER = {"blocking": 0, "warning": 1, "info": 2}
 REQUIRED_OBSERVED_FIELDS = {
     "vcs", "languages", "package_managers", "ci", "shell_files", "recent_commits",
-    "gitignore", "version_sources", "script_surface", "shipped_payload",
+    "gitignore", "version_sources", "script_surface", "reliability_audit_requested", "shipped_payload",
 }
 REQUIRED_INFERRED_FIELDS = {"repo_type", "release_model", "risk_context"}
 
@@ -241,7 +241,7 @@ def run_self_tests() -> int:
                     "observed": {
                         "vcs": "git", "languages": [], "package_managers": [], "ci": None,
                         "shell_files": False, "recent_commits": False, "gitignore": False,
-                        "version_sources": [], "script_surface": "none", "shipped_payload": "none",
+                        "version_sources": [], "script_surface": "none", "reliability_audit_requested": False, "shipped_payload": "none",
                     },
                     "inferred": {"repo_type": "library", "release_model": "none", "risk_context": "routine"},
                 },
@@ -299,7 +299,7 @@ def run_self_tests() -> int:
                         "observed": {
                             "vcs": "git", "languages": [], "package_managers": [], "ci": None,
                             "shell_files": False, "recent_commits": False, "gitignore": False,
-                            "version_sources": [], "script_surface": "none", "shipped_payload": "none",
+                            "version_sources": [], "script_surface": "none", "reliability_audit_requested": False, "shipped_payload": "none",
                         },
                         "inferred": {"repo_type": "library", "release_model": "none", "risk_context": "routine"},
                     },
