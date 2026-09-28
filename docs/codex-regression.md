@@ -1,11 +1,13 @@
 # Codex Model Regression
 
-Status: non-blocking maintainer evaluation implemented; current local
-certification is Codex CLI 0.149.0. Earlier versions remain historical evidence,
-and later versions require their own recorded run before becoming a claim.
+Status: non-blocking maintainer evaluation implemented. The last certified
+baseline is Codex CLI 0.153.2 (runs 13–16). The `reliability_test_gaps` payload
+is **not certified**: it is unobserved, not failing. Earlier versions remain
+historical evidence, and later versions require their own recorded run before
+becoming a claim.
 
-Local status: `sixteen_runs_recorded_current_payload_certified_on_0.153.2`. Hosted
-workflow status: `pending_first_run`.
+Local status: `twenty_two_runs_recorded_current_payload_uncertified_pending_run`.
+Hosted workflow status: `pending_first_run`.
 
 Local runs through an authenticated Codex CLI are the primary reliability path.
 The hosted workflow is optional infrastructure for maintainers with API-key
@@ -117,6 +119,12 @@ Use `not recorded` for historical data that cannot be recovered.
 |   14 | 2026-09-06 | Local     | 0.153.2 | not recorded | Pass                 | 2m 18s       | 231,042 input (197,376 cached); 2,969 output; 86 reasoning    | Second clean time-separated run under the corrected grader; positive and negative scenarios passed.                                                                      |
 |   15 | 2026-09-06 | Local     | 0.153.2 | not recorded | Pass                 | 2m 30s       | 255,211 input (221,440 cached); 2,955 output; 68 reasoning    | Third clean time-separated run under the corrected grader; positive and negative scenarios passed.                                                                      |
 |   16 | 2026-09-06 | Local     | 0.153.2 | not recorded | Pass                 | 2m 06s       | 207,118 input (173,824 cached); 2,677 output; 23 reasoning    | Focused semantic trigger review: positive repository-health audit activated the skill; negative narrow task did not; transcript grader passed.                              |
+| 17   | 2026-09-27 | Local     | 0.157.1 | not emitted  | Fail                 | 2m 14s       | 165,694 input (113,536 cached); 2,755 output; 38 reasoning    | Both scenarios completed; grading rejected the unknown dimension `reliability_test_gaps` because the grader's dimension set predated it.                                 |
+| 18   | 2026-09-27 | Local     | 0.157.1 | not emitted  | Fail                 | 2m 15s       | 188,594 input (159,488 cached); 2,681 output; 30 reasoning    | Same unknown-dimension grading failure; the model emitted the new dimension in both attempts.                                                                            |
+| 19   | 2026-09-27 | Local     | 0.157.1 | not emitted  | Fail                 | 2m 15s       | 190,773 input (162,304 cached); 2,586 output; 52 reasoning    | Both scenarios completed; grading found `profile.observed` missing `reliability_audit_requested` because the result schema stripped the field from model output.         |
+| 20   | 2026-09-27 | Local     | 0.157.1 | not emitted  | Fail                 | 1m 56s       | 213,489 input (184,320 cached); 2,819 output; 86 reasoning    | Positive completed with the correct flag; the negative scenario was rejected at model inference by an external account usage limit.                                      |
+| 21   | 2026-09-28 | Local     | 0.157.1 | not emitted  | Pass                 | 2m 11s       | 162,979 input (134,912 cached); 2,749 output; 43 reasoning    | Clean pass of the reliability payload at commit `2c7deef`; the model activated `reliability_test_gaps` and found the planted `split("=")` defect.                        |
+| 22   | 2026-09-28 | Local     | 0.157.1 | not emitted  | Fail                 | 0m 04s       | not recorded                                                  | Positive scenario rejected at model inference by an external account usage limit; the negative scenario did not start. No model output.                                  |
 
 Runs 1-3 predate the `run-summary.json` observability added in `f21214c`.
 Their committed log entries remain the authoritative historical evidence; do
@@ -130,18 +138,39 @@ version. A stable reliability baseline additionally requires repeated runs of
 the same payload. Review the pass rate and deviations before changing the
 harness or expanding `SKILL.md`.
 
-Current evidence: sixteen runs recorded, with eleven passes, one timeout, and two
-deterministic grading failures (67% pass rate). Runs 4 and 8 found real
-instruction ambiguities; runs 5, 9, and 10 passed after targeted corrections.
-Runs 13–16 are four clean passes of the unchanged hardened payload on Codex CLI
-0.153.2; run 16 additionally served as the focused semantic trigger review. The
-historical payload changes mean the complete log remains diagnostic, while runs
-13–16 provide the current repeated-baseline evidence.
+Current evidence: twenty-two runs recorded, with twelve plain passes, two
+failures regraded to passes, five deterministic grading failures, one timeout,
+and two model-inference failures. Runs 4 and 8 found real instruction
+ambiguities; runs 5, 9, and 10 passed after targeted corrections. Runs 13–16 are
+four clean passes of the unchanged hardened payload on Codex CLI 0.153.2; run 16
+additionally served as the focused semantic trigger review. The historical
+payload changes mean the complete log remains diagnostic, while runs 13–16
+provide the last repeated-baseline evidence.
+
+**No run covers the current payload.** Runs 17–22 exercise the
+`reliability_test_gaps` work, and only run 21 was a clean model observation. The
+five failures are not model-reliability signal: runs 17–19 were deterministic
+grading failures caused by harness and schema defects that were found and fixed
+during development, and runs 20 and 22 were rejected at model inference by an
+external account usage limit. Run 21 passed, but it executed against the payload
+at commit `2c7deef`; the two commits after it changed `SKILL.md` — removing a
+conflicting activation predicate, adding the discovery probe, and amending the
+frontmatter trigger. The current payload therefore has **zero** recorded runs.
+Treat it as unobserved rather than unreliable: it has neither passing nor failing
+evidence, and one recorded run of a materially changed payload would not satisfy
+the repeated-run requirement above in any case. The certification can be
+re-established once the account quota allows a run against the current payload.
 
 Excluded infrastructure attempt: on 2026-07-14, a run inside the restricted
 network sandbox timed out after 900 seconds immediately after `turn.started`,
 without receiving model content. It is not counted as a model-reliability run;
 the successful run above used the authenticated CLI with network access.
+
+Excluded interrupted attempt: `20260927T171259Z` produced both scenario
+transcripts and a positive result but no `run-summary.json` and no `grade.json`,
+so it has no recorded CLI version, grade, duration, or token usage. It is not
+counted; the surrounding runs 17–22 record what was observed. Seven artifacts
+therefore exist under `artifacts/codex-regression/` for runs 17–22.
 
 ## Optional GitHub Actions
 

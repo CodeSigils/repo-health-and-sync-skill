@@ -12,6 +12,13 @@ from 2026-08-24. The current local CLI is 0.149.0; the earlier 0.133.0 install
 and workflow evidence is retained as historical evidence rather than presented
 as the current runtime.
 
+**Baseline boundary.** The findings below describe the payload as of 2026-08-24
+and are not a certification of the `reliability_test_gaps` payload, which was
+added afterwards. That payload is unobserved rather than failing: no run has
+been recorded against it. See the [regression record](../codex-regression.md)
+for the current run log and
+[claim matrix](../claim-evidence-matrix.md) for the resulting claim status.
+
 ## Sources
 
 Accessed 2026-07-13:
