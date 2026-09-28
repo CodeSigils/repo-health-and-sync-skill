@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import sys
 from pathlib import Path
@@ -168,6 +169,25 @@ def validate_case(data: Any) -> list[str]:
 
 def run_self_tests() -> int:
     """Exercise success and missing-activation-evidence failures."""
+    # An independent literal, not derived from the constant it locks: a fixture
+    # only has to be a superset of the required fields, so dropping a name from
+    # REQUIRED_OBSERVED_FIELDS weakens every check without failing any.
+    expected_required = {
+        "vcs",
+        "languages",
+        "package_managers",
+        "ci",
+        "shell_files",
+        "recent_commits",
+        "gitignore",
+        "version_sources",
+        "script_surface",
+        "reliability_audit_requested",
+        "shipped_payload",
+    }
+    assert REQUIRED_OBSERVED_FIELDS == expected_required, (
+        f"REQUIRED_OBSERVED_FIELDS drifted: {sorted(REQUIRED_OBSERVED_FIELDS)}"
+    )
     observed_defaults = {
         "vcs": "git",
         "languages": [],
@@ -234,6 +254,13 @@ def run_self_tests() -> int:
         ],
     }
     assert validate_case(valid) == []
+    for field in sorted(expected_required):
+        without = copy.deepcopy(valid)
+        del without["fixtures"][0]["profile"]["observed"][field]
+        assert any(
+            "missing required fields" in error and field in error
+            for error in validate_case(without)
+        ), f"profile.observed.{field} is declared required but not enforced"
     valid["fixtures"][0]["expected"]["active_dimensions"][0]["activated_by"] = []
     assert any("lacks activated_by evidence" in error for error in validate_case(valid))
     print("PASS: validate-evals.py self-tests")

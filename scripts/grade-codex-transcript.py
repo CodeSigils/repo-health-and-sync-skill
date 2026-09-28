@@ -3,13 +3,14 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import sys
 import tempfile
 from pathlib import Path
 from typing import Any
 
-from _common import read_json, validate_dimensions
+from _common import ROOT, read_json, resolve_profile_path, validate_dimensions
 
 DEFAULT_CONTRACT = Path("evals/cases/repo-health-scan.json")
 SEVERITY_ORDER = {"blocking": 0, "warning": 1, "info": 2}
@@ -18,6 +19,12 @@ REQUIRED_OBSERVED_FIELDS = {
     "gitignore", "version_sources", "script_surface", "reliability_audit_requested", "shipped_payload",
 }
 REQUIRED_INFERRED_FIELDS = {"repo_type", "release_model", "risk_context"}
+
+# Request-gated dimensions are not evidence-activated: a set profile path
+# compels activation rather than merely making the dimension eligible.
+REQUEST_GATED_DIMENSIONS = {
+    "reliability_test_gaps": "observed.reliability_audit_requested",
+}
 
 
 def expected_dimensions(contract: dict[str, Any]) -> set[str]:
@@ -31,6 +38,46 @@ def expected_dimensions(contract: dict[str, Any]) -> set[str]:
                 if isinstance(name, str):
                     dimensions.add(name)
     return dimensions
+
+
+def validate_request_gated_dimensions(
+    active: list[dict[str, Any]],
+    skipped: list[dict[str, Any]],
+    profile: dict[str, Any],
+) -> list[str]:
+    """Require a request-gated dimension to be active rather than skipped.
+
+    validate_dimensions accepts a dimension in either bucket as long as the union
+    is complete and every skip carries a reason. That is the correct contract
+    for an evidence-activated dimension, where the agent judges relevance from
+    the profile and may legitimately decline. It is the wrong contract for a
+    dimension the user requested by name: a plausible skip reason cannot make
+    silently dropping the request acceptable, and no such decline is detectable
+    anywhere else in the regression.
+
+    Deterministic fixtures are already covered -- _common requires activated_by
+    to resolve truthy, so a fixture cannot claim active while the request flag
+    is false. This closes the same hole on the model path, where the bucket
+    choice is the model's own.
+    """
+    names = {
+        key: {
+            item["name"]
+            for item in items
+            if isinstance(item, dict) and isinstance(item.get("name"), str)
+        }
+        for key, items in (("active", active), ("skipped", skipped))
+    }
+    errors: list[str] = []
+    for name, field in sorted(REQUEST_GATED_DIMENSIONS.items()):
+        if name in names["active"] or not resolve_profile_path(profile, field):
+            continue
+        if name in names["skipped"]:
+            errors.append(
+                f"request-gated dimension {name} was skipped although {field} is "
+                "set in the profile; an explicit request must activate it"
+            )
+    return errors
 
 
 def validate_transcript(path: Path, label: str) -> list[str]:
@@ -183,6 +230,7 @@ def grade_positive(result: dict[str, Any], dimensions: set[str]) -> list[str]:
     ))
     if any("active dimension" in e or "skipped dimension" in e or "dimension accounting" in e for e in errors):
         return errors
+    errors.extend(validate_request_gated_dimensions(active, skipped, profile))
 
     findings = events[2].get("findings")
     if not isinstance(findings, list) or not findings:
@@ -227,7 +275,19 @@ def grade_negative(text: str) -> list[str]:
 
 def run_self_tests() -> int:
     """Exercise passing output and representative contract failures."""
-    dimensions = {"history_hygiene", "shell_correctness"}
+    # An independent literal, not derived from the constant it locks: removing a
+    # name from REQUIRED_OBSERVED_FIELDS leaves every fixture a valid superset,
+    # so only a redundant copy can detect the removal.
+    expected_required = {
+        "vcs", "languages", "package_managers", "ci", "shell_files",
+        "recent_commits", "gitignore", "version_sources", "script_surface",
+        "reliability_audit_requested", "shipped_payload",
+    }
+    assert REQUIRED_OBSERVED_FIELDS == expected_required, (
+        f"REQUIRED_OBSERVED_FIELDS drifted: {sorted(REQUIRED_OBSERVED_FIELDS)}"
+    )
+    dimensions = expected_dimensions(read_json(ROOT / DEFAULT_CONTRACT))
+    assert "reliability_test_gaps" in dimensions, "contract lost the reliability dimension"
     result = {
         "skill": {
             "selected": True,
@@ -257,10 +317,11 @@ def run_self_tests() -> int:
                 ],
                 "skipped_dimensions": [
                     {
-                        "name": "shell_correctness",
+                        "name": name,
                         "status": "SKIP",
-                        "skip_reason": "No shell files.",
+                        "skip_reason": "No supporting evidence in this profile.",
                     }
+                    for name in sorted(dimensions - {"history_hygiene"})
                 ],
                 "findings": [],
             },
@@ -281,6 +342,48 @@ def run_self_tests() -> int:
         ],
     }
     assert grade_positive(result, dimensions) == []
+
+    for field in sorted(expected_required):
+        without = copy.deepcopy(result)
+        del without["events"][0]["profile"]["observed"][field]
+        assert any(
+            "missing required fields" in error and field in error
+            for error in grade_positive(without, dimensions)
+        ), f"profile.observed.{field} is declared required but not enforced"
+
+    requested = copy.deepcopy(result)
+    requested["events"][0]["profile"]["observed"]["reliability_audit_requested"] = True
+    requested["events"][1]["active_dimensions"].append(
+        {
+            "name": "reliability_test_gaps",
+            "activated_by": ["observed.reliability_audit_requested"],
+        }
+    )
+    requested["events"][1]["skipped_dimensions"] = [
+        item
+        for item in requested["events"][1]["skipped_dimensions"]
+        if item["name"] != "reliability_test_gaps"
+    ]
+    assert grade_positive(requested, dimensions) == []
+
+    under_triggered = copy.deepcopy(requested)
+    under_triggered["events"][1]["active_dimensions"] = [
+        item
+        for item in under_triggered["events"][1]["active_dimensions"]
+        if item["name"] != "reliability_test_gaps"
+    ]
+    under_triggered["events"][1]["skipped_dimensions"].append(
+        {
+            "name": "reliability_test_gaps",
+            "status": "SKIP",
+            "skip_reason": "No reliability audit requested.",
+        }
+    )
+    assert any(
+        "request-gated dimension reliability_test_gaps" in error
+        for error in grade_positive(under_triggered, dimensions)
+    ), "a recorded request that skips the dimension must fail the regression"
+
     result["events"][1]["active_dimensions"][0]["activated_by"] = ["observed.missing"]
     assert any(
         "missing profile evidence" in error
