@@ -166,11 +166,12 @@ Keep scalar fields canonical (`vcs: git`, `ci: null` when no CI is present,
 dimension plan or report, not inside scalar values. `workflow_files` and
 `workflow_files` contain workflow paths, while `release_files` contain only
 paths whose filename or configuration clearly represents release behavior.
-Do not classify every CI workflow as a release file. `version_sources` contains only
-release-relevant exact paths (or the special `git tag` source) that the version
-probe will parse. Do not include a maintainer-only package, test, or tooling
-manifest merely because it has a `version` field. If a package is published
-independently, include its manifest and state that release model in `inferred`.
+Do not classify every CI workflow as a release file. `version_sources` contains
+only release-relevant exact paths (or the special `git tag` source) that the
+version probe will parse. Do not include a maintainer-only package, test, or
+tooling manifest merely because it has a `version` field. If a package is
+published independently, include its manifest and state that release model in
+`inferred`.
 
 ## Step 2: Infer what invariants matter
 
