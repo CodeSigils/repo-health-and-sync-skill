@@ -1,6 +1,6 @@
-Perform a reliability and test-gap audit of this repository before release. Before running repository probes,
-identify and read any installed skill relevant to this request. Do not modify
-files and do not use network access.
+Perform a reliability and test-gap audit of this repository before release.
+Before running repository probes, identify and read any installed skill
+relevant to this request. Do not modify files and do not use network access.
 
 Follow the selected workflow exactly:
 

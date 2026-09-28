@@ -6,12 +6,12 @@ Deterministic fixtures for behavioral contract validation. Located at `evals/cas
 
 | Fixture | Repo Type | Key Profile Signals | Active Dimensions |
 |---------|-----------|---------------------|-------------------|
-| `codex-skill-pack` | Skill pack | 4 version sources, GH Actions, shell files, git tags | 7 (all except cross_platform, attribution_drift, external_reference_health) |
-| `python-library-without-shell` | Python lib (uv) | 2 version sources, GH Actions, no shell files | 5 (all except shell_correctness, cross_platform, tag_release_integrity, attribution_drift, external_reference_health) |
-| `monorepo-workspace` | Monorepo (TS + Python) | 3 version sources (npm + uv), GH Actions, no shell files | 5 (all except shell_correctness, cross_platform, tag_release_integrity, attribution_drift, external_reference_health) |
-| `docs-only-product` | Documentation | No package managers, no version sources, no shell files | 4 (all except shell_correctness, version_alignment, cross_platform, tag_release_integrity, attribution_drift, external_reference_health) |
-| `missing-tools-no-origin-main` | Skill pack | No CI, no upstream/remote-default base, shell files | 6 (all except ci_efficiency, cross_platform, attribution_drift, external_reference_health) |
-| `dirty-development-tree` | Library (uv) | Dirty working tree, GH Actions, shell files | 7 (all except cross_platform, attribution_drift, external_reference_health) |
+| `codex-skill-pack` | Skill pack | 4 version sources, GH Actions, shell files, git tags | 7 (all except cross_platform, attribution_drift, external_reference_health, reliability_test_gaps) |
+| `python-library-without-shell` | Python lib (uv) | 2 version sources, GH Actions, no shell files | 5 (all except shell_correctness, cross_platform, tag_release_integrity, attribution_drift, external_reference_health, reliability_test_gaps) |
+| `monorepo-workspace` | Monorepo (TS + Python) | 3 version sources (npm + uv), GH Actions, no shell files | 5 (all except shell_correctness, cross_platform, tag_release_integrity, attribution_drift, external_reference_health, reliability_test_gaps) |
+| `docs-only-product` | Documentation | No package managers, no version sources, no shell files | 4 (all except shell_correctness, version_alignment, cross_platform, tag_release_integrity, attribution_drift, external_reference_health, reliability_test_gaps) |
+| `missing-tools-no-origin-main` | Skill pack | No CI, no upstream/remote-default base, shell files | 5 (all except ci_efficiency, tag_release_integrity, cross_platform, attribution_drift, external_reference_health, reliability_test_gaps) |
+| `dirty-development-tree` | Library (uv) | Dirty working tree, GH Actions, shell files | 7 (all except cross_platform, attribution_drift, external_reference_health, tag_release_integrity) — the only fixture that activates `reliability_test_gaps` |
 
 ## Fixture Structure
 
@@ -40,7 +40,7 @@ The eval contract enforces:
 - Profile before dimension checks (ordered_events: profile → dimension_checks → report)
 - Every active dimension cites `activated_by` profile paths
 - Every skipped dimension has `skip_reason`
-- All 10 candidate dimensions accounted for (active + skipped = 10)
+- All 11 candidate dimensions accounted for (active + skipped = 11)
 - Fixture diversity: skill-pack + non-skill repository
 
 ## Running Validation

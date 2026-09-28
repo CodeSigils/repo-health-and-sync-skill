@@ -11,7 +11,7 @@ shape, infers what invariants matter, and reports findings with concrete
 harm and remediation.
 
 For an explicit reliability or test-gap request, it additionally traces public
-entry-point failure semantics and coverage without changing the audited
+entry-point failure semantics and test gaps without changing the audited
 repository. Routine health and release audits remain scoped to the
 evidence-activated dimensions they need.
 
@@ -63,6 +63,7 @@ The agent activates only relevant checks from this catalog — not a universal c
 | Attribution drift         | Commits outside upstream/remote-default base |
 | File coverage             | `.gitignore` exists                          |
 | External reference health | `REPO_HEALTH_VERIFY_REFS=1` set              |
+| Reliability and test gaps | Explicit reliability or test-gap request     |
 
 *Not a checklist — the agent may add custom dimensions when repo evidence supports them.*
 

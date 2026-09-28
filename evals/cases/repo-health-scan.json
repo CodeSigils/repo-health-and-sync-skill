@@ -147,7 +147,7 @@
           },
           {
             "name": "reliability_test_gaps",
-            "skip_reason": "The request does not ask for a reliability or test-gap audit."
+            "skip_reason": "observed.reliability_audit_requested is false in the profile."
           }
         ]
       }
@@ -245,7 +245,7 @@
           },
           {
             "name": "reliability_test_gaps",
-            "skip_reason": "The request does not ask for a reliability or test-gap audit."
+            "skip_reason": "observed.reliability_audit_requested is false in the profile."
           }
         ]
       }
@@ -346,7 +346,7 @@
           },
           {
             "name": "reliability_test_gaps",
-            "skip_reason": "The request does not ask for a reliability or test-gap audit."
+            "skip_reason": "observed.reliability_audit_requested is false in the profile."
           }
         ]
       }
@@ -437,7 +437,7 @@
           },
           {
             "name": "reliability_test_gaps",
-            "skip_reason": "The request does not ask for a reliability or test-gap audit."
+            "skip_reason": "observed.reliability_audit_requested is false in the profile."
           }
         ]
       }
@@ -534,7 +534,7 @@
           },
           {
             "name": "reliability_test_gaps",
-            "skip_reason": "The request does not ask for a reliability or test-gap audit."
+            "skip_reason": "observed.reliability_audit_requested is false in the profile."
           }
         ]
       }
