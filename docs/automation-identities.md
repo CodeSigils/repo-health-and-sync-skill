@@ -29,6 +29,31 @@ Both use the `chore(deps)` convention so the normal commit gate accepts bot
 commits. Security updates remain a GitHub security feature and are not proof
 that ordinary version updates are secure; assess them separately.
 
+`open-pull-requests-limit` is a concurrency cap, not a rate limit: it bounds
+how many version-update pull requests are open at once within one update
+entry, not how many arrive over time. Entries, keyed by ecosystem and
+directory, hold independent budgets, so the two caps never compete. Within
+an entry the budget is shared and a group consumes one slot. At the cap
+Dependabot opens nothing further, builds no backlog, and waits for the next
+scheduled run.
+
+A newer release supersedes instead of queueing. If a version is published
+while its pull request is open, that pull request is closed and a new one
+opens at the newer version, leaving the open count at the cap even though a
+fresh pull request was created. That is the mechanism behind the twelve-day
+stall in [maintaining.md](maintaining.md), and why a cap that works as
+configured does not prevent churn.
+
+`exclude-patterns` ungroups rather than skips. An excluded dependency still
+receives individual version-update pull requests, and because `update-types`
+filters grouping only, a major release still produces one. Group resolution
+carries a documented-versus-implemented discrepancy: GitHub's documentation
+places a dependency in the first group it matches, while the updater
+implementation resolves the most specific matching group. The two coincide
+under one group and diverge under several, so first-match wording is not a
+guarantee once groups multiply. A group matching nothing is ignored, and its
+members receive individual pull requests instead.
+
 ## Review rule
 
 For every bot-authored PR:
@@ -63,3 +88,4 @@ Sources:
 - [Workflow syntax: permissions and Dependabot runs](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax)
 - [Dependabot version updates](https://docs.github.com/en/code-security/concepts/supply-chain-security/dependabot-version-updates)
 - [Customizing Dependabot security updates](https://docs.github.com/en/code-security/how-tos/secure-your-supply-chain/manage-your-dependency-security/customizing-dependabot-security-prs)
+- [Dependabot configuration options reference](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference)
