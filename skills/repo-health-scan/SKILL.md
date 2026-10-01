@@ -8,6 +8,8 @@ description: >-
   Use when asked to audit, review, assess, or check the health of a repo.
   Use before a release, archive, handoff, or onboarding session.
   Use when CI is failing and the cause is unclear.
+  Use when asked for a reliability, failure-semantics, entry-point, or test-gap
+  audit of a repository.
   Not for single-file edits, narrow bug fixes, or feature implementation.
 license: MIT
 metadata:
@@ -136,6 +138,7 @@ observed:
   gitignore: boolean
   version_sources: [string]
   script_surface: string
+  reliability_audit_requested: boolean
   shipped_payload: string
   tags_present: boolean
   base_ref: string | null
@@ -157,19 +160,20 @@ cannot write it, run more discovery probes.
 
 The profile is a machine-readable contract, not a prose summary. The core
 fields (`vcs`, languages, package managers, CI, shell/filesystem signals,
-version sources, script surface, and shipped payload) are mandatory. Extended
-fields are emitted when their probes apply; use `null`, `false`, or `[]` when a
-known extended fact is absent.
+version sources, script surface, reliability-audit request, and shipped
+payload) are mandatory. Extended fields are emitted when their probes apply;
+use `null`, `false`, or `[]` when a known extended fact is absent.
 Keep scalar fields canonical (`vcs: git`, `ci: null` when no CI is present,
 `base_ref: null` when no bounded base resolves); put explanations in the
 dimension plan or report, not inside scalar values. `workflow_files` and
 `workflow_files` contain workflow paths, while `release_files` contain only
 paths whose filename or configuration clearly represents release behavior.
-Do not classify every CI workflow as a release file. `version_sources` contains only
-release-relevant exact paths (or the special `git tag` source) that the version
-probe will parse. Do not include a maintainer-only package, test, or tooling
-manifest merely because it has a `version` field. If a package is published
-independently, include its manifest and state that release model in `inferred`.
+Do not classify every CI workflow as a release file. `version_sources` contains
+only release-relevant exact paths (or the special `git tag` source) that the
+version probe will parse. Do not include a maintainer-only package, test, or
+tooling manifest merely because it has a `version` field. If a package is
+published independently, include its manifest and state that release model in
+`inferred`.
 
 ## Step 2: Infer what invariants matter
 
@@ -205,7 +209,10 @@ an observed tag/release file or opt-in flag); commit quality uses
 `observed.gitignore`; attribution drift uses a positive
 `observed.branch_commits_outside_base`; and external reference health uses the
 true `observed.verify_refs` opt-in. Cross-platform checks additionally require
-inferred platform evidence.
+inferred platform evidence. Reliability test gaps use
+`observed.reliability_audit_requested`, which is true only when the user
+explicitly asks for a reliability, failure-semantics, entry-point, or test-gap
+audit.
 
 ```yaml
 # DIMENSION PLAN
@@ -231,6 +238,7 @@ skipped:
 | attribution_drift         | observed.branch_commits_outside_base > 0                                                         |
 | file_coverage             | observed.gitignore                                                                               |
 | external_reference_health | env:REPO_HEALTH_VERIFY_REFS=1                                                                    |
+| reliability_test_gaps     | observed.reliability_audit_requested                                                             |
 
 Only after emitting the dimension plan, run the smallest command or command
 block that answers each active dimension. Do not run probes for skipped
@@ -242,7 +250,8 @@ release), report it first and **continue safe read-only checks** for remaining
 active dimensions — do not stop the audit. Stop only when the finding requires
 human remediation before any further probing is meaningful.
 
-Safe to continue after a blocker: history_hygiene, file_coverage, commit_quality.
+Safe to continue after a blocker: history_hygiene, file_coverage,
+commit_quality, reliability_test_gaps.
 Pause (may need remediation context): version_alignment, tag_release_integrity, ci_efficiency.
 Skip if tools unavailable: cross_platform (needs shellcheck), external_reference_health (needs gh, opt-in).
 
@@ -433,6 +442,36 @@ done
 tracked_sensitive=$(git ls-files -- .env '.env.*' \
   | grep -Evc '^\.env(\..*)?\.example$' || true)
 printf 'tracked_sensitive_env_files=%s\n' "$tracked_sensitive"
+
+# Reliability test gaps — discovery only. This block never runs a test suite and
+# never writes: it reports which entry points, test configs, maintainer docs, and
+# self-declared verification commands exist, so the review that follows has
+# evidence to select from instead of guessing. Print paths and counts only.
+if command -v git >/dev/null 2>&1; then
+  echo "== maintainer and operational docs =="
+  git ls-files -- '*.md' 'docs/*' 'CONTRIBUTING*' 'AGENTS*' 'Makefile' 'justfile' \
+    2>/dev/null | grep -Ei '(readme|contribut|maintain|operat|runbook|architect|design|troubleshoot|agents)' \
+    | head -20 || echo "none found"
+
+  echo "== test configuration =="
+  git ls-files -- 'pytest.ini' 'tox.ini' 'noxfile.py' 'setup.cfg' 'pyproject.toml' \
+    'package.json' 'Cargo.toml' 'go.mod' 'Makefile' 'justfile' '.github/workflows/*' \
+    2>/dev/null | head -20 || echo "none found"
+
+  echo "== executable entry points =="
+  git grep -IlE 'def main\(|if __name__ == .__main__.|^fn main\(|^func main\(|export (async )?function main' \
+    -- '*.py' '*.rs' '*.go' '*.js' '*.ts' '*.sh' 2>/dev/null | head -20 || echo "none found"
+  git grep -IlE '^\[project\.scripts\]|^console_scripts' -- 'pyproject.toml' 'setup.cfg' 2>/dev/null \
+    | head -5 || true
+
+  echo "== self-declared verification commands (from CI workflows) =="
+  git grep -IhE '\b(uv run|python3|python|bash|sh|make|just|tox|nox|pytest|ruff|mypy|shellcheck)\b' \
+    -- '.github/workflows/*' 'Makefile' 'justfile' 'tox.ini' 'noxfile.py' 2>/dev/null \
+    | grep -E '(run:|^\s{2,}\S|\./)' \
+    | sed -E 's/^[[:space:]]+//; s/^-? ?run: ?//' \
+    | grep -vE '^(- name:|-?[[:alnum:]_-]+: |uses:|$)' \
+    | sort -u | head -30 || echo "none declared"
+fi
 ```
 
 Secret-pattern matching is heuristic, not proof that a repository is clean. If
@@ -446,6 +485,68 @@ report counts or paths, never values.
 Run only the commands for dimensions you deemed relevant. Skip the rest.
 Do not emit PASS/WARNING/BLOCKING for skipped dimensions — they do not
 apply to this repo.
+
+### Reliability and test-gap audit
+
+The dimension plan is the only activation condition. When
+`reliability_test_gaps` is active, extend the evidence-activated scan with this
+focused, read-only review. Do not apply a second test of your own: the review is
+not a code-style pass and not a release-readiness gate, and a request may be
+both
+explicitly reliability-focused and release-related without either canceling the
+other.
+
+Run the `# Reliability test gaps` probe above first. It discovers maintainer and
+operational documentation, test configuration, executable entry points, and the
+repository's own verification commands as declared in its CI workflows. Use that
+output to select entry points; do not re-derive it.
+
+For each relevant entry point, state the observable contract: inputs, output or
+summary behavior, side effects, and exit status. Then fix the failure contract
+by this order, and state which rule you applied:
+
+1. The repository documents an exit-code or status convention — use it verbatim.
+2. The repository documents none — default to treating a non-zero exit, or an
+   explicit error field in the report, as meaning a failure was not observed. A
+   zero exit carrying a non-empty report is not evidence of a clean run.
+
+Do not introduce a third convention.
+
+For each relevant public `main()` or CLI path, trace file reads, parsing,
+subprocess, credential, network/API, and output-writing boundaries. Look for:
+
+- uncaught exceptions and error paths that collapse into a findings status;
+- partial output that is presented as a complete result;
+- empty or success reports that assert an input had no results when it could
+  not be read; and
+- error output that might expose a credential or sensitive response.
+
+Audit tests at the public entry point as well as helpers. Identify gaps only in
+the behaviors this repository actually has: clean success, findings or drift,
+absent credentials, network/API failure, malformed responses, unreadable input,
+and partial-result behavior. When a category does not apply — no executable
+entry point, no network boundary, no documented failure path — name it as not
+applicable and move on rather than reporting an empty result. Run the
+repository's existing read-only verification commands, as discovered by the
+probe, before forming any gap conclusion.
+
+**Temporary adversarial fixtures.** Use one only to reproduce a concrete
+suspected defect. Write it under the system temporary directory via `mktemp -d`
+with a `repo-health-probe-` prefix, never inside the audited repository, and
+remove the directory before delivering the report. This is the only write the
+audit permits and it does not mutate the repository. Do not alter tracked inputs
+or manufacture speculative cases.
+
+In the final report, rank confirmed findings with the severity the rest of the
+report uses — blocking for a defect that misleads a user or corrupts a release,
+warning for a real uncovered failure path, info for a documented but unverified
+boundary — and include the exact path and line, the violated contract and user
+impact, the reproduction or reasoning, and the smallest proposed regression
+test.
+If no finding is confirmed, report `PASS` for the dimension and list the entry
+points and failure boundaries checked, so the check is neither silent nor graded
+as a failure. Do not modify files unless the user separately asks for an
+implementation.
 
 ## Step 3: Report findings with judgment, not labels
 
@@ -529,4 +630,7 @@ Before delivering the report, confirm that:
 - sensitive ignore candidates were checked against both ignore rules and
   tracked files; and
 - automation findings distinguished the bot identity, trigger, permissions,
-  and reviewed diff from an assumption that a green bot PR is safe.
+  and reviewed diff from an assumption that a green bot PR is safe; and
+- every `reliability_test_gaps` finding named the smallest regression test that
+  would have caught it, or the review recorded that no finding was confirmed and
+  listed the entry points and failure boundaries it checked.

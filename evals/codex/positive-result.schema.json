@@ -48,6 +48,7 @@
                         "items": { "type": "string" }
                       },
                       "script_surface": { "type": "string" },
+                      "reliability_audit_requested": { "type": "boolean" },
                       "shipped_payload": { "type": "string" }
                     },
                     "required": [
@@ -60,6 +61,7 @@
                       "gitignore",
                       "version_sources",
                       "script_surface",
+                      "reliability_audit_requested",
                       "shipped_payload"
                     ],
                     "additionalProperties": false

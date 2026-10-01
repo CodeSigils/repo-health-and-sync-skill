@@ -42,7 +42,7 @@ Current product assessment:
   examples while retaining inline probes and the complete security contract.
   Do not add new runtime modules until repeated model evidence shows the extra
   surface is useful.
-- The ten dimensions behave as an evidence-activated candidate catalog. Calling
+- The eleven dimensions behave as an evidence-activated candidate catalog. Calling
   the method "not a checklist" without that qualification overstates the
   distinction.
 - The skill is useful guidance, not an executable guarantee. Agent-interpreted

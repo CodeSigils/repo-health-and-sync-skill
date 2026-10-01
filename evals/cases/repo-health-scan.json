@@ -14,6 +14,10 @@
       {
         "prompt": "CI is failing for no obvious reason. Check the repo.",
         "top_k": 3
+      },
+      {
+        "prompt": "Perform a reliability and test-gap audit of this repository.",
+        "top_k": 1
       }
     ],
     "negative": [
@@ -65,6 +69,7 @@
             "git tag"
           ],
           "script_surface": "maintainer-only",
+          "reliability_audit_requested": false,
           "shipped_payload": "single SKILL.md",
           "package_managers": ["uv"],
           "tags_present": true,
@@ -139,6 +144,10 @@
           {
             "name": "external_reference_health",
             "skip_reason": "The opt-in environment flag was not set."
+          },
+          {
+            "name": "reliability_test_gaps",
+            "skip_reason": "observed.reliability_audit_requested is false in the profile."
           }
         ]
       }
@@ -163,6 +172,7 @@
             "src/example/__init__.py"
           ],
           "script_surface": "none",
+          "reliability_audit_requested": false,
           "shipped_payload": "library",
           "tags_present": false,
           "base_ref": "origin/main",
@@ -232,6 +242,10 @@
           {
             "name": "external_reference_health",
             "skip_reason": "The opt-in environment flag was not set."
+          },
+          {
+            "name": "reliability_test_gaps",
+            "skip_reason": "observed.reliability_audit_requested is false in the profile."
           }
         ]
       }
@@ -259,6 +273,7 @@
             "packages/shared/package.json"
           ],
           "script_surface": "maintainer-only",
+          "reliability_audit_requested": false,
           "shipped_payload": "none",
           "tags_present": false,
           "base_ref": "origin/main",
@@ -328,6 +343,10 @@
           {
             "name": "external_reference_health",
             "skip_reason": "The opt-in environment flag was not set."
+          },
+          {
+            "name": "reliability_test_gaps",
+            "skip_reason": "observed.reliability_audit_requested is false in the profile."
           }
         ]
       }
@@ -347,6 +366,7 @@
           "gitignore": true,
           "version_sources": [],
           "script_surface": "none",
+          "reliability_audit_requested": false,
           "shipped_payload": "documentation",
           "tags_present": false,
           "base_ref": "origin/main",
@@ -414,6 +434,10 @@
           {
             "name": "external_reference_health",
             "skip_reason": "The opt-in environment flag was not set."
+          },
+          {
+            "name": "reliability_test_gaps",
+            "skip_reason": "observed.reliability_audit_requested is false in the profile."
           }
         ]
       }
@@ -437,6 +461,7 @@
             "pyproject.toml"
           ],
           "script_surface": "maintainer-only",
+          "reliability_audit_requested": false,
           "shipped_payload": "single SKILL.md",
           "tags_present": false,
           "base_ref": null,
@@ -506,6 +531,10 @@
           {
             "name": "external_reference_health",
             "skip_reason": "The opt-in environment flag was not set."
+          },
+          {
+            "name": "reliability_test_gaps",
+            "skip_reason": "observed.reliability_audit_requested is false in the profile."
           }
         ]
       }
@@ -530,6 +559,7 @@
             "pyproject.toml"
           ],
           "script_surface": "maintainer-only",
+          "reliability_audit_requested": true,
           "shipped_payload": "library",
           "working_tree_dirty": true,
           "tags_present": false,
@@ -582,6 +612,12 @@
             "name": "file_coverage",
             "activated_by": [
               "observed.gitignore"
+            ]
+          },
+          {
+            "name": "reliability_test_gaps",
+            "activated_by": [
+              "observed.reliability_audit_requested"
             ]
           }
         ],

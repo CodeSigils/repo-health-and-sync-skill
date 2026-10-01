@@ -1,13 +1,14 @@
-Audit this repository before release. Before running repository probes,
-identify and read any installed skill relevant to this request. Do not modify
-files and do not use network access.
+Perform a reliability and test-gap audit of this repository before release.
+Before running repository probes, identify and read any installed skill
+relevant to this request. Do not modify files and do not use network access.
 
 Follow the selected workflow exactly:
 
 1. Emit the structured observed/inferred repository profile before selecting
    health dimensions. Include the core profile fields (`vcs`, `languages`,
    `package_managers`, `ci`, `shell_files`, `recent_commits`, `gitignore`,
-   `version_sources`, `script_surface`, and `shipped_payload`). Include
+   `version_sources`, `script_surface`, `reliability_audit_requested`, and
+   `shipped_payload`). Include
    extended fields such as tags, base, workflow, release, and opt-in state when
    those probes apply. Use `null`, `false`, or `[]` when a known fact is
    absent; keep explanations out of scalar fields.
@@ -29,6 +30,7 @@ Follow the selected workflow exactly:
      gitignore: false
      version_sources: []
      script_surface: ""
+     reliability_audit_requested: true
      shipped_payload: ""
      tags_present: false
      base_ref: null
