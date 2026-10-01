@@ -3,12 +3,13 @@
 > Maintainer-only record. Each recurring control must have a named failure
 > mode, evidence, and an explicit cost/coverage decision.
 
-Reviewed: `2026-09-08`
+Reviewed: `2026-10-01`
 Repository scale: solo maintainer; protected `main`; no mandatory second review.
 
 | Control | Trigger | Failure mode addressed | Evidence | Cost | Decision |
 | --- | --- | --- | --- | --- | --- |
-| `lint` job | PR, push, schedule, manual | Drift in docs/contracts, unsafe script changes, version mismatch, portability or trust regressions | `scripts/verify.sh`, validators, ShellCheck/Ruff; required on `main` | ~10 min; dependency install | **Retain** as the primary merge gate. |
+| `lint` job | PR, push, schedule, manual | Drift in docs/contracts, unsafe script changes, version mismatch, portability or trust regressions | `scripts/verify.sh`, validators, ShellCheck/Ruff; required on `main` | ~10 min timeout, ~12 s actual (run `36846473400`) | **Retain** as the primary merge gate, pinned to the 3.13 floor. Not a matrix and not a reusable-workflow caller: both rename the reported check, and `main` requires the literal context `lint`. |
+| `python-range` job | PR, push, schedule, manual | The payload breaks on a release `requires-python` admits but CI never tests | Same 21 checks as `lint`, against 3.14; full set passed locally on 3.14.7 on 2026-10-01 | ~12 s, in parallel with `lint` | **Retain.** Checking only the floor leaves `>=3.13` half-promised. Add to required contexts once its reported context name is confirmed. |
 | `full-verify` job | PR, push, schedule, manual | Fast checks bypassed by workflow or tree-level integration drift | Runs the complete `scripts/verify.sh` after `lint` | ~5 min; serialized after lint | **Retain** because it verifies the aggregate contract. |
 | `phase-b-gate` job | PR and push to `main` | Whitespace, dirty-tree, empty-range, or non-conventional authored commits | Caught generated merge-subject false failure; now excludes merge commits in `scripts/check-commit-convention.py` | ~3 min | **Retain**, with merge-commit handling documented and tested. |
 | `check-expiry` job | Weekly schedule or manual dispatch | Maintainer references silently exceed their review date | Manual run `34025441454` passed on 2026-09-06; no later scheduled result was observed during the 2026-09-08 audit | ~5 min; external state | **Retain**, but keep out of PR merge gates. |
