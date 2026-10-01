@@ -118,7 +118,7 @@ Primary sources and research, accessed 2026-07-12 or 2026-07-13:
 | Audit hardening            | Repository audits streamlined; coverage gaps closed; portability scanner fixed; expiry checker wired. Evidence: commits `1aef227`, `a54272b`, `988322d`.                                  |
 | Release consistency        | The checker validates `SKILL.md`, plugin metadata, `CITATION.cff`, tags, and GitHub releases. Strict CI queries use a read-only job token.                                                |
 | CI and merge governance    | CI runs on every pull request without path filters; `lint`, `full-verify`, and `phase-b-gate` are required on `main`, with conversation resolution and signed commits.     |
-| Release workflow hardening | Tagged releases verify the exact CI commit and required jobs; reruns are idempotent when a GitHub Release already exists.                                                                 |
+| Release workflow hardening | Removed 2026-10-01. `main` is the distribution channel; the `v0.4.0` tag is frozen as a historical marker. Tag verification duplicated protected-`main` CI and failed its own idempotence step in two of three runs. |
 | Repository verification    | Script self-tests, Ruff, ShellCheck, documentation audit, plugin validation, skill validation, and diff checks pass independently.                                                        |
 | Agent Skills format        | Pinned official `skills-ref` validation is run locally and in the `lint` CI job against `skills/repo-health-scan`.                                         |
 | Evidence URL tracking      | `docs/evidence-urls.json` upgraded to v3 schema with status, source_type, domain_tag, and last_verified fields. All 18 URLs verified reachable on 2026-09-08. |

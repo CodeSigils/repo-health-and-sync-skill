@@ -57,7 +57,9 @@ read-only `GITHUB_TOKEN` and no repository secrets. GitHub Actions workflows
 run as `github-actions[bot]` only when a workflow writes with its token, and
 their authority is bounded by each workflow's explicit `permissions` block.
 
-This repository does not auto-merge bot pull requests. The release workflow is
-the only workflow with `contents: write`, and it may create a GitHub Release
-only after tag and CI verification. See [automation-identities.md](docs/automation-identities.md)
-for the operational model and review rules.
+This repository does not auto-merge bot pull requests, and no workflow holds
+`contents: write`: every workflow in this repository runs at `contents: read`,
+except `dependency-backlog`, which adds `pull-requests: write` to comment on
+stale dependency pull requests and holds no other write scope. See
+[automation-identities.md](docs/automation-identities.md) for the operational
+model and review rules.

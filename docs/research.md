@@ -227,8 +227,9 @@ security claim.
 
 **Applied policy:** keep the solo-maintainer queue bounded, use grouped
 minor/patch GitHub Action updates, keep major updates separate, add one
-serialized `uv` stream, and prohibit automatic merge. The release workflow is
-the only write-capable workflow and is gated by tag ancestry and prior CI.
+serialized `uv` stream, and prohibit automatic merge. No workflow holds
+`contents: write`, and `main` is the distribution channel rather than a tag,
+so there is no release workflow whose permissions or gating need review.
 
 **Sources:** [automation-identities.md](automation-identities.md) records the
 official GitHub sources and repository-specific authority map.

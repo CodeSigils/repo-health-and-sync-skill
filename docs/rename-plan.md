@@ -10,7 +10,7 @@ audience: maintainers only — not shipped to skill users.
 
 | Concern                 | Current value                                                                                                         | Compatibility meaning                                                                      |
 | ----------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| GitHub repository       | `CodeSigils/repo-health-scan` (renamed from `repo-health-and-sync-skill`)                                             | Canonical remote source used by clone, Skills CLI, badges, schemas, and release workflows. |
+| GitHub repository       | `CodeSigils/repo-health-scan` (renamed from `repo-health-and-sync-skill`)                                             | Canonical remote source used by clone, Skills CLI, badges, schemas, and installs.           |
 | Skills CLI directory    | `skills/repo-health-scan/`                                                                                            | Discovered skill directory.                                                                |
 | Public skill identifier | `repo-health-scan`                                                                                                    | `SKILL.md` frontmatter name and `--skill` selector.                                        |
 | Codex plugin            | `repo-health-and-sync-skill`                                                                                          | Separate plugin identity; not the Skills CLI skill name.                                   |

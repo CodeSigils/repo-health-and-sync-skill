@@ -179,32 +179,44 @@ it is a scheduled staleness check like `check-expiry.py` and `verify-urls.py`,
 not a local check. Its `--self-test` is offline and already runs under
 `validate-scripts.py`.
 
-## Release process
+## Releases
 
-Releases are created by `.github/workflows/release.yml` from a pushed semantic
-version tag. The workflow is intentionally gated before it writes a GitHub
-Release:
+This repository does not run a release cadence. `main` is the distribution
+channel: clone it, or install from it with the Skills CLI.
 
-1. Align the `SKILL.md`, plugin manifest, citation metadata, and release tag
-   versions with `python3 scripts/check-version-consistency.py`.
-2. Open a pull request for the isolated release-preparation commit. Pass
-   `lint`, `full-verify`, and `phase-b-gate`; merge the PR to `main`.
-3. From an up-to-date local checkout of the merged `main`, create and push the
-   version tag (use the repository's normal signing policy when creating tags):
+```bash
+npx skills add CodeSigils/repo-health-scan \
+  --skill repo-health-scan --agent codex --copy --yes
+```
 
-   ```bash
-   git tag -a vX.Y.Z -m "release: vX.Y.Z"
-   git push origin vX.Y.Z
-   ```
+Use `--agent claude-code` for Claude Code. The install resolves the repository's
+default branch, so a merged pull request is the release. That is why no
+release workflow exists: a tag would add a second ref to keep aligned, and
+`skills.sh` indexes the default branch rather than tags, so a tag would not
+change what installers receive.
 
-4. The release workflow verifies that the tag is reachable from `main`, finds
-   a successful `ci` run for the tagged commit, and checks the tagged diff for
-   whitespace errors.
-5. After the preflight succeeds, it creates the GitHub Release with generated
-   notes. Categories and excluded labels are defined in `.github/release.yml`.
+### The `v0.4.0` tag
 
-Before announcing a release, smoke-test the published repository through the
-Skills CLI in an isolated temporary directory for each claimed host:
+`v0.4.0` and its GitHub Release are retained as-is and are frozen. They predate
+commit `88d98b9`, which renamed the payload directory from
+`skills/repo-health-and-sync-skill/` to `skills/repo-health-scan/`, so the
+tagged tree does not contain the current skill path and the documented install
+command above will not resolve against it. `v0.4.0` is a historical marker, not
+a supported install target.
+
+`scripts/check-version-consistency.py` still runs on every push. It compares the
+version in `SKILL.md`, `.codex-plugin/plugin.json`, and `CITATION.cff` against
+the latest tag and GitHub Release, and all five read `0.4.0`, so the check
+passes and keeps detecting drift. Nothing moves them: with no release cadence,
+no future commit changes a version field. If the payload changes materially,
+update all three together and let the check fail until the tag agrees, or relax
+the check deliberately rather than editing one field.
+
+### Smoke-testing a change
+
+The procedure the release process used is still the right way to confirm an
+install works. Run it in an isolated temporary directory for each claimed host
+after a change to the payload, layout, or install documentation:
 
 ```bash
 release_dir="$(mktemp -d)"
@@ -216,11 +228,7 @@ test "$(find .agents/skills -type f -name SKILL.md | wc -l)" -eq 1
 
 Repeat with `--agent claude-code` and verify
 that `.claude/skills/` contains exactly one `SKILL.md`. Record the CLI version,
-source commit, installed path, and result in the compatibility report. This is
-a release smoke test, not a pull-request merge gate.
-
-Do not create the GitHub Release manually before the preflight completes. A tag
-that does not point into `main` or lacks a successful CI run is rejected.
+source commit, installed path, and result in the compatibility report.
 
 ## How the skill works
 

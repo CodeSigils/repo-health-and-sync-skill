@@ -186,11 +186,10 @@ Install above).
 ```text
 ├── .github/
 │   ├── dependabot.yml               # Weekly GitHub Actions updates
-│   ├── release.yml                  # Generated release-note categories
 │   └── workflows/
 │       ├── ci.yml                    # Deterministic CI pipeline
 │       ├── codex-regression.yml      # Non-blocking model evaluation
-│       └── release.yml               # Validated GitHub release creation
+│       └── python-range.yml          # Same checks on the rest of the declared Python range
 ├── .codex-plugin/
 │   └── plugin.json                   # Codex plugin manifest
 ├── .gitattributes                    # Git text normalization and Linguist overrides

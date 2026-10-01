@@ -7,9 +7,10 @@
 # branch protection requires the status context `lint` by that exact literal
 # name. Routing `lint` through `workflow_call` therefore leaves the required
 # context permanently unsatisfied and makes `main` unmergeable, and it also
-# defeats the `.name == "lint"` match in `release.yml`. Measured, not assumed:
-# that design reported `lint / checks` and left the pull request `BLOCKED` with
-# every check green.
+# defeats the `.name == "lint"` match that `release.yml` used to make. The
+# release workflow has since been removed, but the branch-protection
+# requirement stands on its own. Measured, not assumed: that design reported
+# `lint / checks` and left the pull request `BLOCKED` with every check green.
 #
 # Cost of the duplication is one step list to keep in step. Changing a check
 # means editing both files; a header comment in each points at the other.
