@@ -27,6 +27,22 @@ The installed runtime payload is only `skills/repo-health-scan/SKILL.md`.
 Maintainer-only evidence/templates live under `docs/references/` and are not
 copied into an agent's installed skill directory.
 
+## One-time local setup
+
+Run these once per clone, before the first commit:
+
+```sh
+uv sync --locked
+git config core.hooksPath .githooks
+```
+
+The first command builds the locked environment the verification commands
+expect. The second activates the committed `.githooks/pre-commit`. Without it,
+`core.hooksPath` is unset, `.git/hooks/pre-commit` does not exist, and git
+silently runs no hook at all — every commit passes unchecked even though the
+hook is committed and executable. Nothing in the repository can fix this:
+`core.hooksPath` is local git configuration and does not travel with a clone.
+
 ## Commit convention
 
 Every commit must answer what and why. Use this body format:

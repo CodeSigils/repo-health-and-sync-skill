@@ -3,6 +3,7 @@ name: ci
 env:
   PYTHON_VERSION: "3.13"
   UV_VERSION: "0.11.7"
+  SKILLS_REF_SPEC: "git+https://github.com/agentskills/agentskills.git@69ef37e9424c0a7ea9dd2293b559e43ec8176379#subdirectory=skills-ref"
 
 on:
   workflow_dispatch:
@@ -29,6 +30,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: Set up Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
@@ -39,15 +41,30 @@ jobs:
           version: ${{ env.UV_VERSION }}
       - name: Install dependencies
         run: uv sync --locked
+      - name: Python script lint
+        run: uv run --locked ruff check scripts/ skills/
+      - name: Shell script lint
+        run: shellcheck scripts/*.sh
       - name: Check cross-agent portability
         run: python3 scripts/check-portability.py
       - name: Enforce skills-ref evidence policy
         run: python3 scripts/check-skills-ref-policy.py .
       - name: Validate Agent Skills format
-        run: >-
-          uvx --from
-          git+https://github.com/agentskills/agentskills.git@69ef37e9424c0a7ea9dd2293b559e43ec8176379#subdirectory=skills-ref
-          skills-ref validate skills/repo-health-scan
+        run: |
+          set -euo pipefail
+          MAX_ATTEMPTS=3
+          RETRY_BACKOFF_SECONDS=1
+          for attempt in $(seq 1 "${MAX_ATTEMPTS}"); do
+            if uvx --from "${SKILLS_REF_SPEC}" skills-ref validate skills/repo-health-scan; then
+              exit 0
+            fi
+            if [[ "${attempt}" == "${MAX_ATTEMPTS}" ]]; then
+              echo "skills-ref validation failed after ${MAX_ATTEMPTS} attempts" >&2
+              exit 1
+            fi
+            sleep $((RETRY_BACKOFF_SECONDS * (2 ** (attempt - 1))))
+          done
+          exit 1
       - name: Self-test — doc audit
         run: python3 scripts/doc-audit.py --self-test
       - name: Self-test — verify.sh
@@ -70,10 +87,6 @@ jobs:
         run: python3 scripts/validate-evals.py
       - name: Validate security and trust contract
         run: python3 scripts/check-trust.py
-      - name: Shell script lint
-        run: shellcheck scripts/*.sh
-      - name: Python script lint
-        run: uv run ruff check scripts/ skills/
       - name: Version consistency check
         env:
           GH_TOKEN: ${{ github.token }}
@@ -89,6 +102,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: Full verification
         run: bash scripts/verify.sh
 
@@ -103,6 +117,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: Phase B — Pre-release health check
         run: |
           echo "=== Phase B: Pre-release health check ==="
@@ -141,6 +156,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: Check for expired references
         run: python3 scripts/check-expiry.py --strict
 
@@ -153,6 +169,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: Verify referenced URLs
         run: python3 scripts/verify-urls.py --attempts 3 --retry-delay 2
 
@@ -174,5 +191,6 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: Comment on and fail on stale dependency pull requests
         run: python3 scripts/check-dependency-backlog.py --post
