@@ -112,7 +112,6 @@ check "Self-test: doc audit" python3 scripts/doc-audit.py --self-test
 if [ "$MODE" = "" ]; then
     check "Eval contract" python3 scripts/validate-evals.py
     check "Security and trust contract" python3 scripts/check-trust.py
-    check "Version consistency" python3 scripts/check-version-consistency.py
 
     # Shellcheck on all .sh files
     sh_count=$(find . -name '*.sh' -not -path './.git/*' | wc -l)

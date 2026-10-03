@@ -51,16 +51,6 @@ def frontmatter_description(text: str) -> str:
     return " ".join(description)
 
 
-def guarded_command(text: str, variable: str, command: str) -> bool:
-    """Return whether command appears inside a shell guard for variable."""
-    pattern = re.compile(
-        rf'if \[ "\$\{{{re.escape(variable)}:-0\}}" = "1" \]; then'
-        rf"(?:(?!\nfi\n).)*{re.escape(command)}(?:(?!\nfi\n).)*\nfi\n",
-        re.DOTALL,
-    )
-    return pattern.search(text) is not None
-
-
 def scan_secrets(root: Path) -> list[str]:
     """Scan tracked text files for credential material.
 
@@ -108,8 +98,6 @@ def validate_repo(root: Path = REPO_ROOT) -> list[str]:
         if pattern.search(skill):
             errors.append(f"skill contains {label}")
 
-    if not guarded_command(skill, "REPO_HEALTH_VERIFY_RELEASES", "gh release list"):
-        errors.append("GitHub release query is not guarded by its network opt-in")
     if "REPO_HEALTH_VERIFY_REFS=1" not in skill:
         errors.append("external reference checks are not explicitly opt-in")
     if "REPO_HEALTH_OUTPUT=jsonl" not in skill:
@@ -166,15 +154,8 @@ def validate_repo(root: Path = REPO_ROOT) -> list[str]:
 
 
 def run_self_tests() -> int:
-    """Exercise frontmatter, guard, action, and secret detection helpers."""
     sample = "---\ndescription: >-\n  Use when auditing. Not for edits.\n---\n"
     assert frontmatter_description(sample) == "Use when auditing. Not for edits."
-    guarded = (
-        'if [ "${REPO_HEALTH_VERIFY_RELEASES:-0}" = "1" ]; then\n'
-        "  gh release list --limit 5\n"
-        "fi\n"
-    )
-    assert guarded_command(guarded, "REPO_HEALTH_VERIFY_RELEASES", "gh release list")
     assert FORBIDDEN_ACTIONS["destructive git reset"].search("git reset --hard HEAD")
     assert SECRET_PATTERNS["private key"].search(
         "-----BEGIN OPENSSH PRIVATE KEY-----"

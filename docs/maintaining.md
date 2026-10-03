@@ -78,11 +78,9 @@ range on `main`. Prefixes outside the table above fail the gate, so use only
 those listed.
 
 The prefixes `what:`, `changelog:`, `sync:`, `flatten:`, and `dev:` were used
-historically (before 2026-07-13 / v0.2.0) and are now retired. They are not
-enforced against existing history: because release tag `v0.2.0` points at
-commit `74d2082` whose subject is `what: fix table pipe formatting in Step 2
-dimension table`, rewriting past subjects would destroy release history. Only
-new commits going forward are validated.
+historically and are now retired. They are not enforced against existing
+history: rewriting past subjects would destroy repository history. Only new
+commits going forward are validated.
 
 ## Change admission gate
 
@@ -123,11 +121,10 @@ edits and generated artifacts have been removed:
 4. **No stale refs:** `grep -rn --include='*.md' 'PLAN\\.md\\|PROPOSALS\\.md\\|REPORT\\.md\\|USER-SUGGESTIONS\\.md' . | grep -v '.git/'`
 5. **Eval contract:** `python3 scripts/validate-evals.py`
 6. **Trust contract:** `python3 scripts/check-trust.py`
-7. **Version alignment:** `python3 scripts/check-version-consistency.py`
-8. **Python lint:** `uv run ruff check scripts/ skills/`
-9. **Regression grader self-test:** `python3 scripts/grade-codex-transcript.py --self-test`
-10. **Shellcheck:** run on any modified shell files.
-11. **Final tree:** `git status --porcelain` shows nothing.
+7. **Python lint:** `uv run ruff check scripts/ skills/`
+8. **Regression grader self-test:** `python3 scripts/grade-codex-transcript.py --self-test`
+9. **Shellcheck:** run on any modified shell files.
+10. **Final tree:** `git status --porcelain` shows nothing.
 
 The model regression is deliberately outside the fast checklist because it
 requires authenticated model access and is nondeterministic. After a material
@@ -191,26 +188,8 @@ npx skills add CodeSigils/repo-health-scan \
 
 Use `--agent claude-code` for Claude Code. The install resolves the repository's
 default branch, so a merged pull request is the release. That is why no
-release workflow exists: a tag would add a second ref to keep aligned, and
-`skills.sh` indexes the default branch rather than tags, so a tag would not
-change what installers receive.
-
-### The `v0.4.0` tag
-
-`v0.4.0` and its GitHub Release are retained as-is and are frozen. They predate
-commit `88d98b9`, which renamed the payload directory from
-`skills/repo-health-and-sync-skill/` to `skills/repo-health-scan/`, so the
-tagged tree does not contain the current skill path and the documented install
-command above will not resolve against it. `v0.4.0` is a historical marker, not
-a supported install target.
-
-`scripts/check-version-consistency.py` still runs on every push. It compares the
-version in `SKILL.md`, `.codex-plugin/plugin.json`, and `CITATION.cff` against
-the latest tag and GitHub Release, and all five read `0.4.0`, so the check
-passes and keeps detecting drift. Nothing moves them: with no release cadence,
-no future commit changes a version field. If the payload changes materially,
-update all three together and let the check fail until the tag agrees, or relax
-the check deliberately rather than editing one field.
+release workflow or historical release/tag marker exists: `skills.sh` indexes
+the default branch, so a tag would not change what installers receive.
 
 ### Smoke-testing a change
 

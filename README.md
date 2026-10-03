@@ -1,7 +1,6 @@
 # Repo Health Scan
 
 [![CI](https://github.com/CodeSigils/repo-health-scan/actions/workflows/ci.yml/badge.svg)](https://github.com/CodeSigils/repo-health-scan/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/CodeSigils/repo-health-scan?label=release)](https://github.com/CodeSigils/repo-health-scan/releases)
 [![skills.sh](https://skills.sh/b/codesigils/repo-health-scan)](https://skills.sh/codesigils/repo-health-scan/repo-health-scan)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
@@ -232,7 +231,6 @@ Install above).
 │   ├── check-expiry.py               # Scans for expired doc and config references
 │   ├── check-portability.py          # Validates no agent-specific references in skills
 │   ├── check-trust.py                # Validates security and trust contract
-│   ├── check-version-consistency.py  # Checks version alignment across manifests and tags
 │   ├── doc-audit.py                  # Manifest-driven doc completeness checker
 │   ├── extract-tests.py              # Extracts test fixtures from script docstrings
 │   ├── grade-codex-transcript.py     # Grades Codex regression artifacts deterministically

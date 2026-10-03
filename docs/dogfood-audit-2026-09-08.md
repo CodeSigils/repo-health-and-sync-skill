@@ -24,8 +24,8 @@ skipped with evidence-based reasons.
 
 - `origin/main..HEAD`: `0`; tree clean.
 - `shellcheck scripts/*.sh`: pass.
-- `check-version-consistency.py --require-github-release-query`: pass;
-  `SKILL.md`, plugin, citation, tag, and GitHub release all report `0.4.0`.
+- The former version-consistency check passed; `SKILL.md`, plugin, citation,
+  tag, and GitHub release all reported `0.4.0` at the time of this audit.
 - Workflow inspection found explicit least-privilege permissions, immutable
   action references, scheduled/manual triggers, and bounded Dependabot streams.
 - `check-trust.py`, `validate-evals.py`, and `doc-audit.py`: pass.

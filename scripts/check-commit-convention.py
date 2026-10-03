@@ -22,8 +22,7 @@ from collections.abc import Callable
 # The documented, actively-used subject prefixes. `type(scope):` is also valid,
 # e.g. `chore(deps):` from dependabot. The offline historical prefixes
 # (what:, changelog:, sync:, flatten:, dev:) are intentionally NOT included;
-# they predate the settled convention and, because tag v0.2.0 (commit 74d2082)
-# carries a `what:` subject, they are not rewritten.
+# they predate the settled convention and are not rewritten.
 ALLOWED_PREFIXES = ("feat", "docs", "refactor", "fix", "chore", "ci", "test")
 
 # Special-case subjects that are exempt from prefix rules.

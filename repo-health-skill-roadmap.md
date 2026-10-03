@@ -116,9 +116,9 @@ Primary sources and research, accessed 2026-07-12 or 2026-07-13:
 | Security and trust         | `scripts/check-trust.py` enforces bounded triggers, read-only instructions, opt-in network/output behavior, credential hygiene, versioned compatibility evidence, and payload separation. |
 | Secret scanning            | Skill scans `.gitignore`, commit metadata, and tracked files for heuristic secret patterns; output is limited to counts/paths and includes a redaction guard.                             |
 | Audit hardening            | Repository audits streamlined; coverage gaps closed; portability scanner fixed; expiry checker wired. Evidence: commits `1aef227`, `a54272b`, `988322d`.                                  |
-| Release consistency        | The checker validates `SKILL.md`, plugin metadata, `CITATION.cff`, tags, and GitHub releases. Strict CI queries use a read-only job token.                                                |
+| Release consistency        | Removed with the historical Releases and tags. `main` is the only distribution channel.                                                                                                      |
 | CI and merge governance    | CI runs on every pull request without path filters; `lint`, `full-verify`, and `phase-b-gate` are required on `main`, with conversation resolution and signed commits.     |
-| Release workflow hardening | Removed 2026-10-01. `main` is the distribution channel; the `v0.4.0` tag is frozen as a historical marker. Tag verification duplicated protected-`main` CI and failed its own idempotence step in two of three runs. |
+| Release workflow hardening | Removed 2026-10-01. Historical Releases and tags were removed 2026-10-03; `main` is the distribution channel. |
 | Repository verification    | Script self-tests, Ruff, ShellCheck, documentation audit, plugin validation, skill validation, and diff checks pass independently.                                                        |
 | Agent Skills format        | Pinned official `skills-ref` validation is run locally and in the `lint` CI job against `skills/repo-health-scan`.                                         |
 | Evidence URL tracking      | `docs/evidence-urls.json` upgraded to v3 schema with status, source_type, domain_tag, and last_verified fields. All 18 URLs verified reachable on 2026-09-08. |
@@ -544,7 +544,6 @@ repo-health-scan/
     ├── check-expiry.py
     ├── check-portability.py
     ├── check-trust.py
-    ├── check-version-consistency.py
     ├── doc-audit.py
     ├── extract-tests.py
     ├── grade-codex-transcript.py
