@@ -14,14 +14,14 @@ not copy it into repositories that consume the skill.
 
 Choose the smallest path that matches the change:
 
-| Change                                   | Required path                                                                                              |
-| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| Docs, CI, schemas, or maintainer scripts | Make the change, then run the fast verification checklist.                                                 |
-| `SKILL.md` wording or behavior           | Apply the change, run the fast checklist, then run the local Codex regression.                             |
-| Version metadata                         | Update `SKILL.md`, `plugin.json`, and `CITATION.cff` only when an explicit metadata change requires it; this repository has no tag or Release cadence. |
-| Agent support claim                      | Update the relevant compatibility report and portability evidence; do not broaden claims from one runtime. |
-| Bot or dependency update                 | Read [automation-identities.md](automation-identities.md), inspect the diff and required checks, then use the fast checklist. |
-| Change a public support or distribution claim | Update [claim-evidence-matrix.md](claim-evidence-matrix.md) and its owning evidence report in the same change.            |
+| Change                                        | Required path                                                                                                                                          |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Docs, CI, schemas, or maintainer scripts      | Make the change, then run the fast verification checklist.                                                                                             |
+| `SKILL.md` wording or behavior                | Apply the change, run the fast checklist, then run the local Codex regression.                                                                         |
+| Version metadata                              | Update `SKILL.md`, `plugin.json`, and `CITATION.cff` only when an explicit metadata change requires it; this repository has no tag or Release cadence. |
+| Agent support claim                           | Update the relevant compatibility report and portability evidence; do not broaden claims from one runtime.                                             |
+| Bot or dependency update                      | Read [automation-identities.md](automation-identities.md), inspect the diff and required checks, then use the fast checklist.                          |
+| Change a public support or distribution claim | Update [claim-evidence-matrix.md](claim-evidence-matrix.md) and its owning evidence report in the same change.                                         |
 
 The installed runtime payload is only `skills/repo-health-scan/SKILL.md`.
 Maintainer-only evidence/templates live under `docs/references/` and are not
@@ -228,17 +228,17 @@ Keep one authoritative home for each kind of information. The root
 [README](../README.md) contains the user-facing overview and full repository
 tree; this table identifies where maintainers should make changes:
 
-| Concern                                   | Authoritative location                                                  |
-| ----------------------------------------- | ----------------------------------------------------------------------- |
-| Runtime audit methodology                 | `skills/repo-health-scan/SKILL.md`                                      |
-| Maintainer workflow and distribution procedure | `docs/maintaining.md`                                               |
-| Architecture decisions                    | `docs/decisions.md`                                                     |
-| Portability and compatibility claims      | `docs/portability-contract.md` and `docs/compatibility-reports/`        |
-| Public claim-to-evidence mapping           | `docs/claim-evidence-matrix.md`                                          |
-| Maintainer evaluation references          | `docs/references/`                                                      |
-| Model regression behavior and evidence    | `docs/codex-regression.md` and `evals/`                                 |
-| Deterministic validation                  | `scripts/`, `schemas/`, and `.github/workflows/ci.yml`                  |
-| Packaging metadata                        | `.codex-plugin/plugin.json`, `CITATION.cff`, and `SKILL.md` frontmatter |
+| Concern                                        | Authoritative location                                                  |
+| ---------------------------------------------- | ----------------------------------------------------------------------- |
+| Runtime audit methodology                      | `skills/repo-health-scan/SKILL.md`                                      |
+| Maintainer workflow and distribution procedure | `docs/maintaining.md`                                                   |
+| Architecture decisions                         | `docs/decisions.md`                                                     |
+| Portability and compatibility claims           | `docs/portability-contract.md` and `docs/compatibility-reports/`        |
+| Public claim-to-evidence mapping               | `docs/claim-evidence-matrix.md`                                         |
+| Maintainer evaluation references               | `docs/references/`                                                      |
+| Model regression behavior and evidence         | `docs/codex-regression.md` and `evals/`                                 |
+| Deterministic validation                       | `scripts/`, `schemas/`, and `.github/workflows/ci.yml`                  |
+| Packaging metadata                             | `.codex-plugin/plugin.json`, `CITATION.cff`, and `SKILL.md` frontmatter |
 
 Do not copy guidance between these locations. Link to the owning document
 instead; this is the primary defense against documentation drift.

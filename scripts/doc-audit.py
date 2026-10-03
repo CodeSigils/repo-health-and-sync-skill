@@ -13,6 +13,7 @@ Usage:
 from __future__ import annotations
 
 import re
+import subprocess
 import sys
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -72,12 +73,29 @@ def heading_anchors(filepath: Path) -> set[str]:
     return anchors
 
 
+def tracked_markdown(repo_root: Path) -> list[Path]:
+    """Return the repository's Markdown files, preferring the git index.
+
+    An untracked scratch file in a developer checkout is not part of the
+    documentation contract, so it must not fail the audit. Outside a git
+    work tree (the self-test fixture) fall back to a filesystem walk.
+    """
+    listed = subprocess.run(
+        ["git", "ls-files", "-z", "*.md"],
+        cwd=repo_root,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if listed.returncode != 0:
+        return sorted(p for p in repo_root.rglob("*.md") if ".git" not in p.parts)
+    return [repo_root / name for name in sorted(listed.stdout.split("\0")) if name]
+
+
 def check_markdown_links(repo_root: Path) -> list[str]:
     """Return invalid repository-relative Markdown link descriptions."""
     errors: list[str] = []
-    for source in sorted(repo_root.rglob("*.md")):
-        if ".git" in source.parts:
-            continue
+    for source in tracked_markdown(repo_root):
         content = source.read_text(encoding="utf-8")
         for destination in MARKDOWN_LINK_RE.findall(content):
             parsed = urlsplit(destination)

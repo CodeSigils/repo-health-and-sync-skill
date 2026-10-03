@@ -108,8 +108,8 @@ echo ""
 
 check "Tree is clean" tree_is_clean
 
-check "Self-test: doc audit" python3 scripts/doc-audit.py --self-test
 if [ "$MODE" = "" ]; then
+    check "Self-test: doc audit" python3 scripts/doc-audit.py --self-test
     check "Eval contract" python3 scripts/validate-evals.py
     check "Security and trust contract" python3 scripts/check-trust.py
 
