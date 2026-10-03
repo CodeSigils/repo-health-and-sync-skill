@@ -6,10 +6,7 @@
 set -e
 
 echo "=== pre-commit: ruff check ==="
-python3 -m ruff check scripts/ skills/
+uv run --locked ruff check scripts/ skills/
 
 echo "=== pre-commit: check portability ==="
 python3 scripts/check-portability.py
-
-echo "=== pre-commit: check expiry ==="
-python3 scripts/check-expiry.py

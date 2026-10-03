@@ -37,11 +37,31 @@ git config core.hooksPath .githooks
 ```
 
 The first command builds the locked environment the verification commands
-expect. The second activates the committed `.githooks/pre-commit`. Without it,
-`core.hooksPath` is unset, `.git/hooks/pre-commit` does not exist, and git
-silently runs no hook at all — every commit passes unchecked even though the
-hook is committed and executable. Nothing in the repository can fix this:
-`core.hooksPath` is local git configuration and does not travel with a clone.
+expect. The second activates the committed `pre-commit` and `pre-push` hooks.
+Without it, `core.hooksPath` is unset, `.git/hooks/pre-commit` does not exist,
+and git silently runs no hook at all — every commit and push proceeds unchecked
+even though the hooks are committed and executable. Nothing in the repository
+can fix this: `core.hooksPath` is local git configuration and does not travel
+with a clone.
+
+### Direct-push enforcement
+
+This solo-maintainer repository permits administrator pushes to `main`. GitHub
+required checks run *after* a push and administrator enforcement is disabled,
+so they are evidence and a pull-request merge gate, not a synchronous gate for
+an administrator's direct push. Required signatures have the same limitation.
+
+For a configured clone, the local hooks are the direct-push gate:
+
+- `pre-commit` runs Ruff and the portability check.
+- `pre-push` validates every outgoing commit subject, then runs
+  `bash scripts/verify.sh` before Git sends the ref.
+
+`--no-verify` deliberately bypasses this local gate and leaves CI as the only
+backstop. A fresh clone has no local gate until the setup command above runs.
+If this repository gains regular contributors or independent review, switch to
+pull requests and require administrator enforcement rather than treating local
+hooks as shared protection.
 
 ## Commit convention
 
@@ -73,10 +93,11 @@ already shared.
 | `test:`        | Tests, fixtures, or evaluation evidence            |
 | `chore(deps):` | Dependency bump (dependabot uses this scoped form) |
 
-Subject prefixes are enforced automatically by CI in the `phase-b-gate` job
-(`scripts/check-commit-convention.py`), which checks every commit in the pushed
-range on `main`. Prefixes outside the table above fail the gate, so use only
-those listed.
+Subject prefixes are enforced by the local `pre-push` hook and verified again
+by CI in the `phase-b-gate` job (`scripts/check-commit-convention.py`). The
+hook checks every outgoing commit in the pushed range; CI reports the same
+result after the push. Prefixes outside the table above fail either check, so
+use only those listed.
 
 The prefixes `what:`, `changelog:`, `sync:`, `flatten:`, and `dev:` were used
 historically and are now retired. They are not enforced against existing

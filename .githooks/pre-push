@@ -1,0 +1,64 @@
+#!/bin/sh
+#
+# pre-push hook: the gate for a direct push.
+#
+# Branch protection on this repository runs with enforce_admins=false, so an
+# admin push to main bypasses every required status check. GitHub reports the
+# checks as "expected" because the push that would trigger them has not landed
+# yet, which is exactly why the bypass message appears. There is no protection
+# setting that gates a direct push: turning enforce_admins on rejects the push
+# for the same reason. This hook is the gate instead, and CI is the backstop.
+#
+# Install with: git config core.hooksPath .githooks
+#
+set -eu
+
+ZERO=0000000000000000000000000000000000000000
+RANGES=""
+
+# git feeds one "<local ref> <local sha> <remote ref> <remote sha>" line per
+# ref being updated. A deletion carries an all-zero local sha and has nothing
+# local to verify.
+while read -r _local_ref local_sha _remote_ref remote_sha; do
+    if [ "$local_sha" = "$ZERO" ]; then
+        continue
+    fi
+    if [ "$remote_sha" = "$ZERO" ]; then
+        # New remote branch: there is nothing on the remote to diff against, so
+        # fall back to the default branch when the clone knows where it is.
+        if git rev-parse --verify --quiet origin/main >/dev/null; then
+            RANGES="$RANGES origin/main..$local_sha "
+        fi
+        continue
+    fi
+    RANGES="$RANGES $remote_sha..$local_sha "
+done
+
+if [ -n "$RANGES" ]; then
+    echo "=== pre-push: commit subject convention ==="
+    # RANGES holds only "<sha>..<sha>" tokens, so splitting is intended.
+    # shellcheck disable=SC2086
+    set -- $RANGES
+    for range in "$@"; do
+        if ! python3 scripts/check-commit-convention.py --range "$range"; then
+            echo "" >&2
+            echo "pre-push: subject convention failed for $range" >&2
+            echo "See docs/maintaining.md#commit-convention" >&2
+            exit 1
+        fi
+    done
+else
+    echo "=== pre-push: no new remote commits to check ==="
+fi
+
+echo "=== pre-push: scripts/verify.sh ==="
+if ! bash scripts/verify.sh; then
+    echo "" >&2
+    echo "pre-push: verification failed. Fix the failures above and push" >&2
+    echo "again, or commit or stash a dirty worktree first. Use --no-verify" >&2
+    echo "only if you accept that CI is now the only gate left." >&2
+    exit 1
+fi
+
+echo "=== pre-push: OK ==="
+exit 0
