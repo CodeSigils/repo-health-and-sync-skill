@@ -18,7 +18,7 @@ Choose the smallest path that matches the change:
 | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Docs, CI, schemas, or maintainer scripts      | Make the change, then run the fast verification checklist.                                                                                             |
 | `SKILL.md` wording or behavior                | Apply the change, run the fast checklist, then run the local Codex regression.                                                                         |
-| Version metadata                              | Update `SKILL.md`, `plugin.json`, and `CITATION.cff` only when an explicit metadata change requires it; this repository has no tag or Release cadence. |
+| Plugin manifest metadata                      | Update `.codex-plugin/plugin.json` only when plugin identity changes; the payload and `CITATION.cff` declare no version.                               |
 | Agent support claim                           | Update the relevant compatibility report and portability evidence; do not broaden claims from one runtime.                                             |
 | Bot or dependency update                      | Read [automation-identities.md](automation-identities.md), inspect the diff and required checks, then use the fast checklist.                          |
 | Change a public support or distribution claim | Update [claim-evidence-matrix.md](claim-evidence-matrix.md) and its owning evidence report in the same change.                                         |
@@ -197,8 +197,8 @@ Confirm an install in an isolated temporary directory for each claimed host
 after a change to the payload, layout, or install documentation:
 
 ```bash
-release_dir="$(mktemp -d)"
-cd "$release_dir"
+install_dir="$(mktemp -d)"
+cd "$install_dir"
 npx skills add CodeSigils/repo-health-scan \
   --skill repo-health-scan --agent codex --copy --yes
 test "$(find .agents/skills -type f -name SKILL.md | wc -l)" -eq 1

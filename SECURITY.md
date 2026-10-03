@@ -21,8 +21,8 @@ run through `python3 scripts/check-trust.py` in local verification and CI.
 - [x] Trigger metadata states both when the skill applies and when it does not.
 - [x] Runtime probes are read-only; the skill contains no destructive commands,
   privilege escalation, approval bypasses, or automatic fixes.
-- [x] Network access is explicit: release and external-reference queries require
-  opt-in environment flags.
+- [x] Network access is explicit: external-reference queries require an opt-in
+  environment flag.
 - [x] JSONL output is emitted only when `REPO_HEALTH_OUTPUT=jsonl` is set.
 - [x] Eval fixtures and recorded compatibility evidence contain no credentials.
 - [x] Compatibility claims name the tested agent and exact version.
