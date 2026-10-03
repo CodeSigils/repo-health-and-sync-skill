@@ -59,6 +59,8 @@ jobs:
         run: uv run --locked ruff check scripts/ skills/
       - name: Shell script lint
         run: shellcheck scripts/*.sh
+      - name: Check Python workflow parity
+        run: python3 scripts/check-python-range-parity.py
       - name: Check cross-agent portability
         run: python3 scripts/check-portability.py
       - name: Enforce skills-ref evidence policy
@@ -93,6 +95,8 @@ jobs:
         run: python3 scripts/validate-evals.py --self-test
       - name: Self-test — security and trust validator
         run: python3 scripts/check-trust.py --self-test
+      - name: Self-test — workflow parity checker
+        run: python3 scripts/check-python-range-parity.py --self-test
       - name: Validate behavioral eval contract
         run: python3 scripts/validate-evals.py
       - name: Validate security and trust contract

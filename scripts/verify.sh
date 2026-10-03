@@ -112,6 +112,7 @@ if [ "$MODE" = "" ]; then
     check "Self-test: doc audit" python3 scripts/doc-audit.py --self-test
     check "Eval contract" python3 scripts/validate-evals.py
     check "Security and trust contract" python3 scripts/check-trust.py
+    check "Workflow parity" python3 scripts/check-python-range-parity.py
 
     # Shellcheck on all .sh files
     sh_count=$(find . -name '*.sh' -not -path './.git/*' | wc -l)
