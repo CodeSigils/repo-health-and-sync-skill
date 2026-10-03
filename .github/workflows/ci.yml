@@ -110,7 +110,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
       - name: Full verification
-        run: bash scripts/verify.sh
+        run: bash scripts/verify.sh --after-lint
 
   phase-b-gate:
     runs-on: ubuntu-latest

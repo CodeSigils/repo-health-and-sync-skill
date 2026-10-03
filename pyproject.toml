@@ -1,7 +1,7 @@
 [project]
-name = "repo-health-and-sync-skill-maintenance"
+name = "repo-health-scan-maintenance"
 version = "0.0.0"
-description = "Maintainer tooling for the repo-health-and-sync-skill repository"
+description = "Maintainer tooling for the repo-health-scan repository"
 requires-python = ">=3.13"
 dependencies = []
 

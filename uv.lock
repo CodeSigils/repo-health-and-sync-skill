@@ -3,7 +3,7 @@ revision = 3
 requires-python = ">=3.13"
 
 [[package]]
-name = "repo-health-and-sync-skill-maintenance"
+name = "repo-health-scan-maintenance"
 version = "0.0.0"
 source = { virtual = "." }
 

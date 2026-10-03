@@ -2,11 +2,21 @@
 # verify.sh — Consistency check for the repo-health-scan repo
 #
 # Minimal checks for a methodology-only skill repo. No sync infrastructure,
-# no reference drift checks, no script duplication checks.
+# no reference drift checks, no script duplication checks. CI invokes
+# --after-lint to avoid repeating checks already completed by the lint job.
 set -euo pipefail
 
 PASS=0
 FAIL=0
+MODE="${1:-}"
+
+case "$MODE" in
+    "" | --after-lint | --self-test) ;;
+    *)
+        echo "Usage: $0 [--after-lint|--self-test]" >&2
+        exit 2
+        ;;
+esac
 
 check() {
     local label="$1"; shift
@@ -42,7 +52,7 @@ tree_is_clean() {
 }
 
 # --- Self-test mode ---
-if [ "${1:-}" = "--self-test" ]; then
+if [ "$MODE" = "--self-test" ]; then
     echo "=== verify.sh --self-test ==="
     echo ""
     errors=0
@@ -99,30 +109,32 @@ echo ""
 check "Tree is clean" tree_is_clean
 
 check "Self-test: doc audit" python3 scripts/doc-audit.py --self-test
-check "Eval contract" python3 scripts/validate-evals.py
-check "Security and trust contract" python3 scripts/check-trust.py
-check "Version consistency" python3 scripts/check-version-consistency.py
+if [ "$MODE" = "" ]; then
+    check "Eval contract" python3 scripts/validate-evals.py
+    check "Security and trust contract" python3 scripts/check-trust.py
+    check "Version consistency" python3 scripts/check-version-consistency.py
 
-# Shellcheck on all .sh files
-sh_count=$(find . -name '*.sh' -not -path './.git/*' | wc -l)
-if [ "$sh_count" -gt 0 ]; then
-    err=0
-    while IFS= read -r -d '' f; do
-        if ! shellcheck "$f" >/dev/null 2>&1; then
-            echo "  SC_FAIL $f"
-            err=$((err + 1))
+    # Shellcheck on all .sh files
+    sh_count=$(find . -name '*.sh' -not -path './.git/*' | wc -l)
+    if [ "$sh_count" -gt 0 ]; then
+        err=0
+        while IFS= read -r -d '' f; do
+            if ! shellcheck "$f" >/dev/null 2>&1; then
+                echo "  SC_FAIL $f"
+                err=$((err + 1))
+            fi
+        done < <(find . -name '*.sh' -not -path './.git/*' -print0)
+        if [ "$err" -eq 0 ]; then
+            echo "  PASS  shellcheck: $sh_count file(s) clean"
+            PASS=$((PASS + 1))
+        else
+            echo "  FAIL  shellcheck: $err file(s) with issues"
+            FAIL=$((FAIL + 1))
         fi
-    done < <(find . -name '*.sh' -not -path './.git/*' -print0)
-    if [ "$err" -eq 0 ]; then
-        echo "  PASS  shellcheck: $sh_count file(s) clean"
-        PASS=$((PASS + 1))
     else
-        echo "  FAIL  shellcheck: $err file(s) with issues"
-        FAIL=$((FAIL + 1))
+        echo "  PASS  shellcheck: no .sh files to check"
+        PASS=$((PASS + 1))
     fi
-else
-    echo "  PASS  shellcheck: no .sh files to check"
-    PASS=$((PASS + 1))
 fi
 
 # No stale refs to deleted doc files
