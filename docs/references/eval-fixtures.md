@@ -6,11 +6,12 @@ Deterministic fixtures for behavioral contract validation. Located at `evals/cas
 
 | Fixture | Repo Type | Key Profile Signals | Active Dimensions |
 |---------|-----------|---------------------|-------------------|
-| `codex-skill-pack` | Skill pack | 2 version sources, GH Actions, shell files | 6 (all except cross_platform, attribution_drift, external_reference_health, reliability_test_gaps) |
+| `codex-skill-pack` | Skill pack | One independent plugin-manifest version, GH Actions, shell files | 5 (all except version_alignment, cross_platform, attribution_drift, external_reference_health, reliability_test_gaps) |
 | `python-library-without-shell` | Python lib (uv) | 2 version sources, GH Actions, no shell files | 5 (all except shell_correctness, cross_platform, attribution_drift, external_reference_health, reliability_test_gaps) |
-| `monorepo-workspace` | Monorepo (TS + Python) | 3 version sources (npm + uv), GH Actions, no shell files | 5 (all except shell_correctness, cross_platform, attribution_drift, external_reference_health, reliability_test_gaps) |
+| `monorepo-workspace` | Monorepo (TS + Python) | 3 version sources declared as one version-aligned release group (npm + uv), GH Actions, no shell files | 5 (all except shell_correctness, cross_platform, attribution_drift, external_reference_health, reliability_test_gaps) |
 | `docs-only-product` | Documentation | No package managers, no version sources, no shell files | 4 (all except shell_correctness, version_alignment, cross_platform, attribution_drift, external_reference_health, reliability_test_gaps) |
-| `missing-tools-no-origin-main` | Skill pack | No CI, no upstream/remote-default base, shell files, 2 version sources | 5 (all except ci_efficiency, cross_platform, attribution_drift, external_reference_health, reliability_test_gaps) |
+| `single-plugin-version` | Skill pack | One independent plugin-manifest version | 4 (version_alignment skipped; all other non-applicable dimensions skipped) |
+| `missing-tools-no-origin-main` | Skill pack | No CI, no upstream/remote-default base, shell files, one package version source | 4 (all except version_alignment, ci_efficiency, cross_platform, attribution_drift, external_reference_health, reliability_test_gaps) |
 | `dirty-development-tree` | Library (uv) | Dirty working tree, GH Actions, shell files, 2 version sources | 7 (all except cross_platform, attribution_drift, external_reference_health) — the only fixture that activates `reliability_test_gaps` |
 
 ## Fixture Structure

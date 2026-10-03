@@ -63,8 +63,7 @@
           "recent_commits": true,
           "gitignore": true,
           "version_sources": [
-            ".codex-plugin/plugin.json",
-            "skills/example/SKILL.md"
+            ".codex-plugin/plugin.json"
           ],
           "script_surface": "maintainer-only",
           "reliability_audit_requested": false,
@@ -96,12 +95,6 @@
             ]
           },
           {
-            "name": "version_alignment",
-            "activated_by": [
-              "observed.version_sources"
-            ]
-          },
-          {
             "name": "ci_efficiency",
             "activated_by": [
               "observed.ci"
@@ -121,6 +114,10 @@
           }
         ],
         "skipped_dimensions": [
+          {
+            "name": "version_alignment",
+            "skip_reason": "Only an independent plugin-manifest version is recorded; there is no second comparable source."
+          },
           {
             "name": "cross_platform",
             "skip_reason": "No macOS or BSD user evidence appears in the profile."
@@ -407,6 +404,93 @@
       }
     },
     {
+      "name": "single-plugin-version",
+      "profile": {
+        "observed": {
+          "vcs": "git",
+          "languages": [
+            "Markdown"
+          ],
+          "package_managers": [],
+          "ci": "GitHub Actions",
+          "shell_files": false,
+          "recent_commits": true,
+          "gitignore": true,
+          "version_sources": [
+            ".codex-plugin/plugin.json"
+          ],
+          "script_surface": "maintainer-only",
+          "reliability_audit_requested": false,
+          "shipped_payload": "single SKILL.md",
+          "base_ref": "origin/main",
+          "branch_commits_outside_base": 0,
+          "working_tree_dirty": false,
+          "workflow_files": [
+            ".github/workflows/ci.yml"
+          ],
+          "verify_refs": false
+        },
+        "inferred": {
+          "repo_type": "skill-pack",
+          "risk_context": "routine review"
+        }
+      },
+      "expected": {
+        "active_dimensions": [
+          {
+            "name": "history_hygiene",
+            "activated_by": [
+              "observed.vcs"
+            ]
+          },
+          {
+            "name": "ci_efficiency",
+            "activated_by": [
+              "observed.ci"
+            ]
+          },
+          {
+            "name": "commit_quality",
+            "activated_by": [
+              "observed.recent_commits"
+            ]
+          },
+          {
+            "name": "file_coverage",
+            "activated_by": [
+              "observed.gitignore"
+            ]
+          }
+        ],
+        "skipped_dimensions": [
+          {
+            "name": "shell_correctness",
+            "skip_reason": "The profile records no shell files."
+          },
+          {
+            "name": "version_alignment",
+            "skip_reason": "Only an independent plugin-manifest version is recorded; there is no second comparable source."
+          },
+          {
+            "name": "cross_platform",
+            "skip_reason": "No shell surface or platform-specific user requirement appears in the profile."
+          },
+          {
+            "name": "attribution_drift",
+            "skip_reason": "No unreleased branch commits or attribution policy appears in the profile."
+          },
+          {
+            "name": "external_reference_health",
+            "skip_reason": "The opt-in environment flag was not set."
+          },
+          {
+            "name": "reliability_test_gaps",
+            "skip_reason": "observed.reliability_audit_requested is false in the profile."
+          }
+        ]
+      }
+    },
+    {
       "name": "missing-tools-no-origin-main",
       "profile": {
         "observed": {
@@ -422,8 +506,7 @@
           "recent_commits": true,
           "gitignore": true,
           "version_sources": [
-            "pyproject.toml",
-            "skills/example/SKILL.md"
+            "pyproject.toml"
           ],
           "script_surface": "maintainer-only",
           "reliability_audit_requested": false,
@@ -454,12 +537,6 @@
             ]
           },
           {
-            "name": "version_alignment",
-            "activated_by": [
-              "observed.version_sources"
-            ]
-          },
-          {
             "name": "commit_quality",
             "activated_by": [
               "observed.recent_commits"
@@ -473,6 +550,10 @@
           }
         ],
         "skipped_dimensions": [
+          {
+            "name": "version_alignment",
+            "skip_reason": "Only one package version source is recorded; there is no second comparable source."
+          },
           {
             "name": "ci_efficiency",
             "skip_reason": "The profile records no CI configuration."
