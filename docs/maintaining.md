@@ -52,7 +52,8 @@ what: <one-line description of the change>
 why:  <reason — design rationale, observed failure, user request, or finding>
 ```
 
-Subject line: `type: scope — description`.
+Subject line: `type(scope): description — summary`; `scope` is optional, and
+`!` before the colon marks a breaking change.
 
 Commit subjects and bodies must not include secrets, credentials, access
 tokens, private keys, sensitive values, or secret-bearing URLs. Describe the
@@ -172,7 +173,7 @@ Flags: `--post` writes the comment, `--days N` changes the threshold, and
 repository convention: `0` clean, `1` findings, `2` could not run.
 
 Do not add this to the fast verification checklist. It queries the GitHub API, so
-it is a scheduled staleness check like `check-expiry.py` and `verify-urls.py`,
+it is a scheduled staleness check like `verify-urls.py`,
 not a local check. Its `--self-test` is offline and already runs under
 `validate-scripts.py`.
 

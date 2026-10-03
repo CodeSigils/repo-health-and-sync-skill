@@ -19,7 +19,7 @@ import subprocess
 import sys
 from collections.abc import Callable
 
-# The documented, actively-used subject prefixes. `type(scope):` is also valid,
+# The documented, actively-used subject prefixes. `type(scope)!:` is also valid,
 # e.g. `chore(deps):` from dependabot. The offline historical prefixes
 # (what:, changelog:, sync:, flatten:, dev:) are intentionally NOT included;
 # they predate the settled convention and are not rewritten.
@@ -37,10 +37,10 @@ def _subject_ok(subject: str) -> bool:
         return False
     if REVERT_RE.match(s):
         return True
-    # type: or type(scope):  (scope is any alphanumeric + -_ . / )
-    if re.match(r"^[a-z]+(\([a-z0-9\-_./]+\))?:\s", s):
+    # type:, type!:, type(scope):, or type(scope)!: (scope is [a-z0-9-_.\/]+)
+    if re.match(r"^[a-z]+(\([a-z0-9\-_./]+\))?!?:\s", s):
         prefix = s.split(":", 1)[0]
-        p = prefix.split("(", 1)[0]
+        p = prefix.split("(", 1)[0].removesuffix("!")
         return p in ALLOWED_PREFIXES
     return s in EXEMPT_EXACT
 
@@ -85,6 +85,8 @@ def run_self_tests() -> int:
         ("test: cover parser", True),
         ("chore(deps): bump ruff to 0.16.3", True),
         ("fix(ci): correct portability path", True),
+        ("feat(skill)!: remove release and tag auditing", True),
+        ("feat!: breaking change", True),
         ("Revert \"feat: add audit dimension\"", True),
         ("Revert \"docs: update README\"", True),
         # Historical / off-list prefixes must FAIL so future drift is caught.
