@@ -11,6 +11,29 @@ from typing import Any
 
 from _common import read_json, validate_dimensions
 
+# Activation predicates the eval fixtures can be checked against, keyed by
+# dimension. A dimension whose predicate the profile does not satisfy cannot be
+# active: the probe would skip it at runtime, so the fixture would claim work
+# that never happens.
+#
+# Only observed fields appear here, because that is all validate_activation
+# reads. The remaining dimensions are excluded deliberately: history_hygiene is
+# unconditional, external_reference_health needs an environment flag no fixture
+# records, and cross_platform also reads inferred.platform_requirements.
+ACTIVATION_PREDICATES = {
+    "version_alignment": lambda observed: len(observed.get("version_sources") or []) >= 2,
+    "shell_correctness": lambda observed: bool(observed.get("shell_files")),
+    "commit_quality": lambda observed: bool(observed.get("recent_commits")),
+    "ci_efficiency": lambda observed: bool(observed.get("ci")),
+    "file_coverage": lambda observed: bool(observed.get("gitignore")),
+    "reliability_test_gaps": lambda observed: bool(
+        observed.get("reliability_audit_requested")
+    ),
+    "attribution_drift": lambda observed: bool(
+        observed.get("branch_commits_outside_base")
+    ),
+}
+
 DEFAULT_CASE = Path("evals/cases/repo-health-scan.json")
 DIMENSIONS = {
     "history_hygiene",
@@ -38,6 +61,27 @@ REQUIRED_OBSERVED_FIELDS = {
     "reliability_audit_requested",
     "shipped_payload",
 }
+
+
+def validate_activation(
+    active: list[dict[str, Any]],
+    observed: Any,
+    prefix: str = "",
+) -> list[str]:
+    """Return errors for active dimensions the profile cannot activate."""
+    if not isinstance(observed, dict):
+        return []
+    errors: list[str] = []
+    for item in active:
+        if not isinstance(item, dict):
+            continue
+        name = item.get("name")
+        predicate = ACTIVATION_PREDICATES.get(name) if isinstance(name, str) else None
+        if predicate is not None and not predicate(observed):
+            errors.append(
+                f"{prefix}active dimension {name} is not activated by the profile"
+            )
+    return errors
 
 
 def validate_case(data: Any) -> list[str]:
@@ -158,6 +202,7 @@ def validate_case(data: Any) -> list[str]:
         errors.extend(validate_dimensions(
             active, skipped, DIMENSIONS, profile, prefix=f"{prefix}.",
         ))
+        errors.extend(validate_activation(active, observed, prefix=f"{prefix}."))
 
     if "skill-pack" not in repo_types:
         errors.append("fixtures must include a skill-pack profile")
@@ -262,6 +307,46 @@ def run_self_tests() -> int:
         ), f"profile.observed.{field} is declared required but not enforced"
     valid["fixtures"][0]["expected"]["active_dimensions"][0]["activated_by"] = []
     assert any("lacks activated_by evidence" in error for error in validate_case(valid))
+
+    # Every predicate must reject a profile that does not satisfy it, or the
+    # guard is decorative. Defaults above satisfy nothing, so each dimension is
+    # added as active against a profile that leaves its predicate false.
+    for name, predicate in sorted(ACTIVATION_PREDICATES.items()):
+        unsatisfied = copy.deepcopy(valid)
+        unsatisfied["fixtures"][0]["expected"]["active_dimensions"].append(
+            {"name": name, "activated_by": ["observed.vcs"]}
+        )
+        assert not predicate(observed_defaults), (
+            f"{name} predicate is satisfied by the empty default profile"
+        )
+        assert any(
+            f"active dimension {name} is not activated by the profile" in error
+            for error in validate_case(unsatisfied)
+        ), f"{name} activation is not enforced"
+
+    # And a satisfied profile must not produce the error.
+    satisfied = copy.deepcopy(valid)
+    satisfied["fixtures"][0]["profile"]["observed"].update(
+        {
+            "version_sources": ["pyproject.toml", "package.json"],
+            "shell_files": True,
+            "recent_commits": True,
+            "ci": "GitHub Actions",
+            "gitignore": True,
+            "reliability_audit_requested": True,
+            "branch_commits_outside_base": 1,
+        }
+    )
+    satisfied["fixtures"][0]["expected"]["active_dimensions"] = [
+        {"name": name, "activated_by": ["observed.vcs"]}
+        for name in sorted(ACTIVATION_PREDICATES)
+    ]
+    satisfied["fixtures"][0]["expected"]["skipped_dimensions"] = [
+        {"name": name, "skip_reason": "not activated"}
+        for name in sorted(DIMENSIONS - set(ACTIVATION_PREDICATES))
+    ]
+    assert validate_case(satisfied) == [], validate_case(satisfied)
+
     print("PASS: validate-evals.py self-tests")
     return 0
 
