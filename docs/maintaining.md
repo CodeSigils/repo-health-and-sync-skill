@@ -18,7 +18,7 @@ Choose the smallest path that matches the change:
 | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Docs, CI, schemas, or maintainer scripts      | Make the change, then run the fast verification checklist.                                                                                             |
 | `SKILL.md` wording or behavior                | Apply the change, run the fast checklist, then run the local Codex regression.                                                                         |
-| Plugin manifest metadata                      | Update `.codex-plugin/plugin.json` when plugin identity changes. Its `version` is required by the Codex plugin contract, but tracks nothing.           |
+| Plugin manifest metadata                      | Update `.codex-plugin/plugin.json` when plugin identity changes. `version` is contractually required; it does not track Git tags or GitHub Releases.   |
 | Agent support claim                           | Update the relevant compatibility report and portability evidence; do not broaden claims from one runtime.                                             |
 | Bot or dependency update                      | Read [automation-identities.md](automation-identities.md), inspect the diff and required checks, then use the fast checklist.                          |
 | Change a public support or distribution claim | Update [claim-evidence-matrix.md](claim-evidence-matrix.md) and its owning evidence report in the same change.                                         |
