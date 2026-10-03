@@ -124,9 +124,9 @@
   "docs/codex-setup.md": [
     {
       "id": "tested-version",
-      "description": "Names the tested Codex CLI version",
+      "description": "Names the Codex CLI version the setup guide was verified against",
       "type": "regex",
-      "pattern": "Codex CLI 0\\.149\\.0"
+      "pattern": "verified with Codex CLI [0-9]+\\.[0-9]+\\.[0-9]+"
     },
     {
       "id": "repo-local",
@@ -181,10 +181,10 @@
   ],
   "docs/decisions.md": [
     {
-      "id": "describes-current-architecture",
-      "description": "Preserves the current architecture decisions heading",
+      "id": "describes-methodology-baseline",
+      "description": "Preserves the methodology-baseline decisions heading",
       "type": "regex",
-      "pattern": "Decisions — Repo Health Scan \\(v0\\.3\\.0\\)"
+      "pattern": "Decisions — Repo Health Scan"
     }
   ]
 }

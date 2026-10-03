@@ -1,7 +1,7 @@
 # Codex Setup
 
-Status: verified with Codex CLI 0.149.0 on 2026-08-24. The 0.133.0 setup
-reproduction remains historical evidence in the compatibility report.
+Status: verified with Codex CLI 0.153.2 on 2026-09-06. Earlier setup
+reproductions remain historical evidence in the compatibility report.
 
 This guide separates repository-local skill authoring from plugin distribution.
 The skill itself ships as one `SKILL.md`; the plugin manifest packages that
@@ -118,7 +118,6 @@ is opt-in:
 
 | Variable                        | Effect                            |
 | ------------------------------- | --------------------------------- |
-| `REPO_HEALTH_VERIFY_RELEASES=1` | Permit GitHub release queries.    |
 | `REPO_HEALTH_VERIFY_REFS=1`     | Permit external-reference checks. |
 | `REPO_HEALTH_OUTPUT=jsonl`      | Request JSONL output.             |
 
