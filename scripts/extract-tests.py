@@ -5,7 +5,6 @@ into the review-fixtures.json format.
 
 Usage:
     python3 scripts/extract-tests.py --script check-portability.py --output test-fixtures.json
-    python3 scripts/extract-tests.py --script check-expiry.py --output test-fixtures.json
 """
 
 from __future__ import annotations

@@ -75,8 +75,6 @@ jobs:
         run: python3 scripts/doc-audit.py --self-test
       - name: Self-test — verify.sh
         run: bash scripts/verify.sh --self-test
-      - name: Self-test — expiry checker
-        run: python3 scripts/check-expiry.py --self-test
       - name: Self-test — URL verifier
         run: python3 scripts/verify-urls.py --self-test
       - name: Self-test — test extractor
@@ -144,19 +142,6 @@ jobs:
           echo "=== Commit subject convention check ==="
           echo "Generated merge commits are excluded; authored commits remain subject to the convention."
           python3 scripts/check-commit-convention.py --range "${COMMIT_RANGE}"
-
-  check-expiry:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    needs: lint
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-      - name: Check for expired references
-        run: python3 scripts/check-expiry.py --strict
 
   verify-urls:
     runs-on: ubuntu-latest

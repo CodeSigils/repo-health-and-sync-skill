@@ -83,8 +83,6 @@ jobs:
         run: python3 scripts/doc-audit.py --self-test
       - name: Self-test — verify.sh
         run: bash scripts/verify.sh --self-test
-      - name: Self-test — expiry checker
-        run: python3 scripts/check-expiry.py --self-test
       - name: Self-test — URL verifier
         run: python3 scripts/verify-urls.py --self-test
       - name: Self-test — test extractor

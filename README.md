@@ -228,8 +228,8 @@ Install above).
 │       ├── positive-prompt.md        # Prompt that should trigger full scan
 │       └── positive-result.schema.json  # Expected output schema for positive case
 ├── scripts/                          # CI-only tooling (not shipped)
-│   ├── check-expiry.py               # Scans for expired doc and config references
 │   ├── check-portability.py          # Validates no agent-specific references in skills
+│   ├── check-python-range-parity.py  # Keeps duplicated Python CI jobs equivalent
 │   ├── check-trust.py                # Validates security and trust contract
 │   ├── doc-audit.py                  # Manifest-driven doc completeness checker
 │   ├── extract-tests.py              # Extracts test fixtures from script docstrings

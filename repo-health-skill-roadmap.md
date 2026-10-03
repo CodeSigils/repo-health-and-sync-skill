@@ -115,7 +115,7 @@ Primary sources and research, accessed 2026-07-12 or 2026-07-13:
 | Eval validation            | `scripts/validate-evals.py` enforces profile-first ordering, activation evidence, skip reasons, fixture diversity, and the complete observed profile field set.                           |
 | Security and trust         | `scripts/check-trust.py` enforces bounded triggers, read-only instructions, opt-in network/output behavior, credential hygiene, versioned compatibility evidence, and payload separation. |
 | Secret scanning            | Skill scans `.gitignore`, commit metadata, and tracked files for heuristic secret patterns; output is limited to counts/paths and includes a redaction guard.                             |
-| Audit hardening            | Repository audits streamlined; coverage gaps closed; portability scanner fixed; expiry checker wired. Evidence: commits `1aef227`, `a54272b`, `988322d`.                                  |
+| Audit hardening            | Repository audits streamlined; coverage gaps closed and portability scanner fixed. The later-retired expiry checker is retained only in historical commits. Evidence: commits `1aef227`, `a54272b`, `988322d`. |
 | Distribution model         | Historical Releases and tags were removed 2026-10-03. `main` is the only distribution channel.                                                                                              |
 | CI and merge governance    | CI runs on every pull request without path filters; `lint`, `full-verify`, and `phase-b-gate` are required on `main`, with conversation resolution and signed commits.     |
 | Repository verification    | Script self-tests, Ruff, ShellCheck, documentation audit, plugin validation, skill validation, and diff checks pass independently.                                                        |
@@ -455,8 +455,9 @@ Completed foundation:
 - Added secret scanning: `.gitignore` secret pattern detection, commit body
   secret scanning, and report redaction guard (`92d7481`, `fa0b8f9`).
 - Hardened repository audits: streamlined audit flow, closed coverage gaps,
-  pinned `setup-python`, fixed portability scanner, wired expiry checker
-  (`1aef227`, `a54272b`, `988322d`).
+  pinned `setup-python`, and fixed the portability scanner (`1aef227`,
+  `a54272b`, `988322d`). The expiry checker from that work was retired on
+  2026-10-03 because it had no declared expiry metadata to enforce.
 - Hardened CI governance: removed path-filter bypasses, moved commit convention
   checks into pull requests, and enabled protected-main requirements (`#6`–`#8`).
 - Reconciled runtime-payload documentation: `SKILL.md` is installed; moved
@@ -541,7 +542,6 @@ repo-health-scan/
 │   └── compatibility-reports/
 │       └── codex.md
 └── scripts/                        # maintainer-only validation
-    ├── check-expiry.py
     ├── check-portability.py
     ├── check-trust.py
     ├── doc-audit.py
