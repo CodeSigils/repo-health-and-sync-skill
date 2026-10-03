@@ -57,6 +57,12 @@ For a configured clone, the local hooks are the direct-push gate:
 - `pre-push` validates every outgoing commit subject, then runs
   `bash scripts/verify.sh` before Git sends the ref.
 
+Both hooks are POSIX shell, and both are linted: `verify.sh` sweeps
+`.githooks/` alongside `scripts/*.sh`, and each required CI job runs
+`shellcheck scripts/*.sh .githooks/*`. Anything added to `.githooks/` is
+therefore expected to be shell; if a non-shell hook is ever added
+deliberately, those commands change with it.
+
 `--no-verify` deliberately bypasses this local gate and leaves CI as the only
 backstop. A fresh clone has no local gate until the setup command above runs.
 If this repository gains regular contributors or independent review, switch to

@@ -189,6 +189,9 @@ Install above).
 │       ├── ci.yml                    # Deterministic CI pipeline
 │       ├── codex-regression.yml      # Non-blocking model evaluation
 │       └── python-range.yml          # Same checks on the rest of the declared Python range
+├── .githooks/                        # POSIX shell hooks; shellchecked in CI and by verify.sh
+│   ├── pre-commit                   # Runs ruff and the portability check
+│   └── pre-push                     # Validates subjects, then runs scripts/verify.sh
 ├── .codex-plugin/
 │   └── plugin.json                   # Codex plugin manifest
 ├── .gitattributes                    # Git text normalization and Linguist overrides
