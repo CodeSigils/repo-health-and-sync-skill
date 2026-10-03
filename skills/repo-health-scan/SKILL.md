@@ -216,7 +216,7 @@ skipped:
 | ------------------------- | ----------------------------------------------------- |
 | history_hygiene           | always                                                |
 | shell_correctness         | observed.shell_files                                  |
-| version_alignment         | len(observed.version_sources) ≥ 2                     |
+| version_alignment         | ≥2 comparable observed.version_sources                |
 | commit_quality            | observed.recent_commits                               |
 | ci_efficiency             | observed.ci                                           |
 | cross_platform            | observed.shell_files + inferred.platform_requirements |

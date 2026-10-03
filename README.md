@@ -56,7 +56,7 @@ The agent activates only relevant checks from this catalog — not a universal c
 | ------------------------- | -------------------------------------------- |
 | History hygiene           | Always (cheap, universal)                    |
 | Shell correctness         | Any `.sh` files exist                        |
-| Version alignment         | ≥2 version sources found                     |
+| Version alignment         | ≥2 comparable version sources                |
 | Commit quality            | Commits on this branch                       |
 | CI efficiency             | CI config exists                             |
 | Cross-platform            | `.sh` files + macOS/BSD user evidence        |
