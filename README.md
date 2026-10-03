@@ -235,7 +235,7 @@ Install above).
 │   ├── extract-tests.py              # Extracts test fixtures from script docstrings
 │   ├── grade-codex-transcript.py     # Grades Codex regression artifacts deterministically
 │   ├── run-codex-regression.py       # Runs isolated Codex skill regressions
-│   ├── validate-evals.py             # Validates eval contract structure
+│   ├── validate-evals.py             # Validates eval contract and activation
 │   ├── validate-scripts.py           # Validates script quality conventions
 │   ├── verify.sh                     # Repository structure consistency check
 │   └── verify-urls.py                # Checks external URL references are reachable
