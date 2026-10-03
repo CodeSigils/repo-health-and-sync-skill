@@ -63,9 +63,8 @@
           "recent_commits": true,
           "gitignore": true,
           "version_sources": [
-            "skills/repo-health-scan/SKILL.md",
             ".codex-plugin/plugin.json",
-            "CITATION.cff"
+            "skills/example/SKILL.md"
           ],
           "script_surface": "maintainer-only",
           "reliability_audit_requested": false,
@@ -423,7 +422,8 @@
           "recent_commits": true,
           "gitignore": true,
           "version_sources": [
-            "pyproject.toml"
+            "pyproject.toml",
+            "skills/example/SKILL.md"
           ],
           "script_surface": "maintainer-only",
           "reliability_audit_requested": false,
@@ -513,7 +513,8 @@
           "recent_commits": true,
           "gitignore": true,
           "version_sources": [
-            "pyproject.toml"
+            "pyproject.toml",
+            "src/example/__init__.py"
           ],
           "script_surface": "maintainer-only",
           "reliability_audit_requested": true,
