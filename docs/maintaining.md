@@ -18,10 +18,10 @@ Choose the smallest path that matches the change:
 | ---------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
 | Docs, CI, schemas, or maintainer scripts | Make the change, then run the fast verification checklist.                                                 |
 | `SKILL.md` wording or behavior           | Apply the change, run the fast checklist, then run the local Codex regression.                             |
-| Version fields                           | Update `SKILL.md`, `plugin.json`, and `CITATION.cff` together; see [Releases](#releases).                  |
+| Version metadata                         | Update `SKILL.md`, `plugin.json`, and `CITATION.cff` only when an explicit metadata change requires it; this repository has no tag or Release cadence. |
 | Agent support claim                      | Update the relevant compatibility report and portability evidence; do not broaden claims from one runtime. |
 | Bot or dependency update                 | Read [automation-identities.md](automation-identities.md), inspect the diff and required checks, then use the fast checklist. |
-| Change a public support or release claim  | Update [claim-evidence-matrix.md](claim-evidence-matrix.md) and its owning evidence report in the same change.               |
+| Change a public support or distribution claim | Update [claim-evidence-matrix.md](claim-evidence-matrix.md) and its owning evidence report in the same change.            |
 
 The installed runtime payload is only `skills/repo-health-scan/SKILL.md`.
 Maintainer-only evidence/templates live under `docs/references/` and are not
@@ -176,7 +176,7 @@ it is a scheduled staleness check like `check-expiry.py` and `verify-urls.py`,
 not a local check. Its `--self-test` is offline and already runs under
 `validate-scripts.py`.
 
-## Releases
+## Distribution
 
 This repository does not run a release cadence. `main` is the distribution
 channel: clone it, or install from it with the Skills CLI.
@@ -187,14 +187,13 @@ npx skills add CodeSigils/repo-health-scan \
 ```
 
 Use `--agent claude-code` for Claude Code. The install resolves the repository's
-default branch, so a merged pull request is the release. That is why no
+default branch, so a merged pull request updates distribution. That is why no
 release workflow or historical release/tag marker exists: `skills.sh` indexes
 the default branch, so a tag would not change what installers receive.
 
 ### Smoke-testing a change
 
-The procedure previously used for releases is still the right way to confirm an
-install works. Run it in an isolated temporary directory for each claimed host
+Confirm an install in an isolated temporary directory for each claimed host
 after a change to the payload, layout, or install documentation:
 
 ```bash
@@ -232,7 +231,7 @@ tree; this table identifies where maintainers should make changes:
 | Concern                                   | Authoritative location                                                  |
 | ----------------------------------------- | ----------------------------------------------------------------------- |
 | Runtime audit methodology                 | `skills/repo-health-scan/SKILL.md`                                      |
-| Maintainer workflow and release procedure | `docs/maintaining.md`                                                   |
+| Maintainer workflow and distribution procedure | `docs/maintaining.md`                                               |
 | Architecture decisions                    | `docs/decisions.md`                                                     |
 | Portability and compatibility claims      | `docs/portability-contract.md` and `docs/compatibility-reports/`        |
 | Public claim-to-evidence mapping           | `docs/claim-evidence-matrix.md`                                          |

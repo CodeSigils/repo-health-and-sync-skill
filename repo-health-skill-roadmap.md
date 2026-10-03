@@ -2,7 +2,7 @@
 
 **Status:** Codex-first maintenance mode
 
-**Last reconciled:** 2026-09-08
+**Last reconciled:** 2026-10-03
 
 This roadmap is based on the current repository, recorded compatibility tests,
 official platform documentation, and the research sources listed below. It
@@ -116,9 +116,8 @@ Primary sources and research, accessed 2026-07-12 or 2026-07-13:
 | Security and trust         | `scripts/check-trust.py` enforces bounded triggers, read-only instructions, opt-in network/output behavior, credential hygiene, versioned compatibility evidence, and payload separation. |
 | Secret scanning            | Skill scans `.gitignore`, commit metadata, and tracked files for heuristic secret patterns; output is limited to counts/paths and includes a redaction guard.                             |
 | Audit hardening            | Repository audits streamlined; coverage gaps closed; portability scanner fixed; expiry checker wired. Evidence: commits `1aef227`, `a54272b`, `988322d`.                                  |
-| Release consistency        | Removed with the historical Releases and tags. `main` is the only distribution channel.                                                                                                      |
+| Distribution model         | Historical Releases and tags were removed 2026-10-03. `main` is the only distribution channel.                                                                                              |
 | CI and merge governance    | CI runs on every pull request without path filters; `lint`, `full-verify`, and `phase-b-gate` are required on `main`, with conversation resolution and signed commits.     |
-| Release workflow hardening | Removed 2026-10-01. Historical Releases and tags were removed 2026-10-03; `main` is the distribution channel. |
 | Repository verification    | Script self-tests, Ruff, ShellCheck, documentation audit, plugin validation, skill validation, and diff checks pass independently.                                                        |
 | Agent Skills format        | Pinned official `skills-ref` validation is run locally and in the `lint` CI job against `skills/repo-health-scan`.                                         |
 | Evidence URL tracking      | `docs/evidence-urls.json` upgraded to v3 schema with status, source_type, domain_tag, and last_verified fields. All 18 URLs verified reachable on 2026-09-08. |
@@ -207,7 +206,10 @@ Acceptance evidence:
 
 ---
 
-## 5. Release Milestone and Ordered Follow-up
+## 5. Archived Release Milestone and Ordered Follow-up
+
+The records below describe the former release process. All historical Releases
+and tags were removed on 2026-10-03; they are not a current procedure.
 
 ### 5.1 Completed: Release Current Codex Work
 
@@ -392,7 +394,7 @@ surface expansion.
 |     3 | **Completed:** Consolidate `SKILL.md` and clarify the candidate-catalog and contextual-blocking contracts.                                                                   |                                   1-2 days | High   |
 |     4 | **Completed:** Establish a fresh repeated model baseline for the consolidated payload; runs 13–15 are the current baseline.                                                 |             Observation over multiple runs | High   |
 |     5 | **Completed:** Hold the profile-module go/no-go review; `docs/decisions.md` records defer-by-default.                                                                         |                                    0.5 day | High   |
-|     6 | **Maintenance:** Run release-readiness and real-project dogfood checks; the 2026-09-08 comparative and full-depth audits found no profile-module gap. Repeat only after a concrete evidence gap. | Ongoing, lightweight | High   |
+|     6 | **Maintenance:** Run distribution-readiness and real-project dogfood checks; the 2026-09-08 comparative and full-depth audits found no profile-module gap. Repeat only after a concrete evidence gap. | Ongoing, lightweight | High   |
 |     7 | If a module is later approved, implement and evaluate one at a time with its own fixture, field budget, and fresh regression evidence.                                         | Review, then 0.5-1 day per approved module | Medium |
 
 Optional, unordered infrastructure: activate the hosted Codex Action only if a
@@ -409,18 +411,17 @@ expanding the runtime payload:
    shape, profile, active/skipped dimensions, findings, tool availability,
    commands, and date (`docs/dogfood-audit-template.md`).
 2. **Completed:** Add a control-justification ledger mapping each recurring
-   CI/release check to its failure mode, evidence, recurring cost, and
+   CI/distribution check to its failure mode, evidence, recurring cost, and
    retain/weaken/remove decision (`docs/control-justification-ledger.md`).
 3. **Completed:** Run a focused semantic trigger-selection review; run 16
    activated the skill for a health audit and correctly rejected a narrow task.
 4. **Completed:** Add a claim/evidence matrix for compatibility, distribution,
-   read-only, and release claims, including confidence and explicit boundaries.
+   and read-only claims, including confidence and explicit boundaries.
 5. **Completed:** Enforce the Agent Skills validator policy with a pinned
-   `skills-ref` command in CI (or a manual release gate for no-CI repositories),
+   `skills-ref` command in CI (or a manual validation path for no-CI repositories),
    and provide a reusable audit script for other repositories.
-6. Review the multi-surface versioning model at the next major release; do not
-   migrate it now without evidence that its maintenance cost outweighs the
-   existing release-integrity controls.
+6. Review version metadata only when a packaging or support claim changes; do
+   not reintroduce tag or Release controls without evidence that they add value.
 
 Acceptance for this maintenance track is documentation or a bounded review
 artifact, not a new runtime module or universal agent matrix.
@@ -439,7 +440,8 @@ Completed foundation:
 - Added the focused Codex setup guide and reproduced it from an isolated home.
 - Added deterministic eval fixtures and validation.
 - Fixed dirty-tree verification.
-- Enforced local/tag/release version consistency with strict CI API behavior.
+- Previously enforced local/tag/release version consistency; the control was
+  removed with the historical markers on 2026-10-03.
 - Removed unsupported blanket compatibility metadata.
 - Published signed release `v0.3.0` with aligned skill, plugin, citation, tag,
   and GitHub Release versions.
@@ -456,9 +458,8 @@ Completed foundation:
 - Hardened repository audits: streamlined audit flow, closed coverage gaps,
   pinned `setup-python`, fixed portability scanner, wired expiry checker
   (`1aef227`, `a54272b`, `988322d`).
-- Hardened CI and release governance: removed path-filter bypasses, moved commit
-  convention checks into pull requests, required exact CI jobs for tags, made
-  release reruns idempotent, and enabled protected-main requirements (`#6`–`#8`).
+- Hardened CI governance: removed path-filter bypasses, moved commit convention
+  checks into pull requests, and enabled protected-main requirements (`#6`–`#8`).
 - Reconciled runtime-payload documentation: `SKILL.md` is installed; moved
   maintainer-only references from `skills/.../references/` to
   `docs/references/` so Skills CLI cannot package them as runtime resources.
