@@ -15,8 +15,13 @@ from __future__ import annotations
 import re
 import sys
 from pathlib import Path
+from tempfile import TemporaryDirectory
+from urllib.parse import unquote, urlsplit
 
 from _common import read_json
+
+MARKDOWN_LINK_RE = re.compile(r"(?<!!)\[[^]]*]\(([^)\s]+)(?:\s+[^)]*)?\)")
+EXTERNAL_SCHEMES = {"data", "http", "https", "mailto", "tel"}
 
 
 def load_manifest(manifest_path: Path) -> dict:
@@ -46,6 +51,54 @@ def check_not_regex(filepath: Path, pattern: str) -> bool:
         return False
     content = filepath.read_text(encoding="utf-8")
     return not bool(re.search(pattern, content))
+
+
+def heading_anchors(filepath: Path) -> set[str]:
+    """Return GitHub-style anchors for ATX headings in a Markdown file."""
+    anchors: set[str] = set()
+    counts: dict[str, int] = {}
+    for line in filepath.read_text(encoding="utf-8").splitlines():
+        match = re.match(r"^ {0,3}#{1,6}\s+(.+?)(?:\s+#+)?$", line)
+        if match is None:
+            continue
+        text = re.sub(r"\[([^]]+)]\([^)]+\)", r"\1", match.group(1))
+        slug = re.sub(r"[^\w\- ]", "", text.casefold()).replace(" ", "-")
+        slug = re.sub(r"-+", "-", slug).strip("-")
+        if not slug:
+            continue
+        occurrence = counts.get(slug, 0)
+        counts[slug] = occurrence + 1
+        anchors.add(slug if occurrence == 0 else f"{slug}-{occurrence}")
+    return anchors
+
+
+def check_markdown_links(repo_root: Path) -> list[str]:
+    """Return invalid repository-relative Markdown link descriptions."""
+    errors: list[str] = []
+    for source in sorted(repo_root.rglob("*.md")):
+        if ".git" in source.parts:
+            continue
+        content = source.read_text(encoding="utf-8")
+        for destination in MARKDOWN_LINK_RE.findall(content):
+            parsed = urlsplit(destination)
+            if parsed.scheme.casefold() in EXTERNAL_SCHEMES or destination.startswith("//"):
+                continue
+            target_path = unquote(parsed.path)
+            target = source.parent / target_path if target_path else source
+            resolved = target.resolve()
+            try:
+                resolved.relative_to(repo_root)
+            except ValueError:
+                errors.append(f"{source.relative_to(repo_root)}: link escapes repository: {destination}")
+                continue
+            if not resolved.exists():
+                errors.append(f"{source.relative_to(repo_root)}: missing link target: {destination}")
+                continue
+            if parsed.fragment and resolved.is_file() and resolved.suffix.casefold() == ".md":
+                anchor = unquote(parsed.fragment).casefold()
+                if anchor not in heading_anchors(resolved):
+                    errors.append(f"{source.relative_to(repo_root)}: missing anchor: {destination}")
+    return errors
 
 
 def run_checks(manifest_path: Path, repo_root: Path) -> tuple[int, int]:
@@ -82,6 +135,15 @@ def run_checks(manifest_path: Path, repo_root: Path) -> tuple[int, int]:
             else:
                 print(f"  FAIL  Doc: {desc} ({cid})")
                 failed += 1
+
+    link_errors = check_markdown_links(repo_root)
+    if link_errors:
+        for error in link_errors:
+            print(f"  FAIL  Links: {error}")
+        failed += len(link_errors)
+    else:
+        print("  PASS  Links: repository-relative Markdown targets and anchors")
+        passed += 1
 
     return passed, failed
 
@@ -124,7 +186,23 @@ def self_test() -> int:
                     print(f"  FAIL  Self-test: contains-all check '{check['id']}' missing 'items' list")
                     return 1
 
-    print("  PASS  Self-test: doc-audit.py manifest valid")
+    with TemporaryDirectory() as directory:
+        root = Path(directory)
+        (root / "target.md").write_text("# Target heading\n", encoding="utf-8")
+        (root / "source.md").write_text(
+            "[valid](target.md#target-heading)\n[missing target](missing.md)\n"
+            "[missing anchor](target.md#missing-heading)\n",
+            encoding="utf-8",
+        )
+        errors = check_markdown_links(root)
+        if errors != [
+            "source.md: missing link target: missing.md",
+            "source.md: missing anchor: target.md#missing-heading",
+        ]:
+            print("  FAIL  Self-test: Markdown link validation")
+            return 1
+
+    print("  PASS  Self-test: doc-audit.py manifest and Markdown link validation valid")
     return 0
 
 

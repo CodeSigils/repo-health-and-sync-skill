@@ -121,17 +121,17 @@ Primary sources and research, accessed 2026-07-12 or 2026-07-13:
 | Repository verification    | Script self-tests, Ruff, ShellCheck, documentation audit, plugin validation, skill validation, and diff checks pass independently.                                                        |
 | Agent Skills format        | Pinned official `skills-ref` validation is run locally and in the `lint` CI job against `skills/repo-health-scan`.                                         |
 | Evidence URL tracking      | `docs/evidence-urls.json` upgraded to v3 schema with status, source_type, domain_tag, and last_verified fields. All 18 URLs verified reachable on 2026-09-08. |
-| Local model regression     | Sixteen Codex runs are recorded: eleven passes, one timeout, and two deterministic grading failures. Runs 13–16 are clean passes on Codex CLI 0.153.2. |
+| Local model regression     | Twenty-two Codex runs are recorded. Runs 13–16 are the clean 0.153.2 historical baseline; no run yet certifies the current payload. |
 | Comparative dogfood        | Eight-repository comparison plus a full-depth `psf/requests` follow-up found no profile-module gap; evidence is recorded in `docs/dogfood-batch-2026-09-08.md`. |
 
 ### Remaining Gaps
 
 | Gap                                                                                                                                                             | Consequence                                                                                                                                    | Priority |
 | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| Fifteen local runs are recorded; the current 0.153.2 payload has three clean time-separated passes plus two earlier runs regraded after a transcript-parser fix. | Treat the corrected grader and three clean runs as the initial repeated baseline; review consolidation before expanding the profile contract. | High     |
+| The current payload has no recorded model-regression run after material changes. | Re-establish a baseline before using model behavior as a current support claim; historical 0.153.2 evidence remains diagnostic only. | High     |
 | `.repo-health.json` and JSONL are optional maintainer-side contracts.                                                                                           | Schemas and graders now enforce profile completeness and redacted finding shape; cross-agent runtime conformance remains unverified.           | Low      |
 | Deterministic fixtures cover six repository shapes, including a monorepo, docs product, missing tools, no `origin/main`, and dirty tree.                        | Broader real-world model evidence is still needed beyond deterministic fixtures.                                                               | Medium   |
-| Current-version marketplace installation has not been reproduced in the compatibility report.                                                                   | Resolved: v0.3.0 installation evidence is recorded separately from historical v0.2.0 evidence.                                                 | Resolved |
+| Default-branch distribution has not been reproduced after the historical Release/tag removal.                                                                  | Re-run the Skills CLI smoke test against `main` when distribution instructions or payload layout change; do not treat historical tag evidence as current distribution evidence. | Ongoing |
 | Scheduled URL checks can fail when upstream references drift or are unavailable.                                                                                | Keep URL verification scheduled/manual, retry transient failures, and do not make it a pull-request merge gate.                                | Ongoing  |
 
 The hosted Codex Action is not a product gap. It requires API-key billing, which
@@ -157,9 +157,9 @@ The required sequence is:
 2. **Completed:** collect time-separated repeated runs for the hardened payload
    without changing model-facing inputs; runs 13–15 provide three clean passes.
 3. **Completed:** consolidate the core methodology and contextual blocking
-   behavior; the baseline review supports the current payload.
-4. **Completed:** establish a fresh repeated baseline for the consolidated
-   payload with runs 13–15.
+   behavior; the historical baseline review supports the payload it tested.
+4. **Historical:** runs 13–15 established a repeated baseline for the
+   consolidated payload at that time; material changes require a new baseline.
 5. **Completed:** formalize optional output contracts and broaden deterministic
    fixtures; profile-module go/no-go review is now recorded as defer-by-default
    in `docs/decisions.md`.
@@ -332,9 +332,9 @@ these gates in order:
 6. Add deterministic fixtures for a monorepo, documentation product, missing
    tools, no `origin/main`, and an intentionally dirty non-release workflow.
    **Done:** all six shapes are represented in the eval contract.
-7. **Completed for the current payload:** runs 13–15 establish a fresh repeated
-   model baseline on Codex CLI 0.153.2. Do not carry the v0.3.0 pass rate forward
-   as proof of new behavior after future `SKILL.md` changes.
+7. **Historical baseline:** runs 13–15 established a repeated model baseline
+   on Codex CLI 0.153.2. Do not carry it forward as proof of the current
+   payload; current certification remains unresolved pending a new run.
 8. Hold a documented go/no-go review for profile modules. The default outcome
    is continued deferral unless observed repository failures show that the
    compact core cannot represent necessary evidence.
@@ -392,7 +392,7 @@ surface expansion.
 |     1 | **Completed:** Collect time-separated local regression runs for the hardened payload and preserve all first-attempt outcomes.                                                |             Observation over multiple runs | High   |
 |     2 | **Completed:** Review pass rate, failure phases, runtime, token use, and evidence quality; runs 13–15 support proceeding.                                                   |                                    0.5 day | High   |
 |     3 | **Completed:** Consolidate `SKILL.md` and clarify the candidate-catalog and contextual-blocking contracts.                                                                   |                                   1-2 days | High   |
-|     4 | **Completed:** Establish a fresh repeated model baseline for the consolidated payload; runs 13–15 are the current baseline.                                                 |             Observation over multiple runs | High   |
+|     4 | **Pending:** Establish a fresh repeated model baseline for the current payload; runs 13–16 are historical evidence only.                                                    |             Observation over multiple runs | High   |
 |     5 | **Completed:** Hold the profile-module go/no-go review; `docs/decisions.md` records defer-by-default.                                                                         |                                    0.5 day | High   |
 |     6 | **Maintenance:** Run distribution-readiness and real-project dogfood checks; the 2026-09-08 comparative and full-depth audits found no profile-module gap. Repeat only after a concrete evidence gap. | Ongoing, lightweight | High   |
 |     7 | If a module is later approved, implement and evaluate one at a time with its own fixture, field budget, and fresh regression evidence.                                         | Review, then 0.5-1 day per approved module | Medium |
@@ -443,8 +443,9 @@ Completed foundation:
 - Previously enforced local/tag/release version consistency; the control was
   removed with the historical markers on 2026-10-03.
 - Removed unsupported blanket compatibility metadata.
-- Published signed release `v0.3.0` with aligned skill, plugin, citation, tag,
-  and GitHub Release versions.
+- Historical record: published signed release `v0.3.0` with aligned skill,
+  plugin, citation, tag, and GitHub Release versions. Those markers were
+  removed on 2026-10-03 when `main` became the sole distribution channel.
 - Added and locally verified the non-blocking Codex model regression runner,
   deterministic grader, isolated fixture, and trusted-trigger hosted workflow.
 - Added runner-only timing, usage, last-event, artifact, and failure-phase

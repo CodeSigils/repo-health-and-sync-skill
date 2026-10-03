@@ -28,9 +28,9 @@
   "README.md": [
     {
       "id": "compatibility-scope",
-      "description": "Verified compatibility scope declared",
+      "description": "Compatibility evidence boundary declared",
       "type": "regex",
-      "pattern": "Codex CLI 0\\.149\\.0 is the only verified agent target"
+      "pattern": "Codex is the only agent with recorded workflow\\s+evidence"
     },
     {
       "id": "quickstart-bash",

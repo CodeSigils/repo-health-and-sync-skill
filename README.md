@@ -29,7 +29,9 @@ The shipped payload is one `SKILL.md` — no agent-specific commands or
 paths — so it works with any terminal-capable coding agent. It is
 agentskills.io-compatible.
 
-**Compatibility status:** Codex CLI 0.149.0 is the only verified agent target.
+**Compatibility status:** Codex is the only agent with recorded workflow
+evidence. The exact tested-runtime baseline and its current certification
+boundary are recorded in the [claim and evidence matrix](docs/claim-evidence-matrix.md).
 The `SKILL.md` payload is designed to be portable, but other agents are not
 supported claims until they have their own recorded compatibility tests.
 

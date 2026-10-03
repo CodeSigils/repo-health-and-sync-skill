@@ -115,7 +115,7 @@ the human-reviewed checklist is insufficient.
 Run this after every change. The tree-clean check is the final check, after all
 edits and generated artifacts have been removed:
 
-1. **Documentation:** `python3 scripts/doc-audit.py --self-test`
+1. **Documentation:** `python3 scripts/doc-audit.py --self-test` and `python3 scripts/doc-audit.py` (the latter also verifies repository-relative Markdown links and anchors)
 2. **Agent Skills format:** `uvx --from git+https://github.com/agentskills/agentskills.git@69ef37e9424c0a7ea9dd2293b559e43ec8176379#subdirectory=skills-ref skills-ref validate skills/repo-health-scan`
 3. **Compatibility evidence policy:** `python3 scripts/check-skills-ref-policy.py .`
 4. **No stale refs:** `grep -rn --include='*.md' 'PLAN\\.md\\|PROPOSALS\\.md\\|REPORT\\.md\\|USER-SUGGESTIONS\\.md' . | grep -v '.git/'`

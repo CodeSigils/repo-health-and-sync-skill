@@ -269,7 +269,7 @@ echoing matching values.
 
 ---
 
-## 10. Documentation architecture (2026-08-24)
+## 11. Documentation architecture (2026-08-24)
 
 **Finding:** Maintainer documentation is easier to navigate when each page has
 one job: teach a task, define a contract, explain a decision, or preserve
@@ -299,7 +299,7 @@ avoid flagging detector source code as a credential.
 
 ---
 
-## 11. Real-project dogfood audit (2026-09-06)
+## 12. Real-project dogfood audit (2026-09-06)
 
 **Finding:** A read-only sample across three projects exercised the consolidated
 core without requiring profile modules.

@@ -7,10 +7,10 @@ Date: 2026-08-24
 ## Scope
 
 This report records Codex plugin packaging and local marketplace evidence from
-2026-07-13 and 2026-08-19, plus the latest model-driven runtime certification
-from 2026-08-24. The current local CLI is 0.149.0; the earlier 0.133.0 install
-and workflow evidence is retained as historical evidence rather than presented
-as the current runtime.
+2026-07-13 and 2026-08-19, plus the model-driven runtime certification from
+2026-08-24. The local CLI observed for that certification was 0.149.0; the
+earlier 0.133.0 install and workflow evidence is retained as historical
+evidence rather than presented as the current runtime.
 
 **Baseline boundary.** The findings below describe the payload as of 2026-08-24
 and are not a certification of the `reliability_test_gaps` payload, which was
@@ -252,14 +252,15 @@ Result:
 Plugin validation passed: $REPO_ROOT
 ```
 
-The v0.3.0 plugin manifest (`./.codex-plugin/plugin.json`) identifies version
-`0.3.0`, matching the `SKILL.md` frontmatter, `CITATION.cff`, git tag `v0.3.0`,
-and GitHub release `v0.3.0`. This completes the installation evidence for the
-current released version.
+At the time of this historical test, the v0.3.0 plugin manifest
+(`./.codex-plugin/plugin.json`) matched the `SKILL.md` frontmatter,
+`CITATION.cff`, git tag `v0.3.0`, and GitHub release `v0.3.0`. The repository
+removed its historical Releases and tags on 2026-10-03; `main` is now the sole
+distribution channel, so this evidence does not describe a current release.
 
 ## Runtime freshness note (2026-08-24)
 
-The local Codex CLI currently reports `codex-cli 0.149.0`. A new local
+The local Codex CLI used for this 2026-08-24 record reported `codex-cli 0.149.0`. A new local
 positive/negative regression run completed successfully on 2026-08-24 in
 2m08s, including the stricter profile/evidence contract. This is a fresh
 certification point for 0.149.0, while the older 0.133.0 run history remains
