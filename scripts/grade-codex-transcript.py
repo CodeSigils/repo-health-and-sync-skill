@@ -18,7 +18,7 @@ REQUIRED_OBSERVED_FIELDS = {
     "vcs", "languages", "package_managers", "ci", "shell_files", "recent_commits",
     "gitignore", "version_sources", "script_surface", "reliability_audit_requested", "shipped_payload",
 }
-REQUIRED_INFERRED_FIELDS = {"repo_type", "release_model", "risk_context"}
+REQUIRED_INFERRED_FIELDS = {"repo_type", "risk_context"}
 
 # Request-gated dimensions are not evidence-activated: a set profile path
 # compels activation rather than merely making the dimension eligible.
@@ -303,7 +303,7 @@ def run_self_tests() -> int:
                         "shell_files": False, "recent_commits": False, "gitignore": False,
                         "version_sources": [], "script_surface": "none", "reliability_audit_requested": False, "shipped_payload": "none",
                     },
-                    "inferred": {"repo_type": "library", "release_model": "none", "risk_context": "routine"},
+                    "inferred": {"repo_type": "library", "risk_context": "routine"},
                 },
                 "active_dimensions": [],
                 "skipped_dimensions": [],
@@ -404,7 +404,7 @@ def run_self_tests() -> int:
                             "shell_files": False, "recent_commits": False, "gitignore": False,
                             "version_sources": [], "script_surface": "none", "reliability_audit_requested": False, "shipped_payload": "none",
                         },
-                        "inferred": {"repo_type": "library", "release_model": "none", "risk_context": "routine"},
+                        "inferred": {"repo_type": "library", "risk_context": "routine"},
                     },
                 }
             ]

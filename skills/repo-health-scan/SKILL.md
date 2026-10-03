@@ -6,7 +6,7 @@ description: >-
   filesystem and git history, decide which invariants matter for this
   repository, then report findings with concrete harm and remediation.
   Use when asked to audit, review, assess, or check the health of a repo.
-  Use before a release, archive, handoff, or onboarding session.
+  Use before an archive, handoff, or onboarding session.
   Use when CI is failing and the cause is unclear.
   Use when asked for a reliability, failure-semantics, entry-point, or test-gap
   audit of a repository.
@@ -39,8 +39,8 @@ Four rules govern the scan:
 - Report concrete harm and remediation while keeping sensitive values out of
   commands, transcripts, and findings.
 
-Use this skill before a release, archive, handoff, project revival, unfamiliar-
-repository onboarding, or unclear CI failure. Do not use it for a single-file
+Use this skill before an archive, handoff, project revival, unfamiliar-repository
+onboarding, or unclear CI failure. Do not use it for a single-file
 edit, narrow bug fix, feature implementation, or automatic fixing. Repositories
 without git history receive only a filesystem shape summary. The skill reports
 findings and does not mutate the repository.
@@ -62,7 +62,6 @@ printf 'recent_commits=%s\n' "$(git rev-list --count --max-count=20 HEAD 2>/dev/
 printf 'conventional_subjects=%s\n' "$(git log --format='%s' -20 2>/dev/null | grep -Ec '^(feat|fix|docs|chore|refactor|test|ci|build|perf|revert)(\\([^)]*\\))?!?:' || true)"
 printf 'informative_bodies=%s\n' "$(git log --format='%b' -5 2>/dev/null | grep -Ec '^(what|why):' || true)"
 git status --short --branch
-git tag --list 'v*' --sort=-version:refname | head -5
 base_ref=$(git rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2>/dev/null || true)
 if [ -z "$base_ref" ]; then
   base_ref=$(git for-each-ref --format='%(symref:short)' 'refs/remotes/*/HEAD' | sed -n '1p')
@@ -74,12 +73,11 @@ fi
 
 # What automation exists?
 find .github/workflows -type f \( -name '*.yml' -o -name '*.yaml' \) 2>/dev/null | sort | head -20
-find .github -type f \( -iname '*release*.yml' -o -iname '*release*.yaml' \) 2>/dev/null | sort | head -20
 find . -maxdepth 1 -name '*.sh' 2>/dev/null
 find scripts/ -type f \( -name '*.py' -o -name '*.sh' \) 2>/dev/null | sort | head -20
 
-# What's the dependency surface? A manifest is not automatically a release
-# version source: classify it below before adding it to the profile. In a Git
+# What's the dependency surface? A manifest is not automatically a version
+# source: classify it below before adding it to the profile. In a Git
 # repository, include tracked and non-ignored files so .gitignore is respected;
 # otherwise use a pruned filesystem scan that avoids dependency, cache, and
 # generated trees.
@@ -114,7 +112,6 @@ test -f .gitignore && echo ".gitignore present" || echo "no .gitignore"
 
 # Did the user or environment opt into a conditional check?
 printf 'verify_refs=%s\n' "${REPO_HEALTH_VERIFY_REFS:-0}"
-printf 'verify_releases=%s\n' "${REPO_HEALTH_VERIFY_RELEASES:-0}"
 ```
 
 From this output, form and **emit** a concise structured repo profile before
@@ -140,18 +137,14 @@ observed:
   script_surface: string
   reliability_audit_requested: boolean
   shipped_payload: string
-  tags_present: boolean
   base_ref: string | null
   branch_commits_outside_base: integer | null
   working_tree_dirty: boolean
   workflow_files: [string]
-  release_files: [string]
   verify_refs: boolean
-  verify_releases: boolean
 
 inferred:
   repo_type: string
-  release_model: string
   risk_context: string
 ```
 
@@ -165,15 +158,10 @@ payload) are mandatory. Extended fields are emitted when their probes apply;
 use `null`, `false`, or `[]` when a known extended fact is absent.
 Keep scalar fields canonical (`vcs: git`, `ci: null` when no CI is present,
 `base_ref: null` when no bounded base resolves); put explanations in the
-dimension plan or report, not inside scalar values. `workflow_files` and
-`workflow_files` contain workflow paths, while `release_files` contain only
-paths whose filename or configuration clearly represents release behavior.
-Do not classify every CI workflow as a release file. `version_sources` contains
-only release-relevant exact paths (or the special `git tag` source) that the
-version probe will parse. Do not include a maintainer-only package, test, or
-tooling manifest merely because it has a `version` field. If a package is
-published independently, include its manifest and state that release model in
-`inferred`.
+dimension plan or report, not inside scalar values. `workflow_files` contains
+workflow paths. `version_sources` contains only exact paths that the version
+probe will parse. Do not include a maintainer-only package, test, or tooling
+manifest merely because it has a `version` field.
 
 ## Step 2: Infer what invariants matter
 
@@ -196,16 +184,15 @@ Before running any dimension command, emit a `DIMENSION PLAN` that:
 Keep the dimension plan in its own message, after the profile message and
 before any dimension-specific command or final report.
 
-Use paths such as `observed.ci` or `inferred.release_model`. A recorded request
+Use paths such as `observed.ci` or `observed.gitignore`. A recorded request
 or environment flag may also activate a dimension; an unobserved assumption may
 not.
 
 For built-in dimensions, prefer these canonical activation paths: history uses
 `observed.vcs`; shell correctness uses `observed.shell_files`; version
-alignment uses `observed.version_sources`; tag/release integrity uses
-`inferred.release_model` only when it names concrete tag/release evidence (or
-an observed tag/release file or opt-in flag); commit quality uses
-`observed.recent_commits`; CI efficiency uses `observed.ci`; file coverage uses
+alignment uses `observed.version_sources`; commit quality uses
+`observed.recent_commits`; CI efficiency uses `observed.ci`; file coverage
+uses
 `observed.gitignore`; attribution drift uses a positive
 `observed.branch_commits_outside_base`; and external reference health uses the
 true `observed.verify_refs` opt-in. Cross-platform checks additionally require
@@ -226,33 +213,32 @@ skipped:
 
 ### Candidate Catalog (non-exhaustive)
 
-| Dimension                 | Activated By                                                                                     |
-| ------------------------- | ------------------------------------------------------------------------------------------------ |
-| history_hygiene           | always                                                                                           |
-| shell_correctness         | observed.shell_files                                                                             |
-| version_alignment         | len(observed.version_sources) ≥ 2                                                                |
-| tag_release_integrity     | concrete `inferred.release_model` evidence, observed tags/release files, or verify_releases=true |
-| commit_quality            | observed.recent_commits                                                                          |
-| ci_efficiency             | observed.ci                                                                                      |
-| cross_platform            | observed.shell_files + inferred.platform_requirements                                            |
-| attribution_drift         | observed.branch_commits_outside_base > 0                                                         |
-| file_coverage             | observed.gitignore                                                                               |
-| external_reference_health | env:REPO_HEALTH_VERIFY_REFS=1                                                                    |
-| reliability_test_gaps     | observed.reliability_audit_requested                                                             |
+| Dimension                 | Activated By                                          |
+| ------------------------- | ----------------------------------------------------- |
+| history_hygiene           | always                                                |
+| shell_correctness         | observed.shell_files                                  |
+| version_alignment         | len(observed.version_sources) ≥ 2                     |
+| commit_quality            | observed.recent_commits                               |
+| ci_efficiency             | observed.ci                                           |
+| cross_platform            | observed.shell_files + inferred.platform_requirements |
+| attribution_drift         | observed.branch_commits_outside_base > 0              |
+| file_coverage             | observed.gitignore                                    |
+| external_reference_health | env:REPO_HEALTH_VERIFY_REFS=1                         |
+| reliability_test_gaps     | observed.reliability_audit_requested                  |
 
 Only after emitting the dimension plan, run the smallest command or command
 block that answers each active dimension. Do not run probes for skipped
 dimensions.
 
 **Blocking behavior is contextual.** When a finding represents a genuine
-release blocker (e.g., version drift, secret in tracked file, dirty tree at
-release), report it first and **continue safe read-only checks** for remaining
-active dimensions — do not stop the audit. Stop only when the finding requires
-human remediation before any further probing is meaningful.
+blocker (e.g., version drift, a secret in a tracked file, a dirty tree), report
+it first and **continue safe read-only checks** for remaining active dimensions
+— do not stop the audit. Stop only when the finding requires human remediation
+before any further probing is meaningful.
 
 Safe to continue after a blocker: history_hygiene, file_coverage,
 commit_quality, reliability_test_gaps.
-Pause (may need remediation context): version_alignment, tag_release_integrity, ci_efficiency.
+Pause (may need remediation context): version_alignment, ci_efficiency.
 Skip if tools unavailable: cross_platform (needs shellcheck), external_reference_health (needs gh, opt-in).
 
 **Graceful tool absence.** If an expected tool (`shellcheck`, `gh`, `python3`)
@@ -294,7 +280,7 @@ fi
 # observed.version_sources before running this block. Do not substitute
 # root-only defaults: monorepos, skill packs, and language workspaces commonly
 # keep version metadata in nested or nonstandard files. The parser handles
-# JSON/TOML/CFF/frontmatter/Python assignments and the special git-tag source.
+# JSON/TOML/CFF/frontmatter/Python assignments.
 VERSION_SOURCES="$(printf '%s\n' 'path/from/profile' 'another/path/from/profile')"
 export VERSION_SOURCES
 
@@ -304,16 +290,9 @@ python3 - <<'PY'
 import json
 import os
 import re
-import subprocess
 from pathlib import Path
 
 def extract(path):
-    if path == "git tag":
-        result = subprocess.run(
-            ["git", "tag", "--list", "v*", "--sort=-version:refname"],
-            capture_output=True, text=True, check=False,
-        )
-        return result.stdout.splitlines()[0].removeprefix("v") if result.stdout.strip() else None
     file_path = Path(path)
     try:
         text = file_path.read_text(encoding="utf-8")
@@ -350,14 +329,6 @@ elif len(set(comparable.values())) == 1:
 else:
     print(f"DRIFT: version sources disagree: {list(comparable)}")
 PY
-
-# Tag/release integrity
-git tag --list 'v*' --sort=-version:refname | head -5
-if [ "${REPO_HEALTH_VERIFY_RELEASES:-0}" = "1" ]; then
-  gh release list --limit 5 2>/dev/null || echo "GitHub release query failed"
-else
-  echo "SKIP: GitHub release query requires REPO_HEALTH_VERIFY_RELEASES=1"
-fi
 
 # Commit quality (same as Step 1 — already observed)
 # Just reach a judgment from what you already read
@@ -491,10 +462,7 @@ apply to this repo.
 The dimension plan is the only activation condition. When
 `reliability_test_gaps` is active, extend the evidence-activated scan with this
 focused, read-only review. Do not apply a second test of your own: the review is
-not a code-style pass and not a release-readiness gate, and a request may be
-both
-explicitly reliability-focused and release-related without either canceling the
-other.
+not a code-style pass and not a general readiness gate.
 
 Run the `# Reliability test gaps` probe above first. It discovers maintainer and
 operational documentation, test configuration, executable entry points, and the
@@ -538,9 +506,10 @@ audit permits and it does not mutate the repository. Do not alter tracked inputs
 or manufacture speculative cases.
 
 In the final report, rank confirmed findings with the severity the rest of the
-report uses — blocking for a defect that misleads a user or corrupts a release,
-warning for a real uncovered failure path, info for a documented but unverified
-boundary — and include the exact path and line, the violated contract and user
+report uses — blocking for a defect that misleads a user or corrupts the shipped
+payload, warning for a real uncovered failure path, info for a documented but
+unverified boundary — and include the exact path and line, the violated contract
+and user
 impact, the reproduction or reasoning, and the smallest proposed regression
 test.
 If no finding is confirmed, report `PASS` for the dimension and list the entry

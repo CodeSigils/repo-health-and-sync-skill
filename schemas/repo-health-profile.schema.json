@@ -20,14 +20,11 @@
         "script_surface": { "type": "string" },
         "reliability_audit_requested": { "type": "boolean" },
         "version_sources": { "type": "array", "items": { "type": "string" } },
-        "tags_present": { "type": "boolean" },
         "branch_commits_outside_base": { "type": ["integer", "null"] },
         "working_tree_dirty": { "type": "boolean" },
         "workflow_files": { "type": "array", "items": { "type": "string" } },
-        "release_files": { "type": "array", "items": { "type": "string" } },
         "platform_requirements": { "type": "array", "items": { "type": "string" } },
         "verify_refs": { "type": "boolean" },
-        "verify_releases": { "type": "boolean" },
         "shipped_payload": { "type": "string" },
         "recent_commits": { "type": "boolean" },
         "conventional_subjects": { "type": "integer" },
@@ -39,11 +36,10 @@
     },
     "inferred": {
       "type": "object",
-      "required": ["repo_type", "release_model", "risk_context"],
+      "required": ["repo_type", "risk_context"],
       "additionalProperties": false,
       "properties": {
         "repo_type": { "type": "string" },
-        "release_model": { "type": "string" },
         "risk_context": { "type": "string" }
       }
     }

@@ -16,7 +16,6 @@ DIMENSIONS = {
     "history_hygiene",
     "shell_correctness",
     "version_alignment",
-    "tag_release_integrity",
     "commit_quality",
     "ci_efficiency",
     "cross_platform",

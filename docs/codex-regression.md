@@ -2,9 +2,11 @@
 
 Status: non-blocking maintainer evaluation implemented. The last certified
 baseline is Codex CLI 0.153.2 (runs 13–16). The `reliability_test_gaps` payload
-is **not certified**: it is unobserved, not failing. Earlier versions remain
-historical evidence, and later versions require their own recorded run before
-becoming a claim.
+is **not certified**: it is unobserved, not failing. Dropping the
+`tag_release_integrity` dimension is a material payload change, so runs 13-16
+describe an earlier contract and the baseline for the current contract is
+**unresolved**. Earlier versions remain historical evidence, and later versions
+require their own recorded run before becoming a claim.
 
 Local status: `twenty_two_runs_recorded_current_payload_uncertified_pending_run`.
 Hosted workflow status: `pending_first_run`.
@@ -21,11 +23,11 @@ whether an actual Codex run follows that contract on an isolated repository.
 
 The runner creates a temporary Python library with `uv` metadata, GitHub
 Actions, a repository-local copy of the skill, a narrow parser defect, and one
-untracked release scratch file.
+untracked scratch file.
 
 It executes two read-only scenarios:
 
-1. A release audit that should select `repo-health-scan`, emit the profile before
+1. A repository-health audit that should select `repo-health-scan`, emit the profile before
    dimension checks, account for every dimension, and report the seeded health
    defect with harm and remediation.
 2. A narrow parser task that should not activate the repository-health skill.

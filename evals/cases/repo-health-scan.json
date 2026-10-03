@@ -65,26 +65,21 @@
           "version_sources": [
             "skills/repo-health-scan/SKILL.md",
             ".codex-plugin/plugin.json",
-            "CITATION.cff",
-            "git tag"
+            "CITATION.cff"
           ],
           "script_surface": "maintainer-only",
           "reliability_audit_requested": false,
           "shipped_payload": "single SKILL.md",
           "package_managers": ["uv"],
-          "tags_present": true,
           "base_ref": "origin/main",
           "branch_commits_outside_base": 0,
           "working_tree_dirty": false,
           "workflow_files": [".github/workflows/ci.yml"],
-          "release_files": [".github/workflows/release.yml", ".github/release.yml"],
-          "verify_refs": false,
-          "verify_releases": false
+          "verify_refs": false
         },
         "inferred": {
           "repo_type": "skill-pack",
-          "release_model": "git tag plus Codex plugin",
-          "risk_context": "pre-release"
+          "risk_context": "routine review"
         }
       },
       "expected": {
@@ -105,12 +100,6 @@
             "name": "version_alignment",
             "activated_by": [
               "observed.version_sources"
-            ]
-          },
-          {
-            "name": "tag_release_integrity",
-            "activated_by": [
-              "inferred.release_model"
             ]
           },
           {
@@ -174,18 +163,14 @@
           "script_surface": "none",
           "reliability_audit_requested": false,
           "shipped_payload": "library",
-          "tags_present": false,
           "base_ref": "origin/main",
           "branch_commits_outside_base": 0,
           "working_tree_dirty": false,
           "workflow_files": [".github/workflows/ci.yml"],
-          "release_files": [],
-          "verify_refs": false,
-          "verify_releases": false
+          "verify_refs": false
         },
         "inferred": {
           "repo_type": "library",
-          "release_model": "PyPI package",
           "risk_context": "routine review"
         }
       },
@@ -230,10 +215,6 @@
           {
             "name": "cross_platform",
             "skip_reason": "The profile records no shell surface or platform-specific user requirement."
-          },
-          {
-            "name": "tag_release_integrity",
-            "skip_reason": "The profile contains no tag or release evidence."
           },
           {
             "name": "attribution_drift",
@@ -275,18 +256,14 @@
           "script_surface": "maintainer-only",
           "reliability_audit_requested": false,
           "shipped_payload": "none",
-          "tags_present": false,
           "base_ref": "origin/main",
           "branch_commits_outside_base": 0,
           "working_tree_dirty": false,
           "workflow_files": [".github/workflows/ci.yml"],
-          "release_files": [],
-          "verify_refs": false,
-          "verify_releases": false
+          "verify_refs": false
         },
         "inferred": {
           "repo_type": "monorepo",
-          "release_model": "independent packages",
           "risk_context": "routine review"
         }
       },
@@ -333,10 +310,6 @@
             "skip_reason": "The profile records no shell surface or platform-specific user requirement."
           },
           {
-            "name": "tag_release_integrity",
-            "skip_reason": "The profile contains no tag or release evidence for the workspace root."
-          },
-          {
             "name": "attribution_drift",
             "skip_reason": "No unreleased branch commits or attribution policy appears in the profile."
           },
@@ -368,18 +341,14 @@
           "script_surface": "none",
           "reliability_audit_requested": false,
           "shipped_payload": "documentation",
-          "tags_present": false,
           "base_ref": "origin/main",
           "branch_commits_outside_base": 0,
           "working_tree_dirty": false,
           "workflow_files": [".github/workflows/ci.yml"],
-          "release_files": [],
-          "verify_refs": false,
-          "verify_releases": false
+          "verify_refs": false
         },
         "inferred": {
           "repo_type": "documentation",
-          "release_model": "git tags",
           "risk_context": "handoff"
         }
       },
@@ -424,10 +393,6 @@
             "skip_reason": "The profile records no shell surface or platform-specific user requirement."
           },
           {
-            "name": "tag_release_integrity",
-            "skip_reason": "The profile contains no tag or release evidence."
-          },
-          {
             "name": "attribution_drift",
             "skip_reason": "No unreleased branch commits or attribution policy appears in the profile."
           },
@@ -463,19 +428,15 @@
           "script_surface": "maintainer-only",
           "reliability_audit_requested": false,
           "shipped_payload": "single SKILL.md",
-          "tags_present": false,
           "base_ref": null,
           "branch_commits_outside_base": null,
           "working_tree_dirty": false,
           "workflow_files": [],
-          "release_files": [],
-          "verify_refs": false,
-          "verify_releases": false
+          "verify_refs": false
         },
         "inferred": {
           "repo_type": "skill-pack",
-          "release_model": "git tags",
-          "risk_context": "pre-release"
+          "risk_context": "routine review"
         }
       },
       "expected": {
@@ -515,10 +476,6 @@
           {
             "name": "ci_efficiency",
             "skip_reason": "The profile records no CI configuration."
-          },
-          {
-            "name": "tag_release_integrity",
-            "skip_reason": "No observed tags, release workflow, release manifest, or release verification opt-in."
           },
           {
             "name": "cross_platform",
@@ -562,17 +519,13 @@
           "reliability_audit_requested": true,
           "shipped_payload": "library",
           "working_tree_dirty": true,
-          "tags_present": false,
           "base_ref": "origin/main",
           "branch_commits_outside_base": 0,
           "workflow_files": [".github/workflows/ci.yml"],
-          "release_files": [],
-          "verify_refs": false,
-          "verify_releases": false
+          "verify_refs": false
         },
         "inferred": {
           "repo_type": "library",
-          "release_model": "PyPI package",
           "risk_context": "active development"
         }
       },
@@ -622,10 +575,6 @@
           }
         ],
         "skipped_dimensions": [
-          {
-            "name": "tag_release_integrity",
-            "skip_reason": "No observed tags, release workflow, release manifest, or release verification opt-in."
-          },
           {
             "name": "cross_platform",
             "skip_reason": "No macOS or BSD user evidence appears in the profile."

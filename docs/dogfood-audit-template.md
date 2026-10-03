@@ -26,15 +26,12 @@ observed:
   version_sources: []
   script_surface: ""
   shipped_payload: ""
-  tags_present: false
   base_ref: null
   working_tree_dirty: false
   workflow_files: []
-  release_files: []
   tool_availability: {}
 inferred:
   repo_type: ""
-  release_model: ""
   risk_context: ""
 ```
 

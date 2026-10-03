@@ -70,10 +70,9 @@
                     "type": "object",
                     "properties": {
                       "repo_type": { "type": "string" },
-                      "release_model": { "type": "string" },
                       "risk_context": { "type": "string" }
                     },
-                    "required": ["repo_type", "release_model", "risk_context"],
+                    "required": ["repo_type", "risk_context"],
                     "additionalProperties": false
                   }
                 },

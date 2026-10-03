@@ -325,7 +325,7 @@ def prepare_fixture(root: Path) -> None:
 
     # Seed a visible health finding after the clean baseline commit.
     (root / "scratch.txt").write_text(
-        "untracked release scratch file\n", encoding="utf-8"
+        "untracked scratch file\n", encoding="utf-8"
     )
 
 

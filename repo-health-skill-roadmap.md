@@ -354,7 +354,6 @@ observed:
 
 inferred:
   repo_type:
-  release_model:
   risk_context:
 ```
 
@@ -362,7 +361,6 @@ Activate optional modules only from Step 1 evidence:
 
 | Module     | Activation Evidence                                                 | Maximum Fields |
 | ---------- | ------------------------------------------------------------------- | -------------: |
-| `release`  | Tag, changelog, registry, container, or release workflow.           |              6 |
 | `agent`    | Skill, plugin manifest, or agent instruction file.                  |              6 |
 | `monorepo` | Workspace manifest or multiple packages/services.                   |              6 |
 | `security` | Security policy, scanning, permissions, secrets, or signing policy. |              6 |

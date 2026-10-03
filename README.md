@@ -155,7 +155,6 @@ Optional behavior is explicit:
 
 | Variable                        | Effect                                                       |
 | ------------------------------- | ------------------------------------------------------------ |
-| `REPO_HEALTH_VERIFY_RELEASES=1` | Allow the GitHub release query for tag/release integrity.    |
 | `REPO_HEALTH_VERIFY_REFS=1`     | Allow network checks for external references.                |
 | `REPO_HEALTH_OUTPUT=jsonl`      | Emit automation-oriented JSONL instead of the normal report. |
 
