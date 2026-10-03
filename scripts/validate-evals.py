@@ -324,6 +324,18 @@ def run_self_tests() -> int:
             for error in validate_case(unsatisfied)
         ), f"{name} activation is not enforced"
 
+    one_version_source = copy.deepcopy(valid)
+    one_version_source["fixtures"][0]["profile"]["observed"]["version_sources"] = [
+        ".codex-plugin/plugin.json"
+    ]
+    one_version_source["fixtures"][0]["expected"]["active_dimensions"].append(
+        {"name": "version_alignment", "activated_by": ["observed.version_sources"]}
+    )
+    assert any(
+        "active dimension version_alignment is not activated by the profile" in error
+        for error in validate_case(one_version_source)
+    ), "version_alignment must require at least two version sources"
+
     # And a satisfied profile must not produce the error.
     satisfied = copy.deepcopy(valid)
     satisfied["fixtures"][0]["profile"]["observed"].update(
