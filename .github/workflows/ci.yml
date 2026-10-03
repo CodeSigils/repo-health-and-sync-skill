@@ -50,7 +50,7 @@ jobs:
       - name: Python script lint
         run: uv run --locked ruff check scripts/ skills/
       - name: Shell script lint
-        run: shellcheck scripts/*.sh
+        run: shellcheck scripts/*.sh .githooks/*
       - name: Check Python workflow parity
         run: python3 scripts/check-python-range-parity.py
       - name: Check cross-agent portability
