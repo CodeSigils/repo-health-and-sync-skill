@@ -114,8 +114,9 @@ if [ "$MODE" = "" ]; then
     check "Security and trust contract" python3 scripts/check-trust.py
     check "Workflow parity" python3 scripts/check-python-range-parity.py
 
-    # Shellcheck on all .sh files
-    sh_count=$(find . -name '*.sh' -not -path './.git/*' | wc -l)
+    # Shellcheck on all .sh files and the git hooks. Hooks carry no .sh
+    # suffix, so a name filter alone would skip the direct-push gate.
+    sh_count=$(find . \( -name '*.sh' -o -path './.githooks/*' \) -not -path './.git/*' -type f | wc -l)
     if [ "$sh_count" -gt 0 ]; then
         err=0
         while IFS= read -r -d '' f; do
@@ -123,7 +124,7 @@ if [ "$MODE" = "" ]; then
                 echo "  SC_FAIL $f"
                 err=$((err + 1))
             fi
-        done < <(find . -name '*.sh' -not -path './.git/*' -print0)
+        done < <(find . \( -name '*.sh' -o -path './.githooks/*' \) -not -path './.git/*' -type f -print0)
         if [ "$err" -eq 0 ]; then
             echo "  PASS  shellcheck: $sh_count file(s) clean"
             PASS=$((PASS + 1))
