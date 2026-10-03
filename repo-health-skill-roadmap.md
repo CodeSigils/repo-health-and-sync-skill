@@ -289,7 +289,7 @@ These items are intentionally outside the current Codex-first milestone:
 | Organization-wide scanner and dashboard                       | Single-repository JSONL behavior is executable and evaluated, not only instructional.                              |
 | Generic CI integration guide                                  | A real agent runtime and failure policy are selected.                                                              |
 | Hosted Codex Action activation                                | A maintainer has API-key billing and wants scheduled GitHub-hosted model runs.                                     |
-| `CHANGELOG.md`                                                | Release cadence makes a changelog more useful than GitHub release notes alone.                                     |
+| `CHANGELOG.md`                                                | A release cadence is reintroduced; a changelog is then more useful than commit history alone.                       |
 
 No deferred item should appear in README as verified support before its own
 fixture or compatibility report exists. Apply the claim levels, thin-adapter

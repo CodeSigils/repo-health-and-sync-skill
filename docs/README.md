@@ -35,7 +35,8 @@ files are runtime dependencies of the installed skill.
 2. Run the fast verification commands listed there.
 3. If `SKILL.md` behavior or trigger boundaries changed, run the optional local
    Codex regression.
-4. For a release, follow the tagged-release procedure in `maintaining.md`.
+4. Before publishing a change to the payload, smoke-test the install as
+   described in [maintaining.md](maintaining.md#smoke-testing-a-change).
 
 The root [README](../README.md) is the user-facing overview. `AGENTS.md` is
 only a routing layer; it points maintainers here and does not duplicate these

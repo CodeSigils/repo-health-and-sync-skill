@@ -18,7 +18,7 @@ Choose the smallest path that matches the change:
 | ---------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
 | Docs, CI, schemas, or maintainer scripts | Make the change, then run the fast verification checklist.                                                 |
 | `SKILL.md` wording or behavior           | Apply the change, run the fast checklist, then run the local Codex regression.                             |
-| Release                                  | Align versions, pass CI for the release commit, then follow the release process below.                     |
+| Version fields                           | Update `SKILL.md`, `plugin.json`, and `CITATION.cff` together; see [Releases](#releases).                  |
 | Agent support claim                      | Update the relevant compatibility report and portability evidence; do not broaden claims from one runtime. |
 | Bot or dependency update                 | Read [automation-identities.md](automation-identities.md), inspect the diff and required checks, then use the fast checklist. |
 | Change a public support or release claim  | Update [claim-evidence-matrix.md](claim-evidence-matrix.md) and its owning evidence report in the same change.               |
@@ -214,7 +214,7 @@ the check deliberately rather than editing one field.
 
 ### Smoke-testing a change
 
-The procedure the release process used is still the right way to confirm an
+The procedure previously used for releases is still the right way to confirm an
 install works. Run it in an isolated temporary directory for each claimed host
 after a change to the payload, layout, or install documentation:
 

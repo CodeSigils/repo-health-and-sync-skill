@@ -143,7 +143,7 @@ def check_url(
     request = urllib.request.Request(
         url,
         method="GET",
-        headers={"User-Agent": "repo-health-and-sync-skill-url-check"},
+        headers={"User-Agent": "repo-health-scan-url-check"},
     )
 
     try:

@@ -1,4 +1,4 @@
-"""Shared utilities for repo-health-and-sync-skill scripts."""
+"""Shared utilities for repo-health-scan scripts."""
 
 from __future__ import annotations
 

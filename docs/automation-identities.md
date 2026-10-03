@@ -9,7 +9,7 @@ runtime dependency of the installed skill.
 | Identity | What it can do here | What it cannot establish |
 | --- | --- | --- |
 | `dependabot[bot]` | Open scheduled dependency-update pull requests from `.github/dependabot.yml`. | That an update is semantically safe, compatible with this methodology, or ready to merge without review. |
-| `github-actions[bot]` | Act through a workflow's `GITHUB_TOKEN`; this repository uses `contents: read` by default. The release job alone has `contents: write` to create a GitHub Release. | Approval, bypass of branch protection, or authority beyond the job's explicit permissions. |
+| `github-actions[bot]` | Act through a workflow's `GITHUB_TOKEN`; no workflow in this repository requests write access to repository contents, and only `dependency-backlog` adds `pull-requests: write`. | Approval, bypass of branch protection, or authority beyond the job's explicit permissions. |
 | Codex regression | Uses an OpenAI API secret only when the feature flag enables the scheduled or manual job; it runs in a read-only sandbox. | A deterministic release gate or permission to change repository state. |
 
 Dependabot-triggered pull-request workflows are treated like fork workflows:

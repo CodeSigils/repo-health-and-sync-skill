@@ -65,7 +65,7 @@ The GitHub repository was renamed to `CodeSigils/repo-health-scan`, local
 - Skills CLI lists exactly `repo-health-scan` from the new repository URL.
 - Codex and Claude Code isolated installs contain the expected `SKILL.md`.
 - No stale old repository or directory URLs remain outside this migration note.
-- CI, release verification, security links, and schema identifiers use the
+- CI, verification, security links, and schema identifiers use the
   canonical repository URL.
 - A compatibility report records source commit, CLI version, host, installed
   path, and result.

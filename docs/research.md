@@ -307,7 +307,7 @@ core without requiring profile modules.
 | Repository | Evidence and findings | Module need |
 | --- | --- | --- |
 | `zero-md-formatter` | Node/npm package with CI, release tags, and publishing. `npm test` passed (11 unit suites and 34 integration tests). CI covers Node 24/26, packed-package smoke testing, audit, links, and tag-gated publishing. | None; CI, release, version, history, and package dimensions were sufficient. |
-| `py-review-skill` | Python/uv skill repo with CI, release workflow, validators, fixtures, and `unittest` suites across Python 3.12–3.14. A local `pytest` attempt was correctly inapplicable because pytest is not declared and tests use `unittest`. | None; tool absence was distinguishable from a repository failure. |
+| `py-review-skill` | Python/uv skill repo with CI, validators, fixtures, and `unittest` suites across Python 3.12–3.14. A local `pytest` attempt was correctly inapplicable because pytest is not declared and tests use `unittest`. | None; tool absence was distinguishable from a repository failure. |
 | `learning-path` | Private instruction-only prototype with no commits and an entirely untracked tree. README and roadmap clearly mark Gate 1 as pending. | None; the core exposes provenance, dirty-tree, and missing-CI risk without a module. |
 
 **Decision:** Keep profile modules deferred. These audits produced actionable

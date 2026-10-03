@@ -98,7 +98,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: >-
           python3 scripts/check-version-consistency.py
-          --require-github-release-query --allow-release-prep
+          --require-github-release-query
 
   full-verify:
     runs-on: ubuntu-latest
@@ -124,9 +124,9 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - name: Phase B — Pre-release health check
+      - name: Commit range and tree check
         run: |
-          echo "=== Phase B: Pre-release health check ==="
+          echo "=== Commit range and tree check ==="
           echo "Checking commit range: ${COMMIT_RANGE}"
           if ! git diff --name-only "${COMMIT_RANGE}" >/dev/null; then
             echo "BLOCKING: commit range is invalid or unavailable"
@@ -147,9 +147,9 @@ jobs:
             exit 1
           fi
           echo "PASS: commit range and tree are clean"
-      - name: Phase B — Commit subject convention check
+      - name: Commit subject convention check
         run: |
-          echo "=== Phase B: Commit subject convention check ==="
+          echo "=== Commit subject convention check ==="
           echo "Generated merge commits are excluded; authored commits remain subject to the convention."
           python3 scripts/check-commit-convention.py --range "${COMMIT_RANGE}"
 

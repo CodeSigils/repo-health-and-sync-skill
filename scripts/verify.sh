@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# verify.sh — Consistency check for the repo-health-and-sync-skill repo
+# verify.sh — Consistency check for the repo-health-scan repo
 #
 # Minimal checks for a methodology-only skill repo. No sync infrastructure,
 # no reference drift checks, no script duplication checks.

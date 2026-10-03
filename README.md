@@ -214,7 +214,7 @@ Install above).
 │   ├── portability-contract.md       # Cross-agent portability guarantees
 │   ├── compatibility-reports/
 │   │   └── codex.md                  # Compatibility evidence for Codex CLI
-│   ├── maintaining.md                # Release and maintenance procedures
+│   ├── maintaining.md                # Contributor workflow and verification commands
 │   ├── automation-identities.md       # Bot authority and review boundaries
 │   ├── claim-evidence-matrix.md        # Evidence behind public support claims
 │   ├── decisions.md                  # Architecture decision records
@@ -287,8 +287,7 @@ tracked state are separate: `.gitignore` cannot protect a file already in Git.
   payload, thin adapters, and per-runtime certification
 - [Growth roadmap](repo-health-skill-roadmap.md) — verified scope and ordered
   follow-ups
-- [Maintainer guide](docs/maintaining.md) — repository verification and release
-  workflow
+- [Maintainer guide](docs/maintaining.md) — repository verification
 - [CodeSigils/agents-markdown-formatter](https://github.com/CodeSigils/agents-markdown-formatter) — GFM/MDX formatter with structural guards
 
 ---
