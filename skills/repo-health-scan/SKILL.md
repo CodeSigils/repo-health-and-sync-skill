@@ -159,8 +159,13 @@ Keep scalar fields canonical (`vcs: git`, `ci: null` when no CI is present,
 `base_ref: null` when no bounded base resolves); put explanations in the
 dimension plan or report, not inside scalar values. `workflow_files` contains
 workflow paths. `version_sources` contains only exact paths that the version
-probe will parse. Do not include a maintainer-only package, test, or tooling
-manifest merely because it has a `version` field.
+probe can parse and that claim one distribution boundary: either one
+distributable unit, or a version-aligned release group whose members ship
+under a shared version. Listing those paths together is what declares the
+group; no separate field records it. Do not include a maintainer-only package,
+test, or tooling manifest merely because it has a `version` field. A lone
+plugin-manifest version is valid metadata but is not an alignment target;
+record it alone and skip version alignment.
 
 ## Step 2: Infer what invariants matter
 
@@ -276,10 +281,14 @@ fi
 
 # Version alignment
 # Set VERSION_SOURCES to the exact newline-delimited paths recorded in
-# observed.version_sources before running this block. Do not substitute
-# root-only defaults: monorepos, skill packs, and language workspaces commonly
-# keep version metadata in nested or nonstandard files. The parser handles
-# JSON/TOML/CFF/frontmatter/Python assignments.
+# observed.version_sources before running this block. Each path must be
+# parseable and fall inside one distribution boundary: one distributable unit,
+# or a version-aligned release group whose members ship under a shared version.
+# Do not pair independent plugin metadata with package metadata merely because
+# both have a `version` field.
+# Do not substitute root-only defaults: monorepos, skill packs, and language
+# workspaces commonly keep version metadata in nested or nonstandard files. The
+# parser handles JSON/TOML/CFF/frontmatter/Python assignments.
 VERSION_SOURCES="$(printf '%s\n' 'path/from/profile' 'another/path/from/profile')"
 export VERSION_SOURCES
 

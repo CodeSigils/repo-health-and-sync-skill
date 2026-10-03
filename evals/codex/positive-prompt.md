@@ -12,9 +12,11 @@ Follow the selected workflow exactly:
    extended fields such as base, workflow, and opt-in state when
    those probes apply. Use `null`, `false`, or `[]` when a known fact is
    absent; keep explanations out of scalar fields.
-   Include only paths the version probe will parse in `version_sources`; do not
-   treat a maintainer-only `pyproject.toml` or test manifest as a version source
-   merely because it declares `version`.
+   Include only paths the version probe will parse and that fall inside one
+   distribution boundary—one distributable unit, or a version-aligned release
+   group whose members ship under a shared version—in `version_sources`; do
+   not treat a maintainer-only `pyproject.toml`, test manifest, or independent
+   plugin manifest as a version source merely because it declares `version`.
    Use this shape as a starting point before adding any prose:
 
    ```yaml
