@@ -2,9 +2,7 @@ cff-version: 1.2.0
 message: "If you use this work in your research, please cite it as below."
 authors:
   - family-names: "CodeSigils"
-title: "Repo Health and Sync Skill"
-version: 0.4.0
-date-released: 2026-09-03
+title: "Repo Health Scan"
 license: MIT
 type: software
 repository-code: https://github.com/CodeSigils/repo-health-scan
