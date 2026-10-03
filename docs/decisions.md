@@ -86,27 +86,6 @@ defined in `docs/portability-contract.md`.
 
 ---
 
-## CI API Authentication Is Separate From Commit Signing
-
-**Decision:** Pass the job-scoped `${{ github.token }}` to GitHub CLI as
-`GH_TOKEN` for release queries. Keep SSH commit and tag signing as a separate
-provenance policy.
-
-**Why:** `gh release list` calls the GitHub API and needs API authorization.
-An SSH signature proves who signed a git object; it does not authorize API
-requests. The workflow grants only `contents: read`, which is sufficient for
-the read-only release query and keeps the token scoped to the job.
-
-**Evidence:** GitHub's `GITHUB_TOKEN` authentication guide explicitly configures
-GitHub CLI through `GH_TOKEN`. GitHub's signing documentation describes SSH as
-a mechanism for cryptographically signing commits and tags. Sources accessed
-2026-07-13:
-
-- https://docs.github.com/en/actions/tutorials/authenticate-with-github_token
-- https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits
-
----
-
 ## Single-file payload
 
 **Decision:** `skills/repo-health-scan/SKILL.md` is the only runtime
