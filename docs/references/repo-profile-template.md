@@ -39,7 +39,7 @@ inferred:
 | `shell_files` | `find . -name '*.sh'` | `true` / `false` |
 | `recent_commits` | `git rev-list --count --max-count=20 HEAD` | `true` if >0 |
 | `gitignore` | `test -f .gitignore` | `true` / `false` |
-| `version_sources` | File paths with version fields | `["pyproject.toml", "SKILL.md"]` |
+| `version_sources` | File paths with version fields | `["pyproject.toml", "package.json"]` |
 | `script_surface` | `find scripts/`, root `*.sh` | `"maintainer-only Python + shell"` |
 | `shipped_payload` | Skill discovery | `"single SKILL.md"` |
 | `branch_commits_outside_base` | bounded base comparison | integer or `null` |
@@ -66,7 +66,7 @@ observed:
   shell_files: true
   recent_commits: true
   gitignore: true
-  version_sources: ["skills/repo-health-scan/SKILL.md", ".codex-plugin/plugin.json", "CITATION.cff"]
+  version_sources: [".codex-plugin/plugin.json", "skills/example/SKILL.md"]
   script_surface: "maintainer-only Python + shell"
   shipped_payload: "single SKILL.md"
   base_ref: "origin/main"

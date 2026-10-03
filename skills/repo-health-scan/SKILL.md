@@ -318,7 +318,7 @@ def extract(path):
 sources = [item for item in os.environ.get("VERSION_SOURCES", "").splitlines() if item and not item.startswith("path/")]
 values = {source: extract(source) for source in sources}
 unreadable = [source for source, value in values.items() if value is None]
-comparable = {source: value.removeprefix("v") for source, value in values.items() if value is not None}
+comparable = {source: value for source, value in values.items() if value is not None}
 if unreadable:
     print(f"UNREADABLE: {unreadable}")
 if len(comparable) < 2:
