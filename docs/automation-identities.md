@@ -64,13 +64,15 @@ For every bot-authored PR:
    action SHA.
 3. Check that required CI is green and that the PR has not changed workflow
    permissions, triggers, or secret use unexpectedly.
-4. Merge only a narrow, understood change. Close superseded PRs; GitHub may
-   delete the merged branch according to repository settings.
+4. Merge only a narrow, understood change, then close any superseded pull
+   requests. The merge command deletes the head branch; nothing removes it
+   automatically.
 
-Do not add auto-merge, `pull_request_target`, write permissions for pull
-requests, or a workflow that approves its own changes merely to remove this
-review step. Each would require a concrete repeated failure mode and a separate
-security review.
+Auto-merge is disabled and `delete_branch_on_merge` is off, so a merge keeps
+its head branch unless the merge command deletes it. Do not enable auto-merge,
+`pull_request_target`, write permissions for pull requests, or a workflow that
+approves its own changes merely to remove this review step. Each would require
+a concrete repeated failure mode and a separate security review.
 
 ## Source and scope notes
 

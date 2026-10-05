@@ -170,6 +170,20 @@ automatic approval or merge. A green dependency PR establishes that the
 configured checks passed; it does not establish semantic safety or authorize a
 permissions change.
 
+Auto-merge is disabled on this repository, so the prohibition is enforced by
+configuration rather than by convention. Merge a reviewed pull request
+client-side, which also removes the head branch without depending on repository
+settings:
+
+```
+gh pr merge <number> --squash --delete-branch
+```
+
+Auto-merge was disabled on 2026-10-05. Re-enabling it needs the concrete
+repeated failure mode and separate security review that
+[automation-identities.md](automation-identities.md) describes, recorded in
+[control-justification-ledger.md](control-justification-ledger.md).
+
 See [codex-regression.md](codex-regression.md) for artifacts, grading, and the
 current evidence boundary.
 
